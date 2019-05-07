@@ -1,7 +1,5 @@
 package us.redshift.timesheet.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,11 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "projects")
+@Table(name = "pss_projects")
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = "tasks")
 public class Project extends BaseEntity {
 
     @Column(nullable = false, unique = true)
@@ -34,11 +31,11 @@ public class Project extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectStatus status = ProjectStatus.PENDING;
+    private ProjectStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectType type = ProjectType.FIXED;
+    private ProjectType type;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -53,20 +50,32 @@ public class Project extends BaseEntity {
     private Date endedOn;
 
     @ElementCollection(targetClass = Long.class)
-    @JoinTable(name = "projects_employee")
+    @JoinTable(name = "pss_projects_employee")
     private Set<Long> employeeId = new HashSet<>();
 
-    @ManyToOne
+    private Long managerId;
+
+    @ManyToOne()
     @JoinColumn(name = "client_id", nullable = false)
-    @JsonIgnoreProperties(value = {"projects"})
     private Client client;
 
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "rate_card_id")
-    @JsonIgnoreProperties("project")
     private RateCard rateCard;
 
-//    @JsonIgnoreProperties("project")
+    public void setStatus(ProjectStatus status) {
+        if (status == null)
+            status = ProjectStatus.INACTIVE;
+        this.status = status;
+    }
+
+    public void setType(ProjectType type) {
+        if (type == null)
+            type = ProjectType.FIXED_BID;
+        this.type = type;
+    }
+
+    //    @JsonIgnoreProperties("project")
 //    @OneToMany(mappedBy = "project",
 //            cascade = CascadeType.ALL)
 //    private List<Task> tasks = new ArrayList<>();

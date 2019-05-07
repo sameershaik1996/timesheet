@@ -2,19 +2,18 @@ package us.redshift.timesheet.service;
 
 import us.redshift.timesheet.domain.TaskCard;
 
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 public interface ITaskCardService {
 
-    TaskCard saveTaskCard(TaskCard taskCard);
+    List<TaskCard> saveTaskCard(List<TaskCard> taskCards);
 
-    TaskCard updateTaskCard(TaskCard taskCard);
-
-    List<TaskCard> getAllTaskCard();
+    List<TaskCard> updateTaskCard(List<TaskCard> taskCards);
 
     TaskCard getTaskCard(Long id);
 
-    List<TaskCard> copyTaskCards(Instant dateFrom, Instant dateTo);
+    List<TaskCard> getAllTaskCardByPagination(int page, int limits, String orderBy, String... fields);
+
+    void deleteTaskCardById(Long id);
+
 }

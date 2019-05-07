@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "task_card_details")
+@Table(name = "pss_task_card_details")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class TaskCardDetail extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    private Long hours;
+    private BigDecimal hours;
 
     @Enumerated(EnumType.STRING)
     private TimeSheetStatus status;
@@ -27,9 +28,14 @@ public class TaskCardDetail extends BaseEntity {
 
     private String rejectedComment;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "task_card_id", nullable = false)
-    @JsonIgnoreProperties({"taskCardDetails"})
+    @ManyToOne(cascade = {CascadeType.MERGE})
+    @JoinColumn(name = "task_card_id")
+    @JsonIgnoreProperties(value = {"taskCardDetails"})
     private TaskCard taskCard;
 
+    public void setStatus(TimeSheetStatus status) {
+        if (status == null)
+            status = TimeSheetStatus.PENDING;
+        this.status = status;
+    }
 }

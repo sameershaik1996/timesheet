@@ -1,10 +1,7 @@
 package us.redshift.timesheet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,6 +17,7 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class BaseEntity implements Serializable {
 
     @Id
@@ -37,4 +35,8 @@ public class BaseEntity implements Serializable {
     @JsonIgnoreProperties(value = "updatedAt")
     private Instant updatedAt;
 
+
+    public BaseEntity(Long id) {
+        this.id = id;
+    }
 }

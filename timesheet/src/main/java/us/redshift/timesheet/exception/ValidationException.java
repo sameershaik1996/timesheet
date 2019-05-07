@@ -10,10 +10,8 @@ import java.io.Serializable;
 @Getter
 public class ValidationException extends RuntimeException implements Serializable {
 
-    private String msg;
 
     public ValidationException(String msg) {
-        super(String.format("%s", msg));
-        this.msg = msg;
+        super(msg);
     }
 }

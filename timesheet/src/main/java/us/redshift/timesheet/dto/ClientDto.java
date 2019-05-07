@@ -1,35 +1,28 @@
 package us.redshift.timesheet.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import us.redshift.timesheet.domain.ClientStatus;
 
-import java.time.Instant;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientDto {
+@ToString
+public class ClientDto extends BaseDto {
 
-    private Long id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private String name;
-    private String email;
-    private ClientStatus status = ClientStatus.ACTIVE;
-    private Integer phoneNumber;
+
+    private List<PocDto> pocs;
+    private String url;
+    private ClientStatus status;
     private String domain;
     private String specialization;
     private String offering;
     private String about;
-    private String address;
-    private Long countryCode;
-    private Long stateCode;
-    private Set<ProjectDto> projects;
-
-
+    private String address1;
+    private String address2;
+    private String state;
+    private String country;
+    private String zipCode;
 }

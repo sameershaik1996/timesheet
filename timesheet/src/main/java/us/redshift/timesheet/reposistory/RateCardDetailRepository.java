@@ -5,5 +5,7 @@ import us.redshift.timesheet.domain.RateCardDetail;
 
 public interface RateCardDetailRepository extends JpaRepository<RateCardDetail, Long> {
 
-//    RateCardDetail findByRatecardIdAndLocationIdAndSkillIdAndDesignationId(Long rateCardId, Long locationId, Long skillId, Long designationId);
+
+    RateCardDetail findByRateCard_IdAndLocationIdAndSkillIdAndDesignationId(Long rateCardId, Long locationId, Long skillId, Long designationId);
+
 }

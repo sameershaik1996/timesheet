@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "rate_card_details", uniqueConstraints = {@UniqueConstraint(columnNames = {"skill_id", "designation_id", "location_id"})})
+@Table(name = "pss_rate_card_details")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,16 +17,16 @@ public class RateCardDetail extends BaseEntity {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal value;
-    @Column(name = "skill_id")
+    @Column(name = "skill_id", nullable = false)
     private Long skillId;
-    @Column(name = "designation_id")
+    @Column(name = "designation_id", nullable = false)
     private Long designationId;
-    @Column(name = "location_id")
+    @Column(name = "location_id", nullable = false)
     private Long locationId;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "rate_card_id", nullable = false)
-    @JsonIgnoreProperties({"rateCard", "rateCardDetails"})
+    @JsonIgnoreProperties(value = {"rateCardDetails"}, allowSetters = true)
     private RateCard rateCard;
 
 }

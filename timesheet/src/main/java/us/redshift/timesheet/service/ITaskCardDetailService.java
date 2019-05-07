@@ -10,7 +10,9 @@ public interface ITaskCardDetailService {
 
     TaskCardDetail updateTaskCardDetail(TaskCardDetail taskCardDetail);
 
-    List<TaskCardDetail> getAllTaskCardDetail();
+    List<TaskCardDetail> getTaskCardTaskCardDetailsByPagination(Long taskCardId, int page, int limits, String orderBy, String... fields);
 
     TaskCardDetail getTaskCardDetail(Long id);
+
+    void deleteTaskCardDetailById(Long id);
 }

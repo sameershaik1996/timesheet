@@ -1,17 +1,15 @@
 package us.redshift.timesheet.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import us.redshift.timesheet.domain.TaskCard;
 import us.redshift.timesheet.domain.TimeSheet;
 import us.redshift.timesheet.service.ITimeSheetService;
 
 import javax.validation.Valid;
-import javax.xml.ws.Response;
-import java.util.List;
 
 @RestController
-@RequestMapping("timeSheet/v1/api/")
+@RequestMapping("timesheet/v1/api/")
 public class TimeSheetController {
 
     private final ITimeSheetService timeSheetService;
@@ -20,26 +18,23 @@ public class TimeSheetController {
         this.timeSheetService = timeSheetService;
     }
 
-    @PostMapping("timeSheet/save")
-    public TimeSheet saveTimeSheet(@Valid @RequestBody TimeSheet timeSheet) {
-        return timeSheetService.saveTimeSheet(timeSheet);
+    @PostMapping("timesheet/save")
+    public ResponseEntity<?> saveTimeSheet(@Valid @RequestBody TimeSheet timeSheet) {
+        return new ResponseEntity<>(timeSheetService.saveTimeSheet(timeSheet), HttpStatus.CREATED);
     }
 
-    @PutMapping("timeSheet/update")
-    public TimeSheet updateTimeSheet(@Valid @RequestBody TimeSheet timeSheet) {
-        return timeSheetService.updateTimeSheet(timeSheet);
+    @PutMapping("timesheet/update")
+    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody TimeSheet timeSheet, @RequestParam("status") String status) {
+        return new ResponseEntity<>(timeSheetService.updateTimeSheet(timeSheet, status), HttpStatus.OK);
     }
 
-    @GetMapping({"timeSheet/"})
-    public List<TimeSheet> getAllTimeSheet() {
-        return timeSheetService.getAllTimeSheet();
+    @GetMapping({"timesheet/"})
+    public ResponseEntity<?> getAllTimeSheetByPagination(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) {
+        return new ResponseEntity<>(timeSheetService.getAllTimeSheetByPagination(page, limits, orderBy, fields), HttpStatus.OK);
     }
 
-    @GetMapping("timeSheet/{id}")
-    public TimeSheet getTimeSheet(@PathVariable(value = "id") Long id) {
-        return timeSheetService.getTimeSheet(id);
+    @GetMapping("timesheet/{id}")
+    public ResponseEntity<?> getTimeSheet(@PathVariable(value = "id") Long id) {
+        return new ResponseEntity<>(timeSheetService.getTimeSheet(id), HttpStatus.OK);
     }
-
-
-
 }

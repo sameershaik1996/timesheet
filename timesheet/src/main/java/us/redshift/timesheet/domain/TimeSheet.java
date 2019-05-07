@@ -8,10 +8,11 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "timesheets")
+@Table(name = "pss_timesheets")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,9 +24,11 @@ public class TimeSheet extends BaseEntity {
     private String comment;
 
     @Enumerated(EnumType.STRING)
-    private TimeSheetStatus status = TimeSheetStatus.SUBMITTED;
+    private TimeSheetStatus status;
 
-    private Long approverId;
+    private Long approvedBy;
+
+    private Long submittedBy;
 
     @Temporal(TemporalType.DATE)
     private Date fromDate;
@@ -34,14 +37,19 @@ public class TimeSheet extends BaseEntity {
     private Date toDate;
 
 
-    @JsonIgnoreProperties("timeSheet")
+    @JsonIgnoreProperties(value = "timeSheet")
     @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.MERGE})
-    private List<TaskCard> taskCards;
+    private Set<TaskCard> taskCards = new HashSet<>();
 
-    public void add(TaskCard taskCard) {
-        this.taskCards.add(taskCard);
-        taskCard.setTimeSheet(this);
+//    public void add(TaskCard taskCard) {
+//        taskCard.setTimeSheet(this);
+//        this.taskCards.add(taskCard);
+//    }
 
+    public void setStatus(TimeSheetStatus status) {
+        if (status == null)
+            status = TimeSheetStatus.SUBMITTED;
+        this.status = status;
     }
 
 }

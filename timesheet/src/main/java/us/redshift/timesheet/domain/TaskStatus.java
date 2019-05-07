@@ -1,5 +1,5 @@
 package us.redshift.timesheet.domain;
 
 public enum TaskStatus {
-    PENDING, COMPLETE
+    UNASSIGNED, ACTIVE, ON_HOLD, COMPLETE
 }

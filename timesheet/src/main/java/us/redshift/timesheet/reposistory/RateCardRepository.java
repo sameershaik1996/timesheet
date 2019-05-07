@@ -5,5 +5,4 @@ import us.redshift.timesheet.domain.RateCard;
 
 public interface RateCardRepository extends JpaRepository<RateCard, Long> {
 
-
 }

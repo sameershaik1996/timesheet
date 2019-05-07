@@ -1,5 +1,5 @@
 package us.redshift.timesheet.domain;
 
 public enum ProjectStatus {
-    PENDING, COMPLETE
+    INACTIVE, ACTIVE, ON_HOLD, COMPLETE
 }

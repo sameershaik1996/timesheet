@@ -13,4 +13,6 @@ public interface IRateCardService {
     List<RateCard> getAllRateCard();
 
     RateCard getRateCard(Long id);
+
+
 }

@@ -9,9 +9,9 @@ public interface ITimeSheetService {
 
     TimeSheet saveTimeSheet(TimeSheet timeSheet);
 
-    TimeSheet updateTimeSheet(TimeSheet timeSheet);
+    TimeSheet updateTimeSheet(TimeSheet timeSheet, String status);
 
-    List<TimeSheet> getAllTimeSheet();
+    List<TimeSheet> getAllTimeSheetByPagination(int page, int limits, String orderBy, String... fields);
 
     TimeSheet getTimeSheet(Long id);
 }

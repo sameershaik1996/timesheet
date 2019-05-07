@@ -8,11 +8,11 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "task_cards")
+@Table(name = "pss_task_cards")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +23,7 @@ public class TaskCard extends BaseEntity {
     private TimeSheetStatus status;
 
     @Enumerated(EnumType.STRING)
-    private TaskType type = TaskType.BILLABLE;
+    private TaskType type;
 
     private Long employeeId;
     private Long skillId;
@@ -33,28 +33,39 @@ public class TaskCard extends BaseEntity {
 
     private BigDecimal amount;
 
+    private BigDecimal hours;
+
 
     private String comment;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "task_id", nullable = false)
+    @JoinColumn(name = "task_id")
     private Task task;
 
     @OneToMany(mappedBy = "taskCard",
             cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("taskCard")
-    private List<TaskCardDetail> taskCardDetails = new ArrayList<>();
+    @JsonIgnoreProperties(value = "taskCard")
+    private Set<TaskCardDetail> taskCardDetails = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties("taskCards")
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "time_sheet_id")
     private TimeSheet timeSheet;
 
     public void add(TaskCardDetail taskCardDetail) {
         this.taskCardDetails.add(taskCardDetail);
         taskCardDetail.setTaskCard(this);
+    }
 
+    public void setStatus(TimeSheetStatus status) {
+        if (status == null)
+            status = TimeSheetStatus.PENDING;
+        this.status = status;
+    }
 
+    public void setType(TaskType type) {
+        if (type == null)
+            type = TaskType.BILLABLE;
+        this.type = type;
     }
 
 }

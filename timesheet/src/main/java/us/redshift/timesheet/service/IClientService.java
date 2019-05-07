@@ -1,7 +1,7 @@
 package us.redshift.timesheet.service;
 
 import us.redshift.timesheet.domain.Client;
-import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.domain.ClientStatus;
 
 import java.util.List;
 
@@ -12,8 +12,10 @@ public interface IClientService {
 
     Client updateClient(Client client);
 
-    List<Client> getAllClient();
+    Client getClientById(Long id);
 
-    Client getClient(Long id);
+    List<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields);
 
+
+    ClientStatus[] getAllClientStatus();
 }

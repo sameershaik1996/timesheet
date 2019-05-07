@@ -1,6 +1,7 @@
 package us.redshift.timesheet.service;
 
 import us.redshift.timesheet.domain.Project;
+import us.redshift.timesheet.domain.ProjectStatus;
 
 import java.util.List;
 
@@ -9,14 +10,18 @@ public interface IProjectService {
 
     Project saveProject(Project project);
 
-    Project saveProject(Long clientId, Project project);
+    Project saveProjectByClientId(Long clientId, Project project);
 
     Project updateProject(Project project);
 
-    List<Project> getAllProject();
+    Project getProjectId(Long id);
 
-    Project getProject(Long id);
+    List<Project> getAllProjectByPagination(int page, int limits, String orderBy, String... fields);
 
-    List<Project> getClientProject(Long clientId);
+    List<Project> getClientProjectsByPagination(Long clientId, int page, int limits, String orderBy, String... fields);
+
+    List<Project> findAllByEmployeeId(Long employeeId);
+
+    ProjectStatus[] getAllProjectStatus();
 
 }

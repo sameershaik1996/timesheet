@@ -23,14 +23,18 @@ public class RateCardService implements IRateCardService {
 
     @Override
     public RateCard saveRateCard(RateCard rateCard) {
-        Set<RateCardDetail> cardDetails = new HashSet<>(rateCard.getRateCardDetails());
-        cardDetails.forEach(cardDetail -> rateCard.addRateCardDetail(cardDetail));
+        Set<RateCardDetail> rateCardDetails = new HashSet<>(rateCard.getRateCardDetails());
+        rateCardDetails.forEach(cardDetail -> {
+            rateCard.addRateCardDetail(cardDetail);
+        });
         return rateCardRepository.save(rateCard);
     }
 
     @Override
     public RateCard updateRateCard(RateCard rateCard) {
         rateCardRepository.findById(rateCard.getId()).orElseThrow(() -> new ResourceNotFoundException("RateCard", "Id", rateCard.getId()));
+        List<RateCardDetail> cardDetails = new ArrayList<>(rateCard.getRateCardDetails());
+        cardDetails.forEach(cardDetail -> rateCard.addRateCardDetail(cardDetail));
         return rateCardRepository.save(rateCard);
     }
 
@@ -45,4 +49,6 @@ public class RateCardService implements IRateCardService {
     public RateCard getRateCard(Long id) {
         return rateCardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("RateCard", "Id", id));
     }
+
+
 }

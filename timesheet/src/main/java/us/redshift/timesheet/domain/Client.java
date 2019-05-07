@@ -1,45 +1,61 @@
 package us.redshift.timesheet.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
-@Table(name = "clients")
+@Table(name = "pss_clients")
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = "projects")
+@AllArgsConstructor
+@ToString
 public class Client extends BaseEntity {
 
 
-    @Column(nullable = false)
     @Size(max = 32)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    @Size(max = 64)
-    private String email;
+    @JsonIgnoreProperties(value = "poc")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
+    private Set<Poc> pocs = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ClientStatus status = ClientStatus.ACTIVE;
+    private ClientStatus status;
 
-    @Column(nullable = false, unique = true)
-    private Integer phoneNumber;
+    private String url;
     private String domain;
     private String specialization;
     private String offering;
     private String about;
-    private String address;
+    private String address1;
+    private String address2;
+    private String state;
+    private String Country;
+    private String zipCode;
 
-    private Long countryCode;
-    private Long stateCode;
+    public Client(Long id) {
+        super(id);
+    }
+
+
+    public void setStatus(ClientStatus status) {
+        if (status == null)
+            status = ClientStatus.ACTIVE;
+        this.status = status;
+    }
+
+    public void addPoc(Poc poc) {
+        poc.setClient(this);
+        pocs.add(poc);
+    }
+
 
 //    //    @JsonManagedReference
 //    @JsonIgnoreProperties(value = "client")

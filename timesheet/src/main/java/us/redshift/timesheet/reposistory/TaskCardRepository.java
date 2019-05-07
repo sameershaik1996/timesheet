@@ -1,21 +1,26 @@
 package us.redshift.timesheet.reposistory;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import us.redshift.timesheet.domain.TaskCard;
-import us.redshift.timesheet.domain.TimeSheetStatus;
-
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
 
 public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
 
+
+    Page<TaskCard> findAll(Pageable pageable);
+
+
+    @Transactional
     @Modifying
-    @Query(value = "SELECT * FROM Task_Cards t join Task_card_Details t1 on t.id=t1.task_card_id where t1.date between ? and ? group by t.id ",nativeQuery = true)
-    public List<TaskCard> findByDateBetween(Instant start, Instant end);
+    @Query(value = "UPDATE pss_task_cards SET status=?1 WHERE id = ?2", nativeQuery = true)
+    int setStatusForTaskCard(String status, Long id);
 
-    //public List<TaskCard> setStatus(TimeSheetStatus status);
-
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE pss_task_cards SET time_sheet_id=?1 WHERE id = ?2", nativeQuery = true)
+    int setTimeSheetIdForTaskCard(Long timeSheetId, Long id);
 }

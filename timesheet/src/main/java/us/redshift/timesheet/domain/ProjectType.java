@@ -1,5 +1,5 @@
 package us.redshift.timesheet.domain;
 
 public enum ProjectType {
-    FIXED
+    FIXED_BID, TIME_AND_MONEY
 }
