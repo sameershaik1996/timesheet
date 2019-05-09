@@ -1,5 +1,6 @@
 package us.redshift.employee;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import us.redshift.employee.domain.Employee;
 
 
 import javax.annotation.PostConstruct;
@@ -23,7 +25,11 @@ import java.util.TimeZone;
 @EnableFeignClients
 @EnableDiscoveryClient
 @ComponentScan("us.redshift")
-@EnableJpaAuditing
+@EntityScan(basePackageClasses = {
+		EmployeeApplication.class,
+		Jsr310JpaConverters.class
+})
+
 public class EmployeeApplication {
 
 	@Value( "${spring.jackson.time-zone}" )
@@ -39,7 +45,9 @@ public class EmployeeApplication {
 
 	@Bean("mapper")
 	public ModelMapper modelMapper() {
-		return new ModelMapper();
+		ModelMapper mapper=new ModelMapper();
+		mapper.typeMap(Employee.class,Employee.class).setPropertyCondition(Conditions.isNotNull());
+		return mapper;
 	}
 
 

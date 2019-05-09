@@ -1,13 +1,14 @@
 package us.redshift.timesheet.service;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.Client;
 import us.redshift.timesheet.domain.Project;
 import us.redshift.timesheet.domain.ProjectStatus;
 import us.redshift.timesheet.domain.RateCardDetail;
+import us.redshift.timesheet.dto.SkillDto;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.feignclient.EmployeeFeign;
 import us.redshift.timesheet.reposistory.ClientRepository;
 import us.redshift.timesheet.reposistory.ProjectRepository;
 import us.redshift.timesheet.util.Reusable;
@@ -21,13 +22,13 @@ public class ProjectService implements IProjectService {
 
     private final ProjectRepository projectRepository;
     private final ClientRepository clientRepository;
-    private final ModelMapper mapper;
+    private final EmployeeFeign employeeFeign;
 
 
-    public ProjectService(ProjectRepository projectRepository, ClientRepository clientRepository, ModelMapper mapper) {
+    public ProjectService(ProjectRepository projectRepository, ClientRepository clientRepository, EmployeeFeign employeeFeign) {
         this.projectRepository = projectRepository;
         this.clientRepository = clientRepository;
-        this.mapper = mapper;
+        this.employeeFeign = employeeFeign;
     }
 
     @Override
@@ -54,7 +55,7 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public Project getProjectId(Long id) {
+    public Project getProjectById(Long id) {
         return projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", id));
 
     }
@@ -74,8 +75,18 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public List<Project> findAllByEmployeeId(Long employeeId) {
-        return projectRepository.findAllByEmployeeId(employeeId);
+    public List<Project> findAllByEmployeeId(Long employeeId, ProjectStatus status) {
+        return projectRepository.findAllByEmployeeIdAndStatus(employeeId, status);
+    }
+
+    @Override
+    public Set<SkillDto> findAllSkillsByProjectId(Long projectId) {
+
+        if (!projectRepository.existsById(projectId))
+            throw new ResourceNotFoundException("Project", "Id", projectId);
+
+        Set<Long> ids = projectRepository.findById(projectId).get().getEmployeeId();
+        return employeeFeign.getAllSkillByEmployeeIds(ids).getBody();
     }
 
     @Override

@@ -7,9 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
@@ -27,47 +32,47 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@NoArgsConstructor
-public class JwtAuthenticationFilter extends GenericFilterBean {
 
 
+public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
+
+    @Autowired
     private JwtTokenProvider tokenProvider;
 
-    public  JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider)
-    {
-        this.tokenProvider=jwtTokenProvider;
-
-    }
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
 
     @Override
-    public void doFilter(final ServletRequest req,
-                         final ServletResponse res,
-                         final FilterChain chain) throws IOException, ServletException {
-        final HttpServletRequest request = (HttpServletRequest) req;
-        System.out.println(request.getContextPath());
-        if(!request.getContextPath().contains("swagger-ui.html")) {
-            final String token = getJwtFromRequest(request); // The part after "Bearer "
-            try {
-                // LOGGER.info(token);
-                if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-                    User user = tokenProvider.getUserDetails(token);
-                    req.setAttribute("details", user);
-                    //LOGGER.info(user.toString());
-                } else {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-                }
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String jwt = getJwtFromRequest(request);
 
-            } catch (final Exception e) {
-                e.printStackTrace();
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+                LOGGER.info(jwt);
+                User user = tokenProvider.getUserDetails(jwt);
+                request.setAttribute("details", user);
+                //Long userId = tokenProvider.getUserIdFromJWT(jwt);
+
+                UserDetails userDetails = UserPrincipal.create(user);
+                System.out.println(user.toString());
+
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            logger.error("Could not set user authentication in security context", ex);
         }
-        chain.doFilter(req, res);
+
+        filterChain.doFilter(request, response);
     }
+
+
+
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");

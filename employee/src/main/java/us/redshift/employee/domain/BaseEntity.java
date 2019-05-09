@@ -4,11 +4,16 @@ package us.redshift.employee.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -26,13 +31,21 @@ public class BaseEntity implements Serializable {
     @CreatedDate
     @JsonIgnoreProperties(allowGetters = true)
     @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    private Instant createdTimeStamp;
 
     @JsonIgnoreProperties(allowGetters = true)
     @LastModifiedDate
     @Column(nullable = false)
-    private Instant updatedAt;
+    private Instant updatedTimeStamp;
 
+    @CreatedBy
+    @Column(nullable = true,updatable = false)
+    private Long createdBy;
+
+
+    @LastModifiedBy
+    @Column(nullable = true)
+    private Long updatedBy;
 
 
 

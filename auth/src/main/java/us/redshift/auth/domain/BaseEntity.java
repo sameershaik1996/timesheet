@@ -29,11 +29,25 @@ public class BaseEntity implements Serializable {
     @CreatedDate
     @JsonIgnoreProperties(allowGetters = true)
     @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    private Instant createdTimeStamp;
 
     @JsonIgnoreProperties(allowGetters = true)
     @LastModifiedDate
     @Column(nullable = false)
-    private Instant updatedAt;
+    private Instant updatedTimeStamp;
+
+
+    @Column(nullable = true,updatable = false)
+    private Long createdBy;
+
+    @Column(nullable = true)
+    private Long updatedBy;
+
+
+
+
+
+
+
 
 }

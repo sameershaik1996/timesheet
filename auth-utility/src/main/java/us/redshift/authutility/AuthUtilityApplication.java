@@ -38,12 +38,12 @@ public class AuthUtilityApplication {
 		return registrationBean;
 	}
 
+*/
 
-
-	@Bean("modelMapper")
+	@Bean()
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
-	}*/
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(AuthUtilityApplication.class, args);

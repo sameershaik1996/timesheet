@@ -14,19 +14,28 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProjectDto extends BaseDto {
 
-
+    @NonNull
+    private String projectCode;
+    @NonNull
+    private String name;
     private String description;
-    private Double estimatedHour;
+    @NonNull
+    private Long estimatedDays;
+    @NonNull
     private Double estimatedCost;
+    @NonNull
     private ProjectStatus status;
+    @NonNull
     private ProjectType type;
     private Date startDate;
     private Date endDate;
     private Date startedOn;
     private Date endedOn;
-    private Set<BaseDto> employees;
-    private BaseDto manager;
+    @NonNull
+    private Set<EmployeeListDto> employees;
+    private EmployeeListDto manager;
     @NonNull
     private ClientListDto client;
     private RateCard rateCard;
+
 }

@@ -15,7 +15,7 @@ public class TestController {
     @RequestMapping("/api/test")
     public void Test(  HttpServletRequest req){
         User user= (User)req.getAttribute("details");
-        System.out.println(provider.getJwtSecret());
+        System.out.println(user.toString());
 
     }
 }

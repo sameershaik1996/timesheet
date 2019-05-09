@@ -1,9 +1,6 @@
 package us.redshift.timesheet.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import us.redshift.timesheet.domain.ClientStatus;
 
 import java.util.List;
@@ -14,6 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ClientListDto extends BaseDto {
 
+    @NonNull
+    private String clientCode;
+    private String name;
     private List<PocDto> pocs;
     private ClientStatus status;
+    private String domain;
+    private String specialization;
 }

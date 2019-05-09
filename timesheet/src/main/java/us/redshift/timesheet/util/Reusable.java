@@ -5,6 +5,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
 
 public class Reusable {
 
@@ -25,5 +30,28 @@ public class Reusable {
 
     public static BigDecimal multiplyRates(BigDecimal hours, BigDecimal ratePerHours) {
         return hours.multiply(ratePerHours);
+    }
+
+    public static LocalDate calcEndDate(final LocalDate startDate, final Long estimatedDays) {
+
+
+        if (estimatedDays < 1) {
+            return startDate;
+        }
+        LocalDate endDate = startDate;
+        int addedDays = 1;
+        while (addedDays < estimatedDays) {
+            endDate = endDate.plusDays(1);
+
+            if (!isWeekEnd(endDate)) {
+                addedDays++;
+            }
+        }
+        return endDate;
+    }
+
+    private static boolean isWeekEnd(LocalDate date) {
+        DayOfWeek dow = date.getDayOfWeek();
+        return dow == SATURDAY || dow == SUNDAY;
     }
 }

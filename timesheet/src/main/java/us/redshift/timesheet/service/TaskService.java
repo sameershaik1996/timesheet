@@ -29,17 +29,14 @@ public class TaskService implements ITaskService {
     @Override
     public Task saveTask(Task task) {
         Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
-//        taskValidate(project, task);
-        System.out.println(project.getStartDate());
-        System.out.println(task.getStartDate());
+        taskValidate(project, task);
         return taskRepository.save(task);
     }
 
     @Override
     public Task saveTaskByProjectId(Long projectId, Task task) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", projectId));
-//        taskValidate(project, task);
-//        task.setProject(project);
+        taskValidate(project, task);
         return taskRepository.save(task);
     }
 
@@ -48,7 +45,7 @@ public class TaskService implements ITaskService {
         if (!taskRepository.existsById(task.getId()))
             throw new ResourceNotFoundException("Task", "Id", task.getId());
         Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
-//        taskValidate(project, task);
+        taskValidate(project, task);
         return taskRepository.save(task);
     }
 
@@ -77,16 +74,17 @@ public class TaskService implements ITaskService {
     }
 
     private void taskValidate(Project project, Task task) {
-        if (project.getStartDate().compareTo(task.getStartDate()) > 0) {
-            throw new ValidationException("The Task Start Date should  be greater then or equal the Project Start Date");
-        }
 
-        if (project.getEndDate().compareTo(task.getStartDate()) < 0) {
-            throw new ValidationException("The Task Start Date should not be greater then the Project End Date");
-        }
-
-        if (project.getEndDate().compareTo(task.getEndDate()) < 0) {
-            throw new ValidationException("The Task End Date should not be greater then the Project End Date");
+        if (project.getStartDate() != null && project.getEndDate() != null && task.getStartDate() != null && task.getEndDate() != null) {
+            if (project.getStartDate().compareTo(task.getStartDate()) > 0) {
+                throw new ValidationException("The Task Start Date should  be greater then or equal the Project Start Date");
+            }
+            if (project.getEndDate().compareTo(task.getStartDate()) < 0 || project.getEndDate().compareTo(task.getEndDate()) < 0) {
+                throw new ValidationException("The Task Start Date / End Date should not be greater then the Project End Date");
+            }
+            if (task.getStartDate().compareTo(task.getEndDate()) > 0) {
+                throw new ValidationException("The Task Start Date should not be greater then the Task End Date");
+            }
         }
     }
 

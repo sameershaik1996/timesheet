@@ -33,4 +33,8 @@ public enum ClientStatus {
     public String getStatus() {
         return status;
     }
+
+    public static Map<String, ClientStatus> getLookup() {
+        return lookup;
+    }
 }

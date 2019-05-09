@@ -35,11 +35,11 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
-    public JwtTokenProvider(String jwtSecret,int jwtExpirationInMs,ModelMapper mapper){
+   /* public JwtTokenProvider(String jwtSecret,int jwtExpirationInMs,ModelMapper mapper){
         this.jwtExpirationInMs=jwtExpirationInMs;
         this.jwtSecret=jwtSecret;
         this.mapper=mapper;
-    }
+    }*/
 
 
     public Long getUserIdFromJWT(String token) {

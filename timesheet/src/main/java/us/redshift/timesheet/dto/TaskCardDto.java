@@ -18,15 +18,16 @@ import java.util.Set;
 public class TaskCardDto extends BaseDto {
 
 
+    private String name;
     private TimeSheetStatus status;
     private TaskType type;
-    private BaseDto employeeId;
-    private BaseDto skillId;
-    private BaseDto locationId;
+    private CommonDto employee;
+    private SkillDto skill;
+    private CommonDto locationId;
     private BigDecimal ratePerHour;
     private BigDecimal amount;
     private BigDecimal hours;
     private String comment;
-    private BaseDto task;
+    private TaskListDto task;
     private Set<TaskCardDetail> taskCardDetails;
 }

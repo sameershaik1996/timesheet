@@ -2,8 +2,10 @@ package us.redshift.employee.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import us.redshift.employee.domain.common.Address;
+import us.redshift.employee.domain.common.Gender;
+import us.redshift.employee.domain.common.MaritalStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -18,6 +20,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "designation")
+
 public class Employee extends BaseEntity implements Serializable {
 
     @Column(name="first_name",nullable = false)
@@ -30,9 +33,16 @@ public class Employee extends BaseEntity implements Serializable {
     private String lastName;
 
 
+    @Column(nullable =false,unique = true,updatable = false)
+    private String employeeId;
+
     @Column(name="dob",nullable = false)
     @Temporal(TemporalType.DATE)
     private Date dob;
+
+    @Column(nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date anniversaryDate;
 
     @Email
     @Column(name="email_id",nullable = false,unique = true)
@@ -52,9 +62,9 @@ public class Employee extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private MaritalStatus maritalStatus;
 
-    @JsonProperty("aadhar_ssn_number")
-    @Column(nullable=true,unique = true)
-    private String aadharSsnNumber;
+   // @JsonProperty("aadhar_ssn_number")
+    //@Column(nullable=true,unique = true)
+    //private String aadharSsnNumber;
 
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -63,11 +73,10 @@ public class Employee extends BaseEntity implements Serializable {
     private Designation designation;
 
 
-    @Column(name="timesheet_approver_id",nullable=true)
-    private Long approverId;
+    @Column(name="reporting_Manager",nullable=true)
+    private Long reportingManager;
 
-   // @Column(name="leave_approver_id",nullable=true)
-    //private Long leaveApproverId;
+
 
     @Column(name="joining_date",nullable = false)
     @Temporal(TemporalType.DATE)
@@ -77,6 +86,8 @@ public class Employee extends BaseEntity implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date resignationDate;
 
+    @Column(nullable = false)
+    private Boolean status=Boolean.TRUE;
 
     @JsonIgnoreProperties(value="employees")
     @ManyToMany
@@ -86,5 +97,8 @@ public class Employee extends BaseEntity implements Serializable {
     private List<Skill> skills = new ArrayList<>();
 
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="address_id")
+    private Address address;
 
 }

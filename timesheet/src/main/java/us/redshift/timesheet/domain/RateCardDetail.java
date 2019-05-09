@@ -24,7 +24,7 @@ public class RateCardDetail extends BaseEntity {
     @Column(name = "location_id", nullable = false)
     private Long locationId;
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne()
     @JoinColumn(name = "rate_card_id", nullable = false)
     @JsonIgnoreProperties(value = {"rateCardDetails"}, allowSetters = true)
     private RateCard rateCard;

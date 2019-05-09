@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,8 +17,10 @@ import java.util.Set;
 @ToString
 public class Client extends BaseEntity {
 
+    @Column(nullable = false, unique = true)
+    private String clientCode;
 
-    @Size(max = 32)
+    @Column(nullable = false)
     private String name;
 
     @JsonIgnoreProperties(value = "poc")
@@ -28,32 +29,27 @@ public class Client extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ClientStatus status;
-
     private String url;
     private String domain;
     private String specialization;
     private String offering;
     private String about;
-    private String address1;
-    private String address2;
-    private String state;
-    private String Country;
-    private String zipCode;
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "address_id")
+    private Address address;
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "billing_address_id")
+    private Address billingAddress;
 
-    public Client(Long id) {
-        super(id);
+    public void addPoc(Poc poc) {
+        poc.setClient(this);
+        pocs.add(poc);
     }
-
 
     public void setStatus(ClientStatus status) {
         if (status == null)
             status = ClientStatus.ACTIVE;
         this.status = status;
-    }
-
-    public void addPoc(Poc poc) {
-        poc.setClient(this);
-        pocs.add(poc);
     }
 
 

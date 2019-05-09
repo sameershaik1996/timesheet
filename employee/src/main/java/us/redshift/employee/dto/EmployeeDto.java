@@ -1,10 +1,9 @@
 package us.redshift.employee.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import us.redshift.employee.domain.Gender;
-import us.redshift.employee.domain.MaritalStatus;
+import us.redshift.employee.domain.common.Gender;
+import us.redshift.employee.domain.common.MaritalStatus;
 
 import java.io.Serializable;
 import java.util.Date;

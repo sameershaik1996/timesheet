@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 
 @Entity
 @Table(name = "pss_pocs")
@@ -16,6 +17,7 @@ public class Poc extends BaseEntity {
 
     private String name;
     private String phoneNumber;
+    @Email
     private String email;
 
 

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import us.redshift.employee.domain.Skill;
 import us.redshift.employee.repository.SkillRepository;
+import us.redshift.employee.service.IEmployeeService;
 import us.redshift.employee.service.ISkillService;
 
 import javax.validation.Valid;
@@ -20,6 +21,8 @@ public class SkillController {
     @Autowired
     private ISkillService skillService;
 
+    @Autowired
+    private IEmployeeService employeeService;
 
     @PostMapping("/save")
     public ResponseEntity<?> createSkill(@Valid @RequestBody Skill skill){
@@ -46,8 +49,14 @@ public class SkillController {
     }
 
     @GetMapping("ids")
-    public ResponseEntity<?> getSkillByIds(@RequestParam(value = "id") List<Long> id){
+    public ResponseEntity<?> getSkillByIds(@RequestParam(value = "id",required = false) List<Long> id){
 
         return new ResponseEntity<>(skillService.getSkillByIds(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/employee")
+    public ResponseEntity<?> getSkillByEmployeeId(@RequestParam(value = "id",required = false) List<Long> id){
+
+        return new ResponseEntity<>(skillService.findByEmployeesIn(employeeService.getEmployeeByIds(id)), HttpStatus.OK);
     }
 }

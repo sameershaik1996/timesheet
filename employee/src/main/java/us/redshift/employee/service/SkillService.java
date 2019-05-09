@@ -2,12 +2,14 @@ package us.redshift.employee.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.Skill;
 import us.redshift.employee.repository.SkillRepository;
 
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Transactional
@@ -38,5 +40,10 @@ public class SkillService implements ISkillService {
     @Override
     public List<Skill> getSkillByIds(List<Long> id) {
         return skillRepository.findByIdIn(id);
+    }
+
+    @Override
+    public Set<Skill> findByEmployeesIn(List<Employee> employeeByIds) {
+        return skillRepository.findByEmployeesIn(employeeByIds);
     }
 }

@@ -9,4 +9,9 @@ public interface EmployeeRespository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByIdIn(List<Long> id);
 
+    Employee findTopByOrderByIdDesc();
+
+
+
+
 }

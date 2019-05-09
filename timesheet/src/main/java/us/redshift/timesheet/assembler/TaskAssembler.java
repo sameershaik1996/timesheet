@@ -8,10 +8,8 @@ import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.Client;
 import us.redshift.timesheet.domain.Project;
 import us.redshift.timesheet.domain.Task;
-import us.redshift.timesheet.dto.BaseDto;
-import us.redshift.timesheet.dto.ProjectTaskListDto;
-import us.redshift.timesheet.dto.TaskDto;
-import us.redshift.timesheet.dto.TaskListDto;
+import us.redshift.timesheet.dto.*;
+import us.redshift.timesheet.feignclient.EmployeeFeign;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
@@ -24,69 +22,105 @@ import java.util.stream.Collectors;
 public class TaskAssembler {
 
     private final ModelMapper mapper;
+    private final EmployeeFeign employeeFeign;
 
-    public TaskAssembler(ModelMapper mapper) {
+    public TaskAssembler(ModelMapper mapper, EmployeeFeign employeeFeign) {
         this.mapper = mapper;
+        this.employeeFeign = employeeFeign;
 
-//      BaseDto to Long set
-        Converter<Set<BaseDto>, Set<Long>> BaseToLongSet = mappingContext -> {
 
-            Set<BaseDto> source = new HashSet<>();
+//      EmployeeListDto to Long set
+        Converter<Set<EmployeeListDto>, Set<Long>> EmployeeToLongSet = mappingContext -> {
+
+            Set<EmployeeListDto> source = new HashSet<>();
             if (mappingContext.getSource() != null)
                 source = mappingContext.getSource();
 
-//            Set<Long> dest = new HashSet<>();
-//            source.forEach(baseDto -> {
-//                dest.add(baseDto.getId());
-//            });
-
-            Set<Long> dest = source.stream().map(baseDto -> baseDto.getId()).collect(Collectors.toSet());
+            Set<Long> dest = source.stream().map(employeeListDto -> employeeListDto.getId()).collect(Collectors.toSet());
             return dest;
         };
 
-//      adding BaseDto to long set conversion property
+//      SkillDto to Long set
+        Converter<Set<SkillDto>, Set<Long>> SkillToLongSet = mappingContext -> {
+
+            Set<SkillDto> source = new HashSet<>();
+            if (mappingContext.getSource() != null)
+                source = mappingContext.getSource();
+
+            Set<Long> dest = source.stream().map(skillDto -> skillDto.getId()).collect(Collectors.toSet());
+            return dest;
+        };
+
+//      adding EmployeeListDto to long set conversion property
         mapper.addMappings(new PropertyMap<TaskDto, Task>() {
             protected void configure() {
-                using(BaseToLongSet).map(source.getEmployees()).setEmployeeId(null);
-                using(BaseToLongSet).map(source.getSkills()).setSkillId(null);
+                using(EmployeeToLongSet).map(source.getEmployees()).setEmployeeId(null);
+                using(SkillToLongSet).map(source.getSkills()).setSkillId(null);
             }
         });
 
-//      Long to BaseDto set
-        Converter<Set<Long>, Set<BaseDto>> LongToBaseSet = mappingContext -> {
+//      Long to EmployeeListDto set
+        Converter<Set<Long>, Set<EmployeeListDto>> LongToEmployeeSet = mappingContext -> {
             Set<Long> source = new HashSet<>();
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
             }
-            Set<BaseDto> dest = source.stream().map(id -> new BaseDto(id, "")).collect(Collectors.toSet());
+
+//          Feign Client Call to get EmployeeDto
+            Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+            Type targetType = new TypeToken<Set<EmployeeListDto>>() {
+            }.getType();
+
+//          Convert EmployeeDto to EmployeeListDto
+            Set<EmployeeListDto> dest = mapper.map(employees, targetType);
             return dest;
         };
 
-//      adding long to BaseDto set conversion property
+//      Long to SkillDto set
+        Converter<Set<Long>, Set<SkillDto>> LongToSkillSet = mappingContext -> {
+            Set<Long> source = new HashSet<>();
+            if (mappingContext.getSource() != null) {
+                source = mappingContext.getSource();
+            }
+
+//          Feign Client Call to get SkillDto
+            Set<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source).getBody();
+
+            return dest;
+        };
+
+//      adding long to EmployeeListDto set conversion property
         mapper.addMappings(new PropertyMap<Task, TaskDto>() {
             protected void configure() {
-                using(LongToBaseSet).map(source.getEmployeeId()).setEmployees(null);
-                using(LongToBaseSet).map(source.getSkillId()).setSkills(null);
+                using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
+                using(LongToSkillSet).map(source.getSkillId()).setSkills(null);
             }
         });
 
 
-//      Project to BaseDto
-        Converter<Project, BaseDto> projectToBase =
-                project -> {
-                    return new BaseDto(project.getSource().getId(), project.getSource().getName());
-                };
-//      Client to BaseDto
-        Converter<Client, BaseDto> clientToBase =
-                client -> {
-                    return new BaseDto(client.getSource().getId(), client.getSource().getName());
+//      Project to CommonDto
+        Converter<Project, CommonDto> projectToCommon =
+                mappingContext -> {
+                    Project source = new Project();
+                    if (mappingContext.getSource() != null)
+                        source = mappingContext.getSource();
+                    return new CommonDto(source.getId(), source.getName());
                 };
 
-//      adding toBase Property
+//      Client to CommonDto
+        Converter<Client, CommonDto> clientToCommon =
+                mappingContext -> {
+                    Client source = new Client();
+                    if (mappingContext.getSource() != null)
+                        source = mappingContext.getSource();
+                    return new CommonDto(source.getId(), source.getName());
+                };
+
+//      adding to Common Property
         mapper.addMappings(new PropertyMap<Task, ProjectTaskListDto>() {
             protected void configure() {
-                using(projectToBase).map(source.getProject()).setProject(null);
-                using(clientToBase).map(source.getProject().getClient()).setClient(null);
+                using(projectToCommon).map(source.getProject()).setProject(null);
+                using(clientToCommon).map(source.getProject().getClient()).setClient(null);
             }
         });
 

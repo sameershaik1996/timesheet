@@ -18,13 +18,16 @@ import java.util.Set;
 public class Project extends BaseEntity {
 
     @Column(nullable = false, unique = true)
+    private String projectCode;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal estimatedHour;
+    @Column(nullable = false)
+    private Long estimatedDays;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal estimatedCost;
@@ -49,10 +52,12 @@ public class Project extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private Date endedOn;
 
+    @Column(nullable = false)
     @ElementCollection(targetClass = Long.class)
-    @JoinTable(name = "pss_projects_employee")
+    @JoinTable(name = "pss_project_employees")
     private Set<Long> employeeId = new HashSet<>();
 
+    @Column(nullable = false)
     private Long managerId;
 
     @ManyToOne()
@@ -74,6 +79,7 @@ public class Project extends BaseEntity {
             type = ProjectType.FIXED_BID;
         this.type = type;
     }
+
 
     //    @JsonIgnoreProperties("project")
 //    @OneToMany(mappedBy = "project",

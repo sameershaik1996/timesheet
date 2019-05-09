@@ -17,12 +17,14 @@ import java.util.Set;
 public class ProjectListDto extends BaseDto {
 
 
+    private String projectCode;
+    private String name;
     private ProjectStatus status;
     private ProjectType type;
     private Date startDate;
     private Date endDate;
-    private Set<BaseDto> employees;
-    private BaseDto manager;
-    private BaseDto client;
+    private Set<EmployeeListDto> employees;
+    private EmployeeListDto manager;
+    private CommonDto client;
 
 }

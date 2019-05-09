@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PocDto extends BaseDto {
+    private String name;
     private String email;
     private String phoneNumber;
 }

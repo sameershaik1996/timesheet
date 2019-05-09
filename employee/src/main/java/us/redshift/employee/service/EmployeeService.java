@@ -19,9 +19,11 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public Employee createEmployee(Employee employee) {
-
+        Employee emp=employeeRespository.findTopByOrderByIdDesc();
+        employee.setEmployeeId(generateEmployeeId(emp));
         return employeeRespository.save(employee);
     }
+
 
     @Override
     public Employee updateEmployee(Employee employee) {
@@ -47,4 +49,20 @@ public class EmployeeService implements IEmployeeService {
     public List<Employee> getEmployeeByIds(List<Long> id) {
         return employeeRespository.findByIdIn(id);
     }
+
+    private String generateEmployeeId(Employee emp) {
+
+        String s ;
+        if(emp==null)
+            s=String.format("rs_%04d", 1);
+        else
+        {
+            int i=Integer.parseInt(emp.getEmployeeId().substring(3));
+            i++;
+            s=String.format("rs_%04d",i);
+        }
+        return s;
+
+    }
+
 }

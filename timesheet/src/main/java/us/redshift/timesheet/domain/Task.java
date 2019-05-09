@@ -17,9 +17,13 @@ import java.util.Set;
 @NoArgsConstructor
 public class Task extends BaseEntity {
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
+    private String taskCode;
+
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -42,28 +46,31 @@ public class Task extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private Date endedOn;
 
+
     private BigDecimal billableHour;
 
-    private BigDecimal nBillableHour;
+    private BigDecimal nonBillableHour;
 
     private BigDecimal usedHour;
 
     @ElementCollection(targetClass = Long.class)
-    @JoinTable(name = "pss_tasks_skill")
+    @JoinTable(name = "pss_task_skills")
+    @JoinColumn(nullable = false)
     private Set<Long> skillId;
 
     @ElementCollection(targetClass = Long.class)
-    @JoinTable(name = "pss_tasks_employee")
+    @JoinTable(name = "pss_task_employees")
+    @JoinColumn(nullable = false)
     private Set<Long> employeeId;
 
     @ManyToOne()
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
 
     public void setStatus(TaskStatus status) {
         if (status == null)
-            status = TaskStatus.UNASSIGNED;
+            status = TaskStatus.ACTIVE;
         this.status = status;
     }
 
@@ -73,4 +80,21 @@ public class Task extends BaseEntity {
         this.type = type;
     }
 
+    public void setBillableHour(BigDecimal billableHour) {
+        if (billableHour == null)
+            this.billableHour = new BigDecimal(0);
+        this.billableHour = billableHour;
+    }
+
+    public void setNonBillableHour(BigDecimal nonBillableHour) {
+        if (nonBillableHour == null)
+            this.nonBillableHour = new BigDecimal(0);
+        this.nonBillableHour = nonBillableHour;
+    }
+
+    public void setUsedHour(BigDecimal usedHour) {
+        if (usedHour == null)
+            this.usedHour = new BigDecimal(0);
+        this.usedHour = usedHour;
+    }
 }

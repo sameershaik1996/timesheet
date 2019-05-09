@@ -12,7 +12,10 @@ import java.util.List;
 @ToString
 public class ClientDto extends BaseDto {
 
-
+    @NonNull
+    private String clientCode;
+    @NonNull
+    private String name;
     private List<PocDto> pocs;
     private String url;
     private ClientStatus status;
@@ -20,9 +23,9 @@ public class ClientDto extends BaseDto {
     private String specialization;
     private String offering;
     private String about;
-    private String address1;
-    private String address2;
-    private String state;
-    private String country;
-    private String zipCode;
+    private Boolean addressFlag;
+    private AddressDto address;
+    private AddressDto billingAddress;
+
+
 }
