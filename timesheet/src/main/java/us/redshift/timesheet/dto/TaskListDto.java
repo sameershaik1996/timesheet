@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class TaskListDto extends BaseDto {
 
+    private Long id;
     private String taskCode;
     private String name;
     private String description;

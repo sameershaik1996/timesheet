@@ -2,6 +2,7 @@ package us.redshift.timesheet.dto;
 
 import lombok.*;
 import us.redshift.timesheet.domain.ClientStatus;
+import us.redshift.timesheet.domain.Industry;
 
 import java.util.List;
 
@@ -11,11 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 public class ClientListDto extends BaseDto {
 
+    private Long id;
     @NonNull
     private String clientCode;
     private String name;
     private List<PocDto> pocs;
     private ClientStatus status;
-    private String domain;
-    private String specialization;
+    private Industry industry;
+    private List<FocusAreaDto> focusAreas;
 }

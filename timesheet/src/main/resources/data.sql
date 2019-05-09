@@ -1,4 +1,9 @@
-INSERT INTO `pss_clients` (`id`,`created_by`,`created_time_stamp`,`updated_by`,`updated_time_stamp`,`about`,`client_code`,`domain`,`name`,`offering`,`specialization`,`status`,`url`,`address_id`,`billing_address_id`) VALUES (1,1,'2019-05-08 10:54:42',1,'2019-05-08 10:54:42','Belk','C001','Supplychain','Belk589','Development,Testing','Supplychain','ACTIVE','xyz.com',1,2);
+
+
+
+
+
+INSERT INTO `pss_clients` (`id`,`created_by`,`created_time_stamp`,`updated_by`,`updated_time_stamp`,`about`,`client_code`,`industry`,`name`,`futureFocus`,`focusArea`,`status`,`url`,`address_id`,`billing_address_id`) VALUES (1,1,'2019-05-08 10:54:42',1,'2019-05-08 10:54:42','Belk','C001','Supplychain','Belk589','Development,Testing','Supplychain','ACTIVE','xyz.com',1,2);
 INSERT INTO `pss_pocs` (`id`,`created_by`,`created_time_stamp`,`updated_by`,`updated_time_stamp`,`email`,`name`,`phone_number`,`client_id`) VALUES (1,1,'2019-05-08 10:54:42',1,'2019-05-08 10:54:42','qwertyui@gmail.com','xyz','12345678',1);
 
 INSERT INTO `pss_addresses` (`id`,`address_line1`,`address_line2`,`country_id`,`state_id`,zip_code) VALUES (1,'dt2,My home','machavaram',1,50,"123456");

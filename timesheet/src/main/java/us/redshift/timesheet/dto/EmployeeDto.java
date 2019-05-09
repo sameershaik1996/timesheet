@@ -16,9 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 public class EmployeeDto extends BaseDto {
 
-
+    private Long id;
     private String firstName;
     private String lastName;
+    private String name;
     private String employeeCode;
     private Date dob;
     private String emailId;
@@ -34,10 +35,11 @@ public class EmployeeDto extends BaseDto {
     private Address address;
 
 
-    public EmployeeDto(Long id, String firstName, String lastName, String employeeCode) {
-        super(id);
+    public EmployeeDto(Long id, String firstName, String lastName, String employeeCode, String name) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.employeeCode = employeeCode;
+        this.name = name;
     }
 }

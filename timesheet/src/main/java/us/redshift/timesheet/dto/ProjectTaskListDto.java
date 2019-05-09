@@ -13,8 +13,8 @@ import us.redshift.timesheet.domain.TaskType;
 @AllArgsConstructor
 public class ProjectTaskListDto extends BaseDto {
 
-
-    private String projectCode;
+    private Long id;
+    private String taskCode;
     private String name;
     private TaskType type;
     private TaskStatus status;

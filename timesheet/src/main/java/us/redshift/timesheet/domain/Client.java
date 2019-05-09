@@ -30,9 +30,21 @@ public class Client extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ClientStatus status;
     private String url;
-    private String domain;
-    private String specialization;
-    private String offering;
+
+    @ManyToOne()
+    @JoinColumn(name = "industry_id", nullable = false)
+    private Industry industry;
+
+
+    @JsonIgnoreProperties(value = "clients")
+    @ManyToMany()
+    @JoinTable(name = "pss_clients_focus_area",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "focus_area_id"))
+    private Set<FocusArea> focusAreas;
+
+
+    private String futureFocus;
     private String about;
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "address_id")
@@ -52,8 +64,13 @@ public class Client extends BaseEntity {
         this.status = status;
     }
 
+    public void setFocusAreas(Set<FocusArea> focusAreas) {
+        if (focusAreas == null)
+            this.focusAreas = new HashSet<>();
+        this.focusAreas = focusAreas;
+    }
 
-//    //    @JsonManagedReference
+    //    //    @JsonManagedReference
 //    @JsonIgnoreProperties(value = "client")
 //    @OneToMany(mappedBy = "client",
 //            cascade = CascadeType.ALL)

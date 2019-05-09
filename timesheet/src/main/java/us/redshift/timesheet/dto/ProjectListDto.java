@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProjectListDto extends BaseDto {
 
-
+    private Long id;
     private String projectCode;
     private String name;
     private ProjectStatus status;

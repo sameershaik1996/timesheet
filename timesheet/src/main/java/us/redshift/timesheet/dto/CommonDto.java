@@ -9,11 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommonDto extends BaseDto {
+public class CommonDto extends BaseDto{
+    private Long id;
     private String name;
+    private String code;
 
-    public CommonDto(Long id, String name) {
-        super(id);
-        this.name = name;
-    }
 }

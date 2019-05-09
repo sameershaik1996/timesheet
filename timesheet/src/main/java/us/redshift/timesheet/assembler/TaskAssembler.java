@@ -104,7 +104,7 @@ public class TaskAssembler {
                     Project source = new Project();
                     if (mappingContext.getSource() != null)
                         source = mappingContext.getSource();
-                    return new CommonDto(source.getId(), source.getName());
+                    return new CommonDto(source.getId(), source.getName(), source.getProjectCode());
                 };
 
 //      Client to CommonDto
@@ -113,7 +113,7 @@ public class TaskAssembler {
                     Client source = new Client();
                     if (mappingContext.getSource() != null)
                         source = mappingContext.getSource();
-                    return new CommonDto(source.getId(), source.getName());
+                    return new CommonDto(source.getId(), source.getName(), source.getClientCode());
                 };
 
 //      adding to Common Property

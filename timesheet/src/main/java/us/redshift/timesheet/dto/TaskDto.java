@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class TaskDto extends BaseDto {
 
+    private Long id;
     @NonNull
     private String taskCode;
     @NonNull

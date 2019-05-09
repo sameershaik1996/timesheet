@@ -1,7 +1,6 @@
 package us.redshift.timesheet.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +13,9 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseDto implements Serializable {
 
-    private Long id;
 
     @JsonIgnoreProperties(value = "createdTimeStamp", allowGetters = true)
     private Instant createdTimeStamp;
@@ -28,8 +26,4 @@ public class BaseDto implements Serializable {
     @JsonIgnoreProperties(value = "updatedBy", allowGetters = true)
     private Long updatedBy;
 
-
-    public BaseDto(Long id) {
-        this.id = id;
-    }
 }

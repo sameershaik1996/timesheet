@@ -17,13 +17,12 @@ import java.util.Set;
 @AllArgsConstructor
 public class TaskCardDto extends BaseDto {
 
-
-    private String name;
+    private Long id;
     private TimeSheetStatus status;
     private TaskType type;
     private CommonDto employee;
     private SkillDto skill;
-    private CommonDto locationId;
+    private CommonDto location;
     private BigDecimal ratePerHour;
     private BigDecimal amount;
     private BigDecimal hours;

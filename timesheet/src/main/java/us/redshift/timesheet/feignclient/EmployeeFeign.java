@@ -38,14 +38,14 @@ public interface EmployeeFeign {
 class EmployeeFeignFallback implements EmployeeFeign {
     @Override
     public ResponseEntity<EmployeeDto> getAllEmployeeById(Long id) {
-        EmployeeDto dto = new EmployeeDto(id, "NAN", "NAN", "NAN");
+        EmployeeDto dto = new EmployeeDto(id, "NAN", "NAN", "NAN","NAN");
         System.out.println("error-getAllEmployeeById");
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Set<EmployeeDto>> getAllEmployeeByIds(Set<Long> ids) {
-        Set<EmployeeDto> dtos = ids.stream().map(id -> new EmployeeDto(id, "NAN", "NAN", "NAN")).collect(Collectors.toSet());
+        Set<EmployeeDto> dtos = ids.stream().map(id -> new EmployeeDto(id, "NAN", "NAN", "NAN","NAN")).collect(Collectors.toSet());
         System.out.println("error-getAllEmployeeByIds");
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }

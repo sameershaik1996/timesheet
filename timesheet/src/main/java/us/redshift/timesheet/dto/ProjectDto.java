@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProjectDto extends BaseDto {
 
+    private Long id;
     @NonNull
     private String projectCode;
     @NonNull

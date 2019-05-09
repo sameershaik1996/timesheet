@@ -9,12 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DesignationDto extends BaseDto {
+public class DesignationDto extends BaseDto{
 
+    private Long id;
     private String designation;
 
-    public DesignationDto(Long id, String designation) {
-        super(id);
-        this.designation = designation;
-    }
 }

@@ -47,7 +47,7 @@ public class TaskCard extends BaseEntity {
     @JsonIgnoreProperties(value = "taskCard")
     private Set<TaskCardDetail> taskCardDetails = new HashSet<>();
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne()
     @JoinColumn(name = "time_sheet_id")
     private TimeSheet timeSheet;
 

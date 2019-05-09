@@ -10,10 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SkillDto extends BaseDto {
+    private Long id;
     private String skill;
 
-    public SkillDto(Long id, String skill) {
-        super(id);
-        this.skill = skill;
-    }
 }
