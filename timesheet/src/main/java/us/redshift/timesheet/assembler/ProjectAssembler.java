@@ -5,17 +5,17 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
-import us.redshift.timesheet.domain.Project;
-import us.redshift.timesheet.dto.EmployeeDto;
-import us.redshift.timesheet.dto.EmployeeListDto;
-import us.redshift.timesheet.dto.ProjectDto;
-import us.redshift.timesheet.dto.ProjectListDto;
+import us.redshift.timesheet.domain.project.Project;
+import us.redshift.timesheet.dto.common.EmployeeDto;
+import us.redshift.timesheet.dto.common.EmployeeListDto;
+import us.redshift.timesheet.dto.common.SkillDto;
+import us.redshift.timesheet.dto.project.ProjectDto;
+import us.redshift.timesheet.dto.project.ProjectListDto;
 import us.redshift.timesheet.feignclient.EmployeeFeign;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +58,8 @@ public class ProjectAssembler {
 
 //          Feign Client Call to get EmployeeDto
             Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+
+
             Type targetType = new TypeToken<Set<EmployeeListDto>>() {
             }.getType();
 
@@ -72,6 +74,7 @@ public class ProjectAssembler {
                 using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
             }
         });
+
 
 //      Long to EmployeeListDto
         Converter<Long, EmployeeListDto> LongToEmployee = mappingContext -> {
@@ -101,6 +104,7 @@ public class ProjectAssembler {
             }
         });
 
+
     }
 
 
@@ -112,18 +116,29 @@ public class ProjectAssembler {
         return mapper.map(project, ProjectDto.class);
     }
 
-    public List<ProjectListDto> convertToDto(List<Project> projects) throws ParseException {
+    public Set<ProjectListDto> convertToDto(Set<Project> projects) throws ParseException {
 
-        /*Type targetListType = new TypeToken<List<ProjectListDto>>() {
-        }.getType();
-        List<ProjectListDto> list = mapper.map(projects, targetListType);*/
-
-
-        List<ProjectListDto> list = projects.stream().map(project -> {
+        Set<ProjectListDto> set = projects.stream().map(project -> {
             return mapper.map(project, ProjectListDto.class);
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toCollection(HashSet::new));
 
-        return list;
+        return set;
     }
+
+
+    public Set<EmployeeListDto> convertToEmployeeDto(Set<Long> ids) {
+
+        Set<EmployeeDto> dtos = employeeFeign.getAllEmployeeByIds(ids).getBody();
+        Type targetType = new TypeToken<Set<EmployeeListDto>>() {
+        }.getType();
+        return mapper.map(dtos, targetType);
+    }
+
+    public Set<SkillDto> convertToSkillDto(Set<Long> ids) {
+
+        Set<SkillDto> dtos = employeeFeign.getAllSkillByEmployeeIds(ids).getBody();
+        return dtos;
+    }
+
 
 }

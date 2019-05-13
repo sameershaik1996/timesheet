@@ -3,13 +3,13 @@ package us.redshift.timesheet.assembler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
-import us.redshift.timesheet.domain.Client;
-import us.redshift.timesheet.dto.ClientDto;
-import us.redshift.timesheet.dto.ClientListDto;
+import us.redshift.timesheet.domain.client.Client;
+import us.redshift.timesheet.dto.client.ClientDto;
+import us.redshift.timesheet.dto.client.ClientListDto;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.List;
+import java.util.Set;
 
 @Component
 public class ClientAssembler {
@@ -50,10 +50,10 @@ public class ClientAssembler {
         return mapper.map(client, ClientDto.class);
     }
 
-    public List<ClientListDto> convertToDto(List<Client> clients) throws ParseException {
-        Type targetListType = new TypeToken<List<ClientListDto>>() {
+    public Set<ClientListDto> convertToDto(Set<Client> clients) throws ParseException {
+        Type targetListType = new TypeToken<Set<ClientListDto>>() {
         }.getType();
-        List<ClientListDto> list = mapper.map(clients, targetListType);
-        return list;
+        Set<ClientListDto> set = mapper.map(clients, targetListType);
+        return set;
     }
 }

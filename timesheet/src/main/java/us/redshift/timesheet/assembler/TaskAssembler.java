@@ -5,16 +5,21 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
-import us.redshift.timesheet.domain.Client;
-import us.redshift.timesheet.domain.Project;
-import us.redshift.timesheet.domain.Task;
-import us.redshift.timesheet.dto.*;
+import us.redshift.timesheet.domain.client.Client;
+import us.redshift.timesheet.domain.project.Project;
+import us.redshift.timesheet.domain.task.Task;
+import us.redshift.timesheet.dto.common.CommonDto;
+import us.redshift.timesheet.dto.common.EmployeeDto;
+import us.redshift.timesheet.dto.common.EmployeeListDto;
+import us.redshift.timesheet.dto.common.SkillDto;
+import us.redshift.timesheet.dto.project.ProjectTaskListDto;
+import us.redshift.timesheet.dto.task.TaskDto;
+import us.redshift.timesheet.dto.task.TaskListDto;
 import us.redshift.timesheet.feignclient.EmployeeFeign;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -136,19 +141,19 @@ public class TaskAssembler {
         return mapper.map(task, TaskDto.class);
     }
 
-    public List<TaskListDto> convertToDto(List<Task> tasks) throws ParseException {
-        Type targetListType = new TypeToken<List<TaskListDto>>() {
+    public Set<TaskListDto> convertToDto(Set<Task> tasks) throws ParseException {
+        Type targetSetType = new TypeToken<Set<TaskListDto>>() {
         }.getType();
-        List<TaskListDto> list = mapper.map(tasks, targetListType);
-        return list;
+        Set<TaskListDto> set = mapper.map(tasks, targetSetType);
+        return set;
     }
 
-    public List<ProjectTaskListDto> convertToDto1(List<Task> tasks) throws ParseException {
+    public Set<ProjectTaskListDto> convertToDto1(Set<Task> tasks) throws ParseException {
 
-        List<ProjectTaskListDto> list = tasks.stream().map(task -> {
+        Set<ProjectTaskListDto> set = tasks.stream().map(task -> {
             return mapper.map(task, ProjectTaskListDto.class);
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toCollection(HashSet::new));
 
-        return list;
+        return set;
     }
 }

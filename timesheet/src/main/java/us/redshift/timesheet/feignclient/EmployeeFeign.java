@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import us.redshift.timesheet.dto.DesignationDto;
-import us.redshift.timesheet.dto.EmployeeDto;
-import us.redshift.timesheet.dto.SkillDto;
+import us.redshift.timesheet.dto.common.DesignationDto;
+import us.redshift.timesheet.dto.common.EmployeeDto;
+import us.redshift.timesheet.dto.common.SkillDto;
 
 import java.util.Set;
 import java.util.stream.Collectors;
