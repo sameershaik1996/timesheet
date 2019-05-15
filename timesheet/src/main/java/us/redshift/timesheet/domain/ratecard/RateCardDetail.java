@@ -1,10 +1,10 @@
 package us.redshift.timesheet.domain.ratecard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.domain.common.BaseEntity;
+import us.redshift.timesheet.domain.common.Location;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -22,12 +22,13 @@ public class RateCardDetail extends BaseEntity {
     private Long skillId;
     @Column(name = "designation_id", nullable = false)
     private Long designationId;
-    @Column(name = "location_id", nullable = false)
-    private Long locationId;
 
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
+
+    @ManyToOne
     @JoinColumn(name = "rate_card_id", nullable = false)
-    @JsonIgnoreProperties(value = {"rateCardDetails"}, allowSetters = true)
     private RateCard rateCard;
 
 }

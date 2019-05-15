@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.domain.common.BaseEntity;
-import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.project.Project;
+import us.redshift.timesheet.domain.taskcard.TaskType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -54,7 +54,7 @@ public class Task extends BaseEntity {
 
     private BigDecimal nonBillableHour;
 
-    private BigDecimal usedHour;
+    private BigDecimal usedHour = new BigDecimal(0);
 
     @ElementCollection(targetClass = Long.class)
     @JoinTable(name = "pss_task_skills")

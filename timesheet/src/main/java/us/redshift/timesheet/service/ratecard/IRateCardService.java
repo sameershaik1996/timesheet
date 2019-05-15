@@ -2,7 +2,7 @@ package us.redshift.timesheet.service.ratecard;
 
 import us.redshift.timesheet.domain.ratecard.RateCard;
 
-import java.util.Set;
+import java.util.List;
 
 public interface IRateCardService {
 
@@ -10,7 +10,7 @@ public interface IRateCardService {
 
     RateCard updateRateCard(RateCard rateCard);
 
-    Set<RateCard> getAllRateCard();
+    List<RateCard> getAllRateCard();
 
     RateCard getRateCard(Long id);
 

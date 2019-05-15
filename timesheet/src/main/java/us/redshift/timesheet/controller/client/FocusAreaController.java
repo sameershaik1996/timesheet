@@ -20,25 +20,25 @@ public class FocusAreaController {
     }
 
 
-    @PostMapping("focusarea/save")
+    @PostMapping("client/focusarea/save")
     public ResponseEntity<?> createFocusArea(@Valid @RequestBody FocusArea focusArea) {
 
         return new ResponseEntity<>(focusAreaService.saveFocusArea(focusArea), HttpStatus.CREATED);
     }
 
-    @PutMapping("focusarea/update")
+    @PutMapping("client/focusarea/update")
     public ResponseEntity<?> updateFocusArea(@Valid @RequestBody FocusArea focusArea) {
 
         return new ResponseEntity<>(focusAreaService.updateFocusArea(focusArea), HttpStatus.CREATED);
     }
 
-    @GetMapping("focusareas")
+    @GetMapping("client/focusarea/get")
     public ResponseEntity<?> getAllFocusAreas() {
 
         return new ResponseEntity<>(focusAreaService.getAllFocusAreas(), HttpStatus.OK);
     }
 
-    @GetMapping("focusarea/{id}")
+    @GetMapping("client/focusarea/get/{id}")
     public ResponseEntity<?> getFocusAreaById(@PathVariable Long id) {
 
         return new ResponseEntity<>(focusAreaService.getFocusAreaById(id), HttpStatus.OK);

@@ -14,7 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "pss_timesheets")
+@Table(name = "pss_timesheets",
+        uniqueConstraints =
+        @UniqueConstraint(columnNames = {"employee_id", "from_date", "to_date", "week_number", "year"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,32 +28,41 @@ public class TimeSheet extends BaseEntity {
     private String comment;
 
     @Enumerated(EnumType.STRING)
-    private TimeSheetStatus status;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
-    private Long approvedBy;
+//    private Long approverId;
 
-    private Long submittedBy;
-
+    @Column(name = "employee_id", nullable = false)
+    private Long employeeId;
+    @Column(name = "from_date", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fromDate;
-
+    @Column(name = "to_date", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date toDate;
+    @Column(name = "week_number", nullable = false)
+    private Integer weekNumber;
+    @Column(name = "year", nullable = false)
+    private Integer year;
 
 
-    @JsonIgnoreProperties(value = "timeSheet")
-    @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.MERGE})
+    @JsonIgnoreProperties(value = "timeSheet", allowSetters = true)
+    @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.ALL})
     private Set<TaskCard> taskCards = new HashSet<>();
 
-//    public void add(TaskCard taskCard) {
-//        taskCard.setTimeSheet(this);
-//        this.taskCards.add(taskCard);
-//    }
+    @JsonIgnoreProperties(value = "timeSheet", allowSetters = true)
+    @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.ALL})
+    private Set<TimeOff> timeOffs = new HashSet<>();
 
-    public void setStatus(TimeSheetStatus status) {
-        if (status == null)
-            status = TimeSheetStatus.SUBMITTED;
-        this.status = status;
+
+    public void addTaskCard(TaskCard taskCard) {
+        taskCard.setTimeSheet(this);
+        this.taskCards.add(taskCard);
+    }
+
+    public void addTimeOff(TimeOff timeOff) {
+        timeOff.setTimeSheet(this);
+        this.timeOffs.add(timeOff);
     }
 
 }

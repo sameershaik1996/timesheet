@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ClientStatus {
-    ACTIVE("Active"), INACTIVE("InActive");
+    ACTIVE("ACTIVE"), INACTIVE("INACTIVE");
 
     //Lookup table
     private static final Map<String, ClientStatus> lookup = new HashMap<>();
@@ -26,8 +26,8 @@ public enum ClientStatus {
     }
 
     //This method can be used for reverse lookup purpose
-    public static ClientStatus get(String url) {
-        return lookup.get(url);
+    public static ClientStatus get(String status) {
+        return lookup.get(status);
     }
 
     public String getStatus() {

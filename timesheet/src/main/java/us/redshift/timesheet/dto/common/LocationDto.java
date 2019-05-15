@@ -9,10 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommonDto extends BaseDto{
-    private Long id;
-    private String name;
-    private String code;
-    private String Status;
+public class LocationDto extends BaseDto {
 
+    private Long id;
+    private String location;
 }

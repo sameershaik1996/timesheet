@@ -18,7 +18,7 @@ public class AddressController {
         this.addressService = addressService;
     }
 
-    @RequestMapping("state/{countryId}")
+    @RequestMapping("/state/{countryId}")
     public ResponseEntity<?> getStatesByCountryId(@PathVariable Long countryId) {
         return new ResponseEntity<>(addressService.getStatesByCountryId(countryId), HttpStatus.OK);
     }

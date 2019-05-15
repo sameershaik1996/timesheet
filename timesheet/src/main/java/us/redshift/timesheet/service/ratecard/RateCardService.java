@@ -5,13 +5,9 @@ import us.redshift.timesheet.domain.ratecard.RateCard;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.reposistory.ratecard.RateCardRepository;
-import us.redshift.timesheet.service.ratecard.IRateCardService;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class RateCardService implements IRateCardService {
@@ -25,8 +21,10 @@ public class RateCardService implements IRateCardService {
 
     @Override
     public RateCard saveRateCard(RateCard rateCard) {
-        Set<RateCardDetail> rateCardDetails = new HashSet<>(rateCard.getRateCardDetails());
+        List<RateCardDetail> rateCardDetails = new ArrayList<>(rateCard.getRateCardDetails());
+        System.out.println(rateCardDetails.size());
         rateCardDetails.forEach(cardDetail -> {
+            System.out.println(cardDetail.getLocation().getId());
             rateCard.addRateCardDetail(cardDetail);
         });
         return rateCardRepository.save(rateCard);
@@ -41,10 +39,9 @@ public class RateCardService implements IRateCardService {
     }
 
     @Override
-    public Set<RateCard> getAllRateCard() {
+    public List<RateCard> getAllRateCard() {
         List<RateCard> rateCardList = rateCardRepository.findAll();
-        Set<RateCard> rateCardSet = rateCardList.stream().collect(Collectors.toCollection(HashSet::new));
-        return rateCardSet;
+        return rateCardList;
     }
 
     @Override

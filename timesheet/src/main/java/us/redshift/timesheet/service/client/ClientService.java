@@ -67,4 +67,9 @@ public class ClientService implements IClientService {
     public ClientStatus[] getAllClientStatus() {
         return ClientStatus.values();
     }
+
+    @Override
+    public Set<Client> findAllByStatus(ClientStatus status) {
+        return clientRepository.findAllByStatusOrderByIdAsc(status);
+    }
 }

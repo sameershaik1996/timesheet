@@ -7,10 +7,11 @@ import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.exception.ValidationException;
-import us.redshift.timesheet.reposistory.ProjectRepository;
-import us.redshift.timesheet.reposistory.TaskRepository;
+import us.redshift.timesheet.reposistory.project.ProjectRepository;
+import us.redshift.timesheet.reposistory.task.TaskRepository;
 import us.redshift.timesheet.util.Reusable;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class TaskService implements ITaskService {
         this.projectRepository = projectRepository;
 
     }
+
 
     @Override
     public Task saveTask(Task task) {
@@ -50,6 +52,18 @@ public class TaskService implements ITaskService {
         Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
         taskValidate(project, task);
         return taskRepository.save(task);
+    }
+
+    @Override
+    public void updateTask(Long taskId, BigDecimal usedHour) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
+
+        BigDecimal oldUsedHour = task.getUsedHour();
+
+        BigDecimal newUsedHour = oldUsedHour.add(usedHour);
+        task.setUsedHour(newUsedHour);
+
+        taskRepository.save(task);
     }
 
     @Override
@@ -78,6 +92,16 @@ public class TaskService implements ITaskService {
     @Override
     public TaskStatus[] getAllTaskStatus() {
         return TaskStatus.values();
+    }
+
+    @Override
+    public Set<Task> findAllByStatus(TaskStatus status) {
+        return taskRepository.findAllByStatusOrderByIdAsc(status);
+    }
+
+    @Override
+    public Set<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status) {
+        return taskRepository.findAllByProjectIdAndEmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
     }
 
     private void taskValidate(Project project, Task task) {

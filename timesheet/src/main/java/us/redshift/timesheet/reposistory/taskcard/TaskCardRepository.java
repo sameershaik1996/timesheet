@@ -7,7 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
+
+import java.util.Set;
 
 @Repository
 public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
@@ -21,8 +25,8 @@ public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
     @Query(value = "UPDATE pss_task_cards SET status=?1 WHERE id = ?2", nativeQuery = true)
     int setStatusForTaskCard(String status, Long id);
 
-    @Transactional
-    @Modifying
-    @Query(value = "UPDATE pss_task_cards SET time_sheet_id=?1 WHERE id = ?2", nativeQuery = true)
-    int setTimeSheetIdForTaskCard(Long timeSheetId, Long id);
+
+    Set<TaskCard> findByStatusNotLikeAndProjectIn(TimeSheetStatus status, Set<Project> projectSet);
+
+
 }

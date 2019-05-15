@@ -9,8 +9,8 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.project.ProjectType;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pss_rate_cards")
@@ -25,17 +25,13 @@ public class RateCard extends BaseEntity {
     private Boolean isDefault = false;
 
     @Enumerated(EnumType.STRING)
-    private ProjectType projectType;
+    private ProjectType projectType = ProjectType.FIXED_BID;
 
     @JsonIgnoreProperties(value = "rateCard")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "rateCard")
-    private Set<RateCardDetail> rateCardDetails = new HashSet<>();
+    private List<RateCardDetail> rateCardDetails = new ArrayList<>();
 
-    public void setProjectType(ProjectType projectType) {
-        if (projectType == null)
-            projectType = ProjectType.FIXED_BID;
-        this.projectType = projectType;
-    }
+
 
     public void addRateCardDetail(RateCardDetail rateCardDetail) {
         rateCardDetail.setRateCard(this);

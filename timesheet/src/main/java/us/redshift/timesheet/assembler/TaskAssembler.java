@@ -57,7 +57,7 @@ public class TaskAssembler {
         };
 
 //      adding EmployeeListDto to long set conversion property
-        mapper.addMappings(new PropertyMap<TaskDto, Task>() {
+        this.mapper.addMappings(new PropertyMap<TaskDto, Task>() {
             protected void configure() {
                 using(EmployeeToLongSet).map(source.getEmployees()).setEmployeeId(null);
                 using(SkillToLongSet).map(source.getSkills()).setSkillId(null);
@@ -95,13 +95,18 @@ public class TaskAssembler {
         };
 
 //      adding long to EmployeeListDto set conversion property
-        mapper.addMappings(new PropertyMap<Task, TaskDto>() {
+        this.mapper.addMappings(new PropertyMap<Task, TaskDto>() {
             protected void configure() {
                 using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
                 using(LongToSkillSet).map(source.getSkillId()).setSkills(null);
             }
         });
-
+//      adding long to EmployeeListDto set conversion property
+        this.mapper.addMappings(new PropertyMap<Task, TaskListDto>() {
+            protected void configure() {
+                using(LongToSkillSet).map(source.getSkillId()).setSkills(null);
+            }
+        });
 
 //      Project to CommonDto
         Converter<Project, CommonDto> projectToCommon =
@@ -109,7 +114,7 @@ public class TaskAssembler {
                     Project source = new Project();
                     if (mappingContext.getSource() != null)
                         source = mappingContext.getSource();
-                    return new CommonDto(source.getId(), source.getName(), source.getProjectCode());
+                    return new CommonDto(source.getId(), source.getName(), source.getProjectCode(), source.getStatus().name());
                 };
 
 //      Client to CommonDto
@@ -118,11 +123,11 @@ public class TaskAssembler {
                     Client source = new Client();
                     if (mappingContext.getSource() != null)
                         source = mappingContext.getSource();
-                    return new CommonDto(source.getId(), source.getName(), source.getClientCode());
+                    return new CommonDto(source.getId(), source.getName(), source.getClientCode(), source.getStatus().name());
                 };
 
 //      adding to Common Property
-        mapper.addMappings(new PropertyMap<Task, ProjectTaskListDto>() {
+        this.mapper.addMappings(new PropertyMap<Task, ProjectTaskListDto>() {
             protected void configure() {
                 using(projectToCommon).map(source.getProject()).setProject(null);
                 using(clientToCommon).map(source.getProject().getClient()).setClient(null);

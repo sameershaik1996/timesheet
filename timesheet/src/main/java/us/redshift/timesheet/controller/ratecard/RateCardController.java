@@ -32,9 +32,7 @@ public class RateCardController {
 
     @PostMapping("ratecard/save")
     public ResponseEntity<?> saveRateCard(@Valid @RequestBody RateCard rateCard) {
-
-        RateCard card = mapper.map(rateCard, RateCard.class);
-        return new ResponseEntity<>(rateCardService.saveRateCard(card), HttpStatus.CREATED);
+        return new ResponseEntity<>(rateCardService.saveRateCard(rateCard), HttpStatus.CREATED);
     }
 
     @PutMapping("ratecard/update")

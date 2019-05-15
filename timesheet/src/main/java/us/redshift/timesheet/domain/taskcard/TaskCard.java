@@ -6,9 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.domain.common.BaseEntity;
+import us.redshift.timesheet.domain.common.Location;
+import us.redshift.timesheet.domain.project.Project;
+import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
-import us.redshift.timesheet.domain.task.Task;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -29,9 +31,13 @@ public class TaskCard extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TaskType type;
 
+    private Long approverId;
     private Long employeeId;
     private Long skillId;
-    private Long locationId;
+
+    @ManyToOne
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
 
     private BigDecimal ratePerHour;
 
@@ -41,7 +47,11 @@ public class TaskCard extends BaseEntity {
 
     private String comment;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne()
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    @ManyToOne()
     @JoinColumn(name = "task_id")
     private Task task;
 
@@ -52,6 +62,7 @@ public class TaskCard extends BaseEntity {
 
     @ManyToOne()
     @JoinColumn(name = "time_sheet_id")
+    @JsonIgnoreProperties(value = "taskCard")
     private TimeSheet timeSheet;
 
     public void add(TaskCardDetail taskCardDetail) {

@@ -26,4 +26,7 @@ public interface IProjectService {
 
     ProjectStatus[] getAllProjectStatus();
 
+    Set<Project> findAllByStatus(ProjectStatus status);
+
+
 }

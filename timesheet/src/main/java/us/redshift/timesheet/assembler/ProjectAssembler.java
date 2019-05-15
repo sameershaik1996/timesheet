@@ -41,7 +41,7 @@ public class ProjectAssembler {
         };
 
 //      adding EmployeeListDto to long set conversion property
-        mapper.addMappings(new PropertyMap<ProjectDto, Project>() {
+        this.mapper.addMappings(new PropertyMap<ProjectDto, Project>() {
             protected void configure() {
                 using(EmployeeToLongSet).map(source.getEmployees()).setEmployeeId(null);
             }
@@ -68,13 +68,6 @@ public class ProjectAssembler {
             return dest;
         };
 
-//      adding long to EmployeeListDto set conversion property
-        mapper.addMappings(new PropertyMap<Project, ProjectDto>() {
-            protected void configure() {
-                using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
-            }
-        });
-
 
 //      Long to EmployeeListDto
         Converter<Long, EmployeeListDto> LongToEmployee = mappingContext -> {
@@ -82,25 +75,26 @@ public class ProjectAssembler {
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
             }
-            EmployeeDto employee = this.employeeFeign.getAllEmployeeById(source).getBody();
+            EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
             EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
 
             return dest;
         };
 
 //      adding long to EmployeeListDto  conversion property
-        mapper.addMappings(new PropertyMap<Project, ProjectDto>() {
+        this.mapper.addMappings(new PropertyMap<Project, ProjectDto>() {
             protected void configure() {
                 using(LongToEmployee).map(source.getManagerId()).setManager(null);
+                using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
 
             }
         });
 
 //      adding long to EmployeeListDto  conversion property
-        mapper.addMappings(new PropertyMap<Project, ProjectListDto>() {
+        this.mapper.addMappings(new PropertyMap<Project, ProjectListDto>() {
             protected void configure() {
                 using(LongToEmployee).map(source.getManagerId()).setManager(null);
-                using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
+//                using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
             }
         });
 

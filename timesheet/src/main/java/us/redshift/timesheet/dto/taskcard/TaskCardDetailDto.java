@@ -1,5 +1,6 @@
 package us.redshift.timesheet.dto.taskcard;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.common.BaseDto;
@@ -14,6 +15,7 @@ import java.util.Date;
 @ToString
 public class TaskCardDetailDto extends BaseDto {
 
+    private Long id;
     @NonNull
     private Date date;
     @NonNull
@@ -22,6 +24,7 @@ public class TaskCardDetailDto extends BaseDto {
     private String comment;
     private String rejectedComment;
     @NonNull
+    @JsonIgnoreProperties("taskCardDetails")
     private TaskCardDto taskCard;
 
 }

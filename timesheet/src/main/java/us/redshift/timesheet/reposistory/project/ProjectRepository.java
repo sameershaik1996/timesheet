@@ -1,4 +1,4 @@
-package us.redshift.timesheet.reposistory;
+package us.redshift.timesheet.reposistory.project;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findProjectsByClient_Id(Long clientId, Pageable pageable);
 
-    Set<Project> findAllByEmployeeIdAndStatus(Long employeeId, ProjectStatus status);
+    Set<Project> findAllByEmployeeIdAndStatusOrderByIdAsc(Long employeeId, ProjectStatus status);
+
+    Set<Project> findAllByManagerId(Long mangerId);
+
+    Set<Project> findAllByStatusOrderByIdAsc(ProjectStatus status);
 
 
 }

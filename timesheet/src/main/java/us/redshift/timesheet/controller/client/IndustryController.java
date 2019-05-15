@@ -20,25 +20,25 @@ public class IndustryController {
     }
 
 
-    @PostMapping("industry/save")
+    @PostMapping("client/industry/save")
     public ResponseEntity<?> createIndustry(@Valid @RequestBody Industry industry) {
 
         return new ResponseEntity<>(industryService.saveIndustry(industry), HttpStatus.CREATED);
     }
 
-    @PutMapping("industry/update")
+    @PutMapping("client/industry/update")
     public ResponseEntity<?> updateIndustry(@Valid @RequestBody Industry industry) {
 
         return new ResponseEntity<>(industryService.updateIndustry(industry), HttpStatus.CREATED);
     }
 
-    @GetMapping("industries")
+    @GetMapping("client/industrie/get")
     public ResponseEntity<?> getAllIndustries() {
 
         return new ResponseEntity<>(industryService.getAllIndustries(), HttpStatus.OK);
     }
 
-    @GetMapping("industry/{id}")
+    @GetMapping("client/industry/get/{id}")
     public ResponseEntity<?> getIndustryById(@PathVariable Long id) {
 
         return new ResponseEntity<>(industryService.getIndustryById(id), HttpStatus.OK);

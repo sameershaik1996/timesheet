@@ -2,15 +2,20 @@ package us.redshift.timesheet.service.taskcard;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
+import us.redshift.timesheet.domain.taskcard.TaskType;
+import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.reposistory.ratecard.RateCardDetailRepository;
+import us.redshift.timesheet.reposistory.task.TaskRepository;
+import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardRepository;
-import us.redshift.timesheet.reposistory.TaskRepository;
-import us.redshift.timesheet.service.taskcard.ITaskCardService;
+import us.redshift.timesheet.service.task.TaskService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
@@ -28,20 +33,21 @@ public class TaskCardService implements ITaskCardService {
 
     private final TaskRepository taskRepository;
 
-    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository) {
+    private final ProjectRepository projectRepository;
+
+    private final TaskCardDetailRepository taskCardDetailRepository;
+
+    private final TaskService taskService;
+
+    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository, ProjectRepository projectRepository, TaskCardDetailRepository taskCardDetailRepository, TaskService taskService) {
         this.taskCardRepository = taskCardRepository;
         this.rateCardDetailRepository = rateCardDetailRepository;
         this.taskRepository = taskRepository;
+        this.projectRepository = projectRepository;
+        this.taskCardDetailRepository = taskCardDetailRepository;
+        this.taskService = taskService;
     }
 
-    @Override
-    public Set<TaskCard> saveTaskCard(Set<TaskCard> taskCards) {
-        Set<TaskCard> taskCardSet = new HashSet<>();
-        taskCards.forEach(taskCard -> taskCardSet.add(calculateAmount(taskCard)));
-        List<TaskCard> taskCardList = taskCardRepository.saveAll(taskCardSet);
-        Set<TaskCard> cardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
-        return cardSet;
-    }
 
     @Override
     public Set<TaskCard> updateTaskCard(Set<TaskCard> taskCards) {
@@ -50,6 +56,11 @@ public class TaskCardService implements ITaskCardService {
             if (!taskCardRepository.existsById(taskCard.getId()))
                 new ResourceNotFoundException("TaskCard", "ID", taskCard.getId());
             taskCardSet.add(calculateAmount(taskCard));
+            if (taskCard.getStatus().equals(TimeSheetStatus.APPROVED)) {
+                taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.APPROVED.name(), taskCard.getId());
+                if (taskCard.getType().equals(TaskType.BILLABLE))
+                    taskService.updateTask(taskCard.getTask().getId(), taskCard.getHours());
+            }
         });
         List<TaskCard> taskCardList = taskCardRepository.saveAll(taskCardSet);
         Set<TaskCard> cardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
@@ -73,11 +84,18 @@ public class TaskCardService implements ITaskCardService {
     }
 
     @Override
-    public TaskCard getTaskCard(Long id) {
+    public Set<TaskCard> getAllTaskCardByMangerId(Long managerId) {
+        Set<Project> projectSet = projectRepository.findAllByManagerId(managerId);
+
+        return taskCardRepository.findByStatusNotLikeAndProjectIn(TimeSheetStatus.PENDING, projectSet);
+    }
+
+    @Override
+    public TaskCard getTaskCardById(Long id) {
         return taskCardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TaskCard", "ID", id));
     }
 
-    private TaskCard calculateAmount(TaskCard card) {
+    public TaskCard calculateAmount(TaskCard card) {
 
 //      Get rateCardId
         Task task = taskRepository.findById(card
@@ -85,20 +103,24 @@ public class TaskCardService implements ITaskCardService {
 
 
         Long rateCardId = new Long(0);
-        if (task.getProject().getRateCard() != null)
-            rateCardId = task.getProject().getRateCard().getId();
+        BigDecimal ratePerHour = new BigDecimal(0);
+
+        if (TaskType.BILLABLE.equals(task.getType())) {
+            if (task.getProject().getRateCard() != null)
+                rateCardId = task.getProject().getRateCard().getId();
 
 //      Assign ratePerHour
-        BigDecimal ratePerHour = new BigDecimal(0);
-        if (card.getLocationId() != null && card.getSkillId() != null) {
-            RateCardDetail rateCardDetail = rateCardDetailRepository.findByRateCard_IdAndLocationIdAndSkillIdAndDesignationId
-                    (rateCardId, card.getLocationId(), card.getSkillId(), Long.valueOf(1));
-            if (rateCardDetail != null)
-                ratePerHour = rateCardDetail.getValue();
 
-            System.out.println(ratePerHour);
+            if (card.getLocation().getId() != null && card.getSkillId() != null) {
+                RateCardDetail rateCardDetail = rateCardDetailRepository.findByRateCard_IdAndLocationIdAndSkillIdAndDesignationId
+                        (rateCardId, card.getLocation().getId(), card.getSkillId(), Long.valueOf(1));
+                if (rateCardDetail != null)
+                    ratePerHour = rateCardDetail.getValue();
 
-            card.setRatePerHour(ratePerHour);
+                System.out.println(ratePerHour);
+
+                card.setRatePerHour(ratePerHour);
+            }
         }
 
 //      sum of hours

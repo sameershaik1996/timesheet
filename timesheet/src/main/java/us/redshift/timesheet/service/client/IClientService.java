@@ -16,6 +16,8 @@ public interface IClientService {
 
     Set<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields);
 
-
     ClientStatus[] getAllClientStatus();
+
+    Set<Client> findAllByStatus(ClientStatus status);
+
 }

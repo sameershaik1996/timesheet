@@ -7,9 +7,11 @@ import lombok.Setter;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.dto.common.BaseDto;
+import us.redshift.timesheet.dto.common.SkillDto;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,4 +29,5 @@ public class TaskListDto extends BaseDto {
     private Date endDate;
     private BigDecimal billableHour;
     private BigDecimal usedHours;
+    private Set<SkillDto> skills;
 }

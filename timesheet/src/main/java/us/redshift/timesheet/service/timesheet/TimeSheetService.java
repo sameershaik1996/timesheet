@@ -3,59 +3,78 @@ package us.redshift.timesheet.service.timesheet;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.taskcard.TaskType;
+import us.redshift.timesheet.domain.timesheet.TimeOff;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.exception.ValidationException;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardRepository;
-import us.redshift.timesheet.reposistory.TaskRepository;
-import us.redshift.timesheet.reposistory.TimeSheetRepository;
+import us.redshift.timesheet.reposistory.timesheet.TimeSheetRepository;
+import us.redshift.timesheet.service.task.TaskService;
+import us.redshift.timesheet.service.taskcard.TaskCardService;
 import us.redshift.timesheet.util.Reusable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.time.DayOfWeek.MONDAY;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.temporal.TemporalAdjusters.nextOrSame;
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 @Service
 public class TimeSheetService implements ITimeSheetService {
 
     private final TimeSheetRepository timeSheetRepository;
+    private final TaskCardService taskCardService;
     private final TaskCardDetailRepository taskCardDetailRepository;
-    private final TaskRepository taskRepository;
     private final TaskCardRepository taskCardRepository;
+    private final TaskService taskService;
 
 
-    public TimeSheetService(TimeSheetRepository timeSheetRepository, TaskCardDetailRepository taskCardDetailRepository, TaskRepository taskRepository, TaskCardRepository taskCardRepository) {
+    public TimeSheetService(TimeSheetRepository timeSheetRepository, TaskCardService taskCardService, TaskCardDetailRepository taskCardDetailRepository, TaskCardRepository taskCardRepository, TaskService taskService) {
         this.timeSheetRepository = timeSheetRepository;
+        this.taskCardService = taskCardService;
         this.taskCardDetailRepository = taskCardDetailRepository;
-        this.taskRepository = taskRepository;
         this.taskCardRepository = taskCardRepository;
+        this.taskService = taskService;
     }
 
 
     @Override
-    public TimeSheet saveTimeSheet(TimeSheet timeSheet) {
+    public TimeSheet updateTimeSheet(TimeSheet timeSheet, TimeSheetStatus status) {
 
-        TimeSheet savedTimeSheet = timeSheetRepository.save(timeSheet);
+
+        timeSheetRepository.findById(timeSheet.getId()).orElseThrow(() -> new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId()));
+        timeSheet.setStatus(status);
         Set<TaskCard> taskCards = new HashSet<>(timeSheet.getTaskCards());
         taskCards.forEach(taskCard -> {
-            taskCardRepository.setTimeSheetIdForTaskCard(savedTimeSheet.getId(), taskCard.getId());
-            taskCardRepository.setStatusForTaskCard(TimeSheetStatus.SUBMITTED.name(), taskCard.getId());
-            taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.SUBMITTED.name(), taskCard.getId());
+            TaskCard card = taskCardService.calculateAmount(taskCard);
+            timeSheet.addTaskCard(card);
+            if (status.equals(TimeSheetStatus.SUBMITTED) || status.equals(TimeSheetStatus.APPROVED)) {
+                taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), card.getId());
+                if (status.equals(TimeSheetStatus.APPROVED)) {
+                    if (taskCard.getType().equals(TaskType.BILLABLE))
+                        taskService.updateTask(taskCard.getTask().getId(), taskCard.getHours());
+                }
+            }
         });
-        return savedTimeSheet;
-    }
 
-    @Override
-    public TimeSheet updateTimeSheet(TimeSheet timeSheet, String status) {
-        if (!timeSheetRepository.existsById(timeSheet.getId()))
-            throw new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId());
-        if (status.equalsIgnoreCase(TimeSheetStatus.REJECTED.name()))
-            timeSheet.setStatus(TimeSheetStatus.REJECTED);
-        else
-            timeSheet.setStatus(TimeSheetStatus.APPROVED);
-        return timeSheetRepository.save(timeSheet);
+        Set<TimeOff> timeOffs = new HashSet<>(timeSheet.getTimeOffs());
+
+        timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
+        TimeSheet savedTimeSheet = timeSheetRepository.save(timeSheet);
+        if (status.equals(TimeSheetStatus.SUBMITTED) || status.equals(TimeSheetStatus.APPROVED)) {
+            taskCardRepository.setStatusForTaskCard(status.name(), timeSheet.getId());
+
+        }
+
+        return savedTimeSheet;
     }
 
     @Override
@@ -70,5 +89,47 @@ public class TimeSheetService implements ITimeSheetService {
     public TimeSheet getTimeSheet(Long id) {
         return timeSheetRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TimeSheet", "Id", id));
     }
+
+    @Override
+    public TimeSheet getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber) {
+
+
+        WeekFields weekFields = WeekFields.of(Locale.ENGLISH);
+        LocalDate today = LocalDate.now();
+        int currentWeekNumber = today.get(weekFields.weekOfWeekBasedYear());
+        int currentYear = today.getYear();
+        year = year == 0 ? currentYear : year;
+        TimeSheet timeSheet = new TimeSheet();
+        if (weekNumber != 0 && year != 0) {
+            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(employeeId, year, weekNumber);
+            if (timeSheet == null && weekNumber == currentWeekNumber && year == currentYear) {
+                TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
+                timeSheet = timeSheetRepository.save(newTimeSheet);
+            } else
+                throw new ValidationException("No Entry Found");
+        } else if (weekNumber == 0) {
+            timeSheet = timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateDesc(employeeId, TimeSheetStatus.PENDING);
+            if (timeSheet == null) {
+                TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
+                timeSheet = timeSheetRepository.save(newTimeSheet);
+            }
+        }
+        return timeSheet;
+    }
+
+
+    private TimeSheet newTimeSheet(Long employeeId, int currentWeekNumber, int currentYear, LocalDate today) {
+        ZoneId defaultZoneId = ZoneId.of("UTC");
+        LocalDate monday = today.with(previousOrSame(MONDAY));
+        LocalDate sunday = today.with(nextOrSame(SUNDAY));
+        TimeSheet newTimeSheet = new TimeSheet();
+        newTimeSheet.setFromDate(Date.from(monday.atStartOfDay(defaultZoneId).toInstant()));
+        newTimeSheet.setToDate(Date.from(sunday.atStartOfDay(defaultZoneId).toInstant()));
+        newTimeSheet.setWeekNumber(currentWeekNumber);
+        newTimeSheet.setEmployeeId(employeeId);
+        newTimeSheet.setYear(currentYear);
+        return newTimeSheet;
+    }
+
 
 }

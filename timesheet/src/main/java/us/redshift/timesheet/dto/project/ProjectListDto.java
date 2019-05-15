@@ -11,7 +11,6 @@ import us.redshift.timesheet.dto.common.CommonDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
 
 import java.util.Date;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -26,7 +25,7 @@ public class ProjectListDto extends BaseDto {
     private ProjectType type;
     private Date startDate;
     private Date endDate;
-    private Set<EmployeeListDto> employees;
+    //    private Set<EmployeeListDto> employees;
     private EmployeeListDto manager;
     private CommonDto client;
 

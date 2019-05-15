@@ -9,8 +9,7 @@ import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.feignclient.EmployeeFeign;
 import us.redshift.timesheet.reposistory.client.ClientRepository;
-import us.redshift.timesheet.reposistory.ProjectRepository;
-import us.redshift.timesheet.service.project.IProjectService;
+import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.util.Reusable;
 
 import java.util.HashSet;
@@ -81,7 +80,7 @@ public class ProjectService implements IProjectService {
 
     @Override
     public Set<Project> findAllByEmployeeId(Long employeeId, ProjectStatus status) {
-        return projectRepository.findAllByEmployeeIdAndStatus(employeeId, status);
+        return projectRepository.findAllByEmployeeIdAndStatusOrderByIdAsc(employeeId, status);
     }
 
 
@@ -97,6 +96,11 @@ public class ProjectService implements IProjectService {
     @Override
     public ProjectStatus[] getAllProjectStatus() {
         return ProjectStatus.values();
+    }
+
+    @Override
+    public Set<Project> findAllByStatus(ProjectStatus status) {
+        return projectRepository.findAllByStatusOrderByIdAsc(status);
     }
 
 

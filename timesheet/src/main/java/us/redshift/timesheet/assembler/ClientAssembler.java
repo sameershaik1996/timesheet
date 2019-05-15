@@ -18,27 +18,6 @@ public class ClientAssembler {
 
     public ClientAssembler(ModelMapper mapper) {
         this.mapper = mapper;
-
-//        Converter<Instant, Long> InstantToLong =
-//                mappingContext -> {
-//
-//                    Instant source = null;
-//                    Long epoch = new Long(0);
-//
-//                    if (mappingContext.getSource() != null)
-//                        source = mappingContext.getSource();
-//                    epoch=source.toEpochMilli();
-//                    System.out.println(epoch);
-//
-//                    return epoch;
-//                };
-//
-//        mapper.addMappings(new PropertyMap<BaseEntity, BaseDto>() {
-//            protected void configure() {
-//                using(InstantToLong).map(source.getCreatedAt()).setCreatedAt(null);
-//                using(InstantToLong).map(source.getUpdatedAt()).setUpdatedAt(null);
-//            }
-//        });
     }
 
 
