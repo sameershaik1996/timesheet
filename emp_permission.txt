@@ -1,0 +1,46 @@
+ [
+        {
+            "id": 19,
+            "name": "timesheet_crud"
+        },
+        {
+            "id": 2,
+            "name": "designation_get"
+        },
+        {
+            "id": 14,
+            "name": "client_get"
+        },
+        {
+            "id": 22,
+            "name": "taskcard_crud"
+        },
+        {
+            "id": 8,
+            "name": "user_get"
+        },
+        {
+            "id": 16,
+            "name": "project_get"
+        },
+        {
+            "id": 18,
+            "name": "task_get"
+        },
+        {
+            "id": 6,
+            "name": "employee_get"
+        },
+        {
+            "id": 12,
+            "name": "address_common"
+        },
+        {
+            "id": 4,
+            "name": "skill_get"
+        },
+        {
+            "id": 9,
+            "name": "user_common"
+        }
+    ]

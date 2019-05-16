@@ -54,12 +54,12 @@ public class EmployeeService implements IEmployeeService {
 
         String s ;
         if(emp==null)
-            s=String.format("rs_%04d", 1);
+            s=String.format("RS_%04d", 1);
         else
         {
             int i=Integer.parseInt(emp.getEmployeeId().substring(3));
             i++;
-            s=String.format("rs_%04d",i);
+            s=String.format("RS_%04d",i);
         }
         return s;
 

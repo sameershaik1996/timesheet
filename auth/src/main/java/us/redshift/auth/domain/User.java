@@ -49,15 +49,23 @@ public class User extends BaseEntity implements Serializable {
         private Long employeeId;
 
         @NotBlank
+        @JsonIgnoreProperties(allowGetters = false,allowSetters = true)
         @Size(max = 100)
         private String password;
 
-        @ManyToMany(fetch = FetchType.EAGER)
-        @JsonIgnoreProperties(value = "roles")
-        @JoinTable(name = "auth_employee_roles",
-                joinColumns = @JoinColumn(name = "employee_id"),
-                inverseJoinColumns = @JoinColumn(name = "role_id"))
-        private Set<Role> roles = new HashSet<>();
+        @ManyToOne(fetch = FetchType.EAGER)
 
+        @JoinColumn(name="role_id")
+        private Role role;
 
+        @Override
+        public String toString() {
+                return "User{" +
+                        "userName='" + userName + '\'' +
+                        ", email='" + email + '\'' +
+                        ", employeeId=" + employeeId +
+                        ", password='" + password + '\'' +
+                        ", roles=" + role +
+                        '}';
+        }
 }

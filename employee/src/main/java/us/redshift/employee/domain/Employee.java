@@ -2,6 +2,7 @@ package us.redshift.employee.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import us.redshift.employee.domain.common.Address;
 import us.redshift.employee.domain.common.Gender;
@@ -32,7 +33,7 @@ public class Employee extends BaseEntity implements Serializable {
     @Size(max = 40)
     private String lastName;
 
-
+    @JsonProperty("employeeCode")
     @Column(nullable =false,unique = true,updatable = false)
     private String employeeId;
 
@@ -94,7 +95,7 @@ public class Employee extends BaseEntity implements Serializable {
     @JoinTable(name = "emp_employees_skill",
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private List<Skill> skills = new ArrayList<>();
+    private Set<Skill> skills = new HashSet<>();
 
 
     @OneToOne(cascade = CascadeType.ALL)

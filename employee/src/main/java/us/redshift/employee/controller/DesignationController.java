@@ -31,12 +31,12 @@ public class DesignationController {
         return new ResponseEntity<>(designationService.updateDesignation(designation),HttpStatus.CREATED);
     }
 
-    @GetMapping("")
+    @GetMapping("get")
     public ResponseEntity<?> getAllDesignation(){
         return  new ResponseEntity<>(designationService.getAllDesignation(),HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<?> getDestinationById(@PathVariable Long id){
         return  new ResponseEntity<>(designationService.getDesignationById(id),HttpStatus.OK);
     }

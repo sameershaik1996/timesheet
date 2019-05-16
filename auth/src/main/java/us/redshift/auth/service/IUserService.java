@@ -10,4 +10,6 @@ public interface IUserService {
     User loadUserByEmployeeId(Long id);
 
     Object authenticateUser(LoginDto login);
+
+    User updateUser(User user);
 }

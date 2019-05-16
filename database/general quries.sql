@@ -1,3 +1,28 @@
-select T1.name,T2.skill_id from tasks as T1 join task_skill_mapping as T2;
+drop database auth;
 
-insert into tasks(name,description,project_id,status,start_date,end_date,started_on,ended_on) values('task1','asd',1,'open','2019-12-21','2019-12-21','2019-12-21','2019-12-21');
+create database auth;
+
+use auth;
+
+show tables;
+delete from auth_roles where id=3 or id =4;
+
+INSERT INTO auth_roles(name) VALUES('EMPLOYEE');
+INSERT INTO auth_roles(name) VALUES('MANAGER');
+
+INSERT INTO auth_permissions(name) VALUES('employee_save');
+INSERT INTO auth_permissions(name) VALUES('employee_update');
+INSERT INTO auth_permissions(name) VALUES('employee_get');
+
+insert into auth_roles_permission values(6,3);
+
+
+select * from auth_roles;
+select  * from auth_permissions order by id;
+
+select * from auth_employee_roles;
+select * from auth_roles_permission;
+
+
+select * from auth_users;
+

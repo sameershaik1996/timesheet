@@ -11,6 +11,7 @@ import us.redshift.employee.domain.common.Country;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "emp_addresses")
 @Getter
 @Setter
 @NoArgsConstructor

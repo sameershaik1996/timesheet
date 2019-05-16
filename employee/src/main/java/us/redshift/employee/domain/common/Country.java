@@ -10,11 +10,12 @@ import javax.annotation.Generated;
 import javax.persistence.*;
 
 @Entity
+@Table(name="emp_countries")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "countries")
+
 public class Country {
 
     @Id

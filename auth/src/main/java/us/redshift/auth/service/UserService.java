@@ -59,4 +59,10 @@ public class UserService implements IUserService {
         //return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
         return jwt;
     }
+
+    @Override
+    public User updateUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
 }

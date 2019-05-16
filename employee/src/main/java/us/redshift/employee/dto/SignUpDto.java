@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 @Getter
@@ -24,6 +25,8 @@ public class SignUpDto implements Serializable {
 
     @JsonProperty("email")
     private String emailId;
+
+
 
 
 }

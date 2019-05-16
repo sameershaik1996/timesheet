@@ -1,0 +1,72 @@
+{
+    "id": 2,
+    "name": "ADMIN",
+    "permissions":[
+    {
+        "id": 13,
+        "name": "address_common"
+    },
+    {
+        "id": 14,
+        "name": "client_crud"
+    },
+    
+    {
+        "id": 1,
+        "name": "designation_crud"
+    },
+    {
+        "id": 5,
+        "name": "employee_crud"
+    },
+    {
+        "id": 12,
+        "name": "permission_crud"
+    },
+    {
+        "id": 16,
+        "name": "project_crud"
+    },
+    {
+        "id": 11,
+        "name": "role_common"
+    },
+    {
+        "id": 10,
+        "name": "role_crud"
+    },
+    {
+        "id": 3,
+        "name": "skill_crud"
+    },
+    {
+        "id": 18,
+        "name": "task_crud"
+    },
+    {
+        "id": 20,
+        "name": "taskcard_crud"
+    },
+    {
+        "id": 21,
+        "name": "timesheet_crud"
+    },
+    {
+        "id": 9,
+        "name": "user_common"
+    },
+    {
+        "id": 7,
+        "name": "user_crud"
+    },
+     {
+        "id": 24,
+        "name": "taskcard_common"
+    },
+    {
+        "id": 27,
+        "name": "timesheet_common"
+    }
+    
+]
+}

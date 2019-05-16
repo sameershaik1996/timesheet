@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "states")
+@Table(name = "emp_states")
 public class State {
 
     @Id

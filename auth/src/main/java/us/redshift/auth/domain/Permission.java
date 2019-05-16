@@ -20,10 +20,10 @@ public class Permission implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+
     @NaturalId
     @Column(length = 60,unique = true)
-    private PermissionName name;
+    private String name;
 
 
 }

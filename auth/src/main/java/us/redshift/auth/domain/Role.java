@@ -1,6 +1,7 @@
 package us.redshift.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Setter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "auth_roles")
 public class Role {
     @Id
@@ -25,7 +27,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @NaturalId
     @Column(length = 60,unique = true)
-    private RoleName name=RoleName.ROLE_USER;
+    private RoleName name;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = "permissions")

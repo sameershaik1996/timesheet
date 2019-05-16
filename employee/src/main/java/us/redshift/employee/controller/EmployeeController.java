@@ -1,13 +1,13 @@
 package us.redshift.employee.controller;
 
 
-import org.modelmapper.Condition;
-import org.modelmapper.Conditions;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.Skill;
 import us.redshift.employee.dto.EmployeeDto;
@@ -79,17 +79,9 @@ public class EmployeeController {
 
     }
 
-    @GetMapping("ids")
-    public ResponseEntity<?> getEmployeeByIds(@RequestParam(value="id",required = false) List<Long> id)
-    {
-        if(id==null){
-            return new ResponseEntity<>(new ArrayList<Long>(), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(employeeService.getEmployeeByIds(id), HttpStatus.OK);
 
-    }
 
-    @GetMapping("{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable Long id)
     {
 
@@ -97,12 +89,13 @@ public class EmployeeController {
 
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getAllEmployee(HttpServletRequest request)
+    @GetMapping("get")
+    public ResponseEntity<?> getAllEmployee(@RequestParam(value="id",required = false) List<Long> id)
     {
-        System.out.println("asdasd:"+request.getAttribute("details"));
-
-        return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
+        if(id==null)
+            return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(employeeService.getEmployeeByIds(id), HttpStatus.OK);
 
     }
 

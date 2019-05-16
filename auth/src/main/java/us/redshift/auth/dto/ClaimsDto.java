@@ -25,5 +25,5 @@ public class ClaimsDto {
     private Long employeeId;
 
 
-    private Set<Role> roles = new HashSet<>();
+
 }

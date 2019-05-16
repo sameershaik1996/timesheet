@@ -2,22 +2,35 @@ package us.redshift.auth.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import us.redshift.auth.security.CustomUserDetailsService;
 import us.redshift.auth.security.JwtAuthenticationEntryPoint;
 import us.redshift.auth.security.JwtAuthenticationFilter;
+import us.redshift.auth.security.JwtGrantFilter;
+
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -44,6 +57,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
+    }
+
+    @Bean
+    public JwtGrantFilter jwtGrantFilter() {
+        return new JwtGrantFilter();
     }
 
     @Override
@@ -82,18 +100,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.jpg",
                         "/**/*.html",
                         "/**/*.css",
-                        "/**/*.js")
+                        "/**/*.js",
+                        "/**/v2/api-docs",
+                        "/**/configuration/ui",
+                        "/**/swagger-resources",
+                        "/**/configuration/security",
+                        "/**/swagger-ui.html",
+                        "/**/webjars/**")
                 .permitAll()
-                .antMatchers("/auth/v1/api/user/**")
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                .antMatchers("/auth/v1/api/permission/**").permitAll()
+                .antMatchers("/auth/v1/api/user/login")
                 .permitAll()
-                .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
+                .antMatchers("auth/v1/api/checkUsernameAvailability", "auth/v1/api/checkEmailAvailability")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
 
         // Add our custom JWT security filter
-       http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(jwtGrantFilter(), BasicAuthenticationFilter.class);
     }
+
+
 
 }

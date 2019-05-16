@@ -36,27 +36,22 @@ public class SkillController {
         return new ResponseEntity<>(skillService.updateSkill(skill), HttpStatus.CREATED);
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getAllSkills(){
-
-        return new ResponseEntity<>(skillService.getAllSkills(), HttpStatus.OK);
+    @GetMapping("get")
+    public ResponseEntity<?> getAllSkills(@RequestParam(value = "id",required = false) List<Long> id,@RequestParam(value = "empId",required = false) List<Long> employeeId){
+        if(id!=null)
+            return new ResponseEntity<>(skillService.getSkillByIds(id), HttpStatus.OK);
+        else if(employeeId!=null)
+            return new ResponseEntity<>(skillService.findByEmployeesIn(employeeService.getEmployeeByIds(employeeId)), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(skillService.getAllSkills(), HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<?> getSkillById(@PathVariable Long id){
 
         return new ResponseEntity<>(skillService.getSkillById(id), HttpStatus.OK);
     }
 
-    @GetMapping("ids")
-    public ResponseEntity<?> getSkillByIds(@RequestParam(value = "id",required = false) List<Long> id){
 
-        return new ResponseEntity<>(skillService.getSkillByIds(id), HttpStatus.OK);
-    }
 
-    @GetMapping("/employee")
-    public ResponseEntity<?> getSkillByEmployeeId(@RequestParam(value = "id",required = false) List<Long> id){
-
-        return new ResponseEntity<>(skillService.findByEmployeesIn(employeeService.getEmployeeByIds(id)), HttpStatus.OK);
-    }
 }
