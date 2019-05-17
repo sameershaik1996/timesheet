@@ -21,10 +21,13 @@ public class TaskCardDetail extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private Date date;
 
+
+    private Long _index;
+
     private BigDecimal hours;
 
     @Enumerated(EnumType.STRING)
-    private TimeSheetStatus status;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
     private String comment;
 
@@ -32,12 +35,7 @@ public class TaskCardDetail extends BaseEntity {
 
     @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "task_card_id")
-    @JsonIgnoreProperties(value = {"taskCardDetails"})
+    @JsonIgnoreProperties(value = {"taskCardDetails", "project"})
     private TaskCard taskCard;
 
-    public void setStatus(TimeSheetStatus status) {
-        if (status == null)
-            status = TimeSheetStatus.PENDING;
-        this.status = status;
-    }
 }

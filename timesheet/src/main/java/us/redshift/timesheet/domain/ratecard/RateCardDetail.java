@@ -1,5 +1,6 @@
 package us.redshift.timesheet.domain.ratecard;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,10 +26,12 @@ public class RateCardDetail extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
+
     private Location location;
 
     @ManyToOne
     @JoinColumn(name = "rate_card_id", nullable = false)
+    @JsonIgnoreProperties(value = "rateCardDetails")
     private RateCard rateCard;
 
 }

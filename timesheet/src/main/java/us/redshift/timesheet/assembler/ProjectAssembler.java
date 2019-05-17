@@ -52,20 +52,21 @@ public class ProjectAssembler {
             Set<Long> source = new HashSet<>();
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-//                System.out.println(source);
-            }
-
+//                //System.out.println(source);
 
 //          Feign Client Call to get EmployeeDto
-            Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+                Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
 
 
-            Type targetType = new TypeToken<Set<EmployeeListDto>>() {
-            }.getType();
+                Type targetType = new TypeToken<Set<EmployeeListDto>>() {
+                }.getType();
 
 //          Convert EmployeeDto to EmployeeListDto
-            Set<EmployeeListDto> dest = mapper.map(employees, targetType);
-            return dest;
+                Set<EmployeeListDto> dest = mapper.map(employees, targetType);
+                return dest;
+            }
+
+            return null;
         };
 
 
@@ -74,11 +75,15 @@ public class ProjectAssembler {
             Long source = new Long(1);
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-            }
-            EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
-            EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
+                //System.out.println("project Assembler");
 
-            return dest;
+                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
+
+                return dest;
+            }
+            return null;
+
         };
 
 //      adding long to EmployeeListDto  conversion property

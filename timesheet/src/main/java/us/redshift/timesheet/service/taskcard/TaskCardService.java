@@ -8,6 +8,7 @@ import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
+import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
@@ -15,10 +16,12 @@ import us.redshift.timesheet.reposistory.ratecard.RateCardDetailRepository;
 import us.redshift.timesheet.reposistory.task.TaskRepository;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardRepository;
+import us.redshift.timesheet.reposistory.timesheet.TimeSheetRepository;
 import us.redshift.timesheet.service.task.TaskService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,30 +42,44 @@ public class TaskCardService implements ITaskCardService {
 
     private final TaskService taskService;
 
-    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository, ProjectRepository projectRepository, TaskCardDetailRepository taskCardDetailRepository, TaskService taskService) {
+    private final TimeSheetRepository timeSheetRepository;
+
+
+    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository, ProjectRepository projectRepository, TaskCardDetailRepository taskCardDetailRepository, TaskService taskService, TimeSheetRepository timeSheetRepository) {
         this.taskCardRepository = taskCardRepository;
         this.rateCardDetailRepository = rateCardDetailRepository;
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.taskCardDetailRepository = taskCardDetailRepository;
         this.taskService = taskService;
+        this.timeSheetRepository = timeSheetRepository;
+
+
     }
 
 
     @Override
-    public Set<TaskCard> updateTaskCard(Set<TaskCard> taskCards) {
-        Set<TaskCard> taskCardSet = new HashSet<>();
+    public Set<TaskCard> updateTaskCard(Set<TaskCard> taskCards, TimeSheetStatus status) {
+        List<TaskCard> taskCardList = new ArrayList<>();
+
         taskCards.forEach(taskCard -> {
             if (!taskCardRepository.existsById(taskCard.getId()))
-                new ResourceNotFoundException("TaskCard", "ID", taskCard.getId());
-            taskCardSet.add(calculateAmount(taskCard));
-            if (taskCard.getStatus().equals(TimeSheetStatus.APPROVED)) {
+                throw new ResourceNotFoundException("TaskCard", "ID", taskCard.getId());
+            taskCard.setStatus(status);
+            TimeSheet timeSheet = timeSheetRepository.findById(taskCard.getTimeSheet().getId()).orElseThrow(() -> new ResourceNotFoundException("TimeSheet", "ID", taskCard.getTimeSheet().getId()));
+            TaskCard savedTaskCard = taskCardRepository.save(calculateAmount(taskCard));
+            taskCardList.add(savedTaskCard);
+            if (status.equals(TimeSheetStatus.APPROVED)) {
                 taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.APPROVED.name(), taskCard.getId());
                 if (taskCard.getType().equals(TaskType.BILLABLE))
-                    taskService.updateTask(taskCard.getTask().getId(), taskCard.getHours());
+                    taskService.updateTaskHours(taskCard.getTask().getId(), taskCard.getHours());
+//                timeSheet status update
+                TimeSheetStatus(timeSheet);
+            } else {
+                taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.REJECTED.name(), taskCard.getId());
+                timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
             }
         });
-        List<TaskCard> taskCardList = taskCardRepository.saveAll(taskCardSet);
         Set<TaskCard> cardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
         return cardSet;
     }
@@ -79,7 +96,7 @@ public class TaskCardService implements ITaskCardService {
     @Override
     public void deleteTaskCardById(Long id) {
         if (!taskCardRepository.existsById(id))
-            new ResourceNotFoundException("TaskCard", "ID", id);
+            throw new ResourceNotFoundException("TaskCard", "ID", id);
         taskCardRepository.deleteById(id);
     }
 
@@ -88,6 +105,11 @@ public class TaskCardService implements ITaskCardService {
         Set<Project> projectSet = projectRepository.findAllByManagerId(managerId);
 
         return taskCardRepository.findByStatusNotLikeAndProjectIn(TimeSheetStatus.PENDING, projectSet);
+    }
+
+    @Override
+    public List<TaskCard> getAllTaskCardByProject(Long projectId) {
+        return taskCardRepository.findByStatusNotLikeAndProject_IdOrderByEmployeeIdAscTaskCardDetailsAsc(TimeSheetStatus.PENDING, projectId);
     }
 
     @Override
@@ -110,10 +132,9 @@ public class TaskCardService implements ITaskCardService {
                 rateCardId = task.getProject().getRateCard().getId();
 
 //      Assign ratePerHour
-
-            if (card.getLocation().getId() != null && card.getSkillId() != null) {
-                RateCardDetail rateCardDetail = rateCardDetailRepository.findByRateCard_IdAndLocationIdAndSkillIdAndDesignationId
-                        (rateCardId, card.getLocation().getId(), card.getSkillId(), Long.valueOf(1));
+            if (card.getLocation().getId() != null && card.getSkillId() != null && card.getEmployeeId() != null) {
+                RateCardDetail rateCardDetail = rateCardDetailRepository.findByLocationIdAndSkillIdAndDesignationId
+                        (card.getLocation().getId(), card.getSkillId(), Long.valueOf(1));
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
 
@@ -139,4 +160,26 @@ public class TaskCardService implements ITaskCardService {
         card.setTask(task);
         return card;
     }
+
+    public void TimeSheetStatus(TimeSheet timeSheet) {
+
+        int taskCardApprove = 0, taskCardReject = 0;
+        int size = timeSheet.getTaskCards().size();
+
+        for (TaskCard taskCard1 : timeSheet.getTaskCards()) {
+            if (taskCard1.getStatus().equals(TimeSheetStatus.APPROVED))
+                taskCardApprove++;
+            else if (taskCard1.getStatus().equals(TimeSheetStatus.REJECTED))
+                taskCardReject++;
+        }
+        if (taskCardApprove == size) {
+            timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.APPROVED.name(), timeSheet.getId());
+        } else if (taskCardReject > 1) {
+            timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
+        }
+
+    }
+
+
 }
+

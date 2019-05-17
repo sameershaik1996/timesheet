@@ -6,9 +6,6 @@ import lombok.Setter;
 import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.project.ProjectType;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +14,7 @@ public class RateCardDto extends BaseEntity {
     private String name;
     private Boolean isDefault = false;
     private ProjectType projectType;
-    private Set<RateCardDetailDto> rateCardDetails = new HashSet<>();
+//    private Set<RateCardDetailDto> rateCardDetails = new HashSet<>();
 
 
 }

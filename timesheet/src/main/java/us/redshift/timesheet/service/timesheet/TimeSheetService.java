@@ -48,33 +48,24 @@ public class TimeSheetService implements ITimeSheetService {
 
     @Override
     public TimeSheet updateTimeSheet(TimeSheet timeSheet, TimeSheetStatus status) {
-
-
         timeSheetRepository.findById(timeSheet.getId()).orElseThrow(() -> new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId()));
-        timeSheet.setStatus(status);
         Set<TaskCard> taskCards = new HashSet<>(timeSheet.getTaskCards());
         taskCards.forEach(taskCard -> {
             TaskCard card = taskCardService.calculateAmount(taskCard);
+            card.setStatus(status);
             timeSheet.addTaskCard(card);
-            if (status.equals(TimeSheetStatus.SUBMITTED) || status.equals(TimeSheetStatus.APPROVED)) {
-                taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), card.getId());
-                if (status.equals(TimeSheetStatus.APPROVED)) {
-                    if (taskCard.getType().equals(TaskType.BILLABLE))
-                        taskService.updateTask(taskCard.getTask().getId(), taskCard.getHours());
-                }
+            if (status.equals(TimeSheetStatus.APPROVED)) {
+                if (card.getType().equals(TaskType.BILLABLE))
+                    taskService.updateTaskHours(card.getTask().getId(), taskCard.getHours());
             }
         });
-
         Set<TimeOff> timeOffs = new HashSet<>(timeSheet.getTimeOffs());
-
         timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
-        TimeSheet savedTimeSheet = timeSheetRepository.save(timeSheet);
-        if (status.equals(TimeSheetStatus.SUBMITTED) || status.equals(TimeSheetStatus.APPROVED)) {
-            taskCardRepository.setStatusForTaskCard(status.name(), timeSheet.getId());
-
-        }
-
-        return savedTimeSheet;
+        timeSheet.setStatus(status);
+        TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
+        timeSheet.getTaskCards().forEach(taskCard ->
+                System.out.println(taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId())));
+        return SaveTimeSheet;
     }
 
     @Override
@@ -101,7 +92,7 @@ public class TimeSheetService implements ITimeSheetService {
         year = year == 0 ? currentYear : year;
         TimeSheet timeSheet = new TimeSheet();
         if (weekNumber != 0 && year != 0) {
-            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(employeeId, year, weekNumber);
+            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, year, weekNumber);
             if (timeSheet == null && weekNumber == currentWeekNumber && year == currentYear) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
                 timeSheet = timeSheetRepository.save(newTimeSheet);
@@ -110,11 +101,22 @@ public class TimeSheetService implements ITimeSheetService {
         } else if (weekNumber == 0) {
             timeSheet = timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateDesc(employeeId, TimeSheetStatus.PENDING);
             if (timeSheet == null) {
-                TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
-                timeSheet = timeSheetRepository.save(newTimeSheet);
+                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, currentYear, currentWeekNumber);
+                if (timeSheet == null) {
+                    TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
+                    timeSheet = timeSheetRepository.save(newTimeSheet);
+                }
             }
         }
         return timeSheet;
+    }
+
+    @Override
+    public Set<TimeSheet> getAllTimeSheetByProjectId(Long projectId) {
+
+        Set<TaskCard> taskCardSet = new HashSet<>(taskCardService.getAllTaskCardByProject(projectId));
+
+        return timeSheetRepository.findAllByTaskCardsInOrderByFromDateAsc(taskCardSet);
     }
 
 

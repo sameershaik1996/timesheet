@@ -1,12 +1,14 @@
 package us.redshift.timesheet.service.taskcard;
 
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ITaskCardService {
 
-    Set<TaskCard> updateTaskCard(Set<TaskCard> taskCards);
+    Set<TaskCard> updateTaskCard(Set<TaskCard> taskCards, TimeSheetStatus status);
 
     TaskCard getTaskCardById(Long id);
 
@@ -15,5 +17,7 @@ public interface ITaskCardService {
     void deleteTaskCardById(Long id);
 
     Set<TaskCard> getAllTaskCardByMangerId(Long managerId);
+
+    List<TaskCard> getAllTaskCardByProject(Long projectId);
 
 }

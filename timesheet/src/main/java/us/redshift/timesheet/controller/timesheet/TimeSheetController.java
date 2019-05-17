@@ -48,8 +48,13 @@ public class TimeSheetController {
 
 
     @GetMapping({"timesheet/get"})
-    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "employeeId") Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber) throws ParseException {
-        TimeSheet timeSheet = timeSheetService.getTimeSheetByWeekNumber(employeeId, year, weekNumber);
-        return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheet), HttpStatus.OK);
+    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber) throws ParseException {
+        if (projectId != 0) {
+            Set<TimeSheet> timeSheetSet = timeSheetService.getAllTimeSheetByProjectId(projectId);
+            return new ResponseEntity<>(timeSheetAssembler.convertToDto1(timeSheetSet), HttpStatus.OK);
+        } else {
+            TimeSheet timeSheet = timeSheetService.getTimeSheetByWeekNumber(employeeId, year, weekNumber);
+            return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheet), HttpStatus.OK);
+        }
     }
 }

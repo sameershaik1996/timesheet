@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.dto.common.BaseDto;
-import us.redshift.timesheet.dto.common.DesignationDto;
-import us.redshift.timesheet.dto.common.LocationDto;
-import us.redshift.timesheet.dto.common.SkillDto;
 
 import java.math.BigDecimal;
 
@@ -17,9 +14,10 @@ import java.math.BigDecimal;
 public class RateCardDetailDto extends BaseDto {
 
     private BigDecimal value;
-    private SkillDto skill;
-    private DesignationDto designation;
-    private LocationDto location;
+    private long skillId;
+    private long designationId;
+    private long locationId;
+    private RateCardDto rateCard;
 
 
 }

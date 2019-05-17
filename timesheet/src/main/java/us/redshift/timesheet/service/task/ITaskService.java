@@ -14,7 +14,7 @@ public interface ITaskService {
 
     Task updateTask(Task task);
 
-    void updateTask(Long taskId, BigDecimal usedHour);
+    void updateTaskHours(Long taskId, BigDecimal usedHour);
 
     Task getTaskById(Long id);
 
