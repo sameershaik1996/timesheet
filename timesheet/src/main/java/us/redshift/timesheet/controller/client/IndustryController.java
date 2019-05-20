@@ -32,7 +32,7 @@ public class IndustryController {
         return new ResponseEntity<>(industryService.updateIndustry(industry), HttpStatus.CREATED);
     }
 
-    @GetMapping("client/industrie/get")
+    @GetMapping("client/industry/get")
     public ResponseEntity<?> getAllIndustries() {
 
         return new ResponseEntity<>(industryService.getAllIndustries(), HttpStatus.OK);

@@ -10,7 +10,7 @@ public interface IClientService {
 
     Client saveClient(Client client);
 
-    Client updateClient(Client client);
+    Set<Client> updateClient(Set<Client> clients, ClientStatus status);
 
     Client getClientById(Long id);
 

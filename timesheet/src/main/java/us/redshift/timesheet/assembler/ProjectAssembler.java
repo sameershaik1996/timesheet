@@ -111,6 +111,13 @@ public class ProjectAssembler {
         return mapper.map(projectDto, Project.class);
     }
 
+    public Set<Project> convertToEntity(Set<ProjectDto> projectDtos) throws ParseException {
+        Type targetListType = new TypeToken<Set<Project>>() {
+        }.getType();
+        Set<Project> set = mapper.map(projectDtos, targetListType);
+        return set;
+    }
+
     public ProjectDto convertToDto(Project project) throws ParseException {
         return mapper.map(project, ProjectDto.class);
     }

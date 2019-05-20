@@ -7,11 +7,11 @@ import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
-import us.redshift.timesheet.feignclient.EmployeeFeign;
 import us.redshift.timesheet.reposistory.client.ClientRepository;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.util.Reusable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,13 +22,11 @@ public class ProjectService implements IProjectService {
 
     private final ProjectRepository projectRepository;
     private final ClientRepository clientRepository;
-    private final EmployeeFeign employeeFeign;
 
 
-    public ProjectService(ProjectRepository projectRepository, ClientRepository clientRepository, EmployeeFeign employeeFeign) {
+    public ProjectService(ProjectRepository projectRepository, ClientRepository clientRepository) {
         this.projectRepository = projectRepository;
         this.clientRepository = clientRepository;
-        this.employeeFeign = employeeFeign;
     }
 
     @Override
@@ -47,11 +45,26 @@ public class ProjectService implements IProjectService {
 
 
     @Override
-    public Project updateProject(Project project) {
-        if (!projectRepository.existsById(project.getId()))
-            throw new ResourceNotFoundException("Project", "Id", project.getId());
-        project = setRateCardDetail(project);
-        return projectRepository.save(project);
+    public Set<Project> updateProject(Set<Project> projects, ProjectStatus status) {
+
+
+        List<Project> projectList = new ArrayList<>();
+        projects.forEach(project -> {
+            if (status != null) {
+                Project getProject = projectRepository.findById(project.getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", ""));
+                getProject.setStatus(status);
+                projectList.add(getProject);
+            } else {
+                if (!projectRepository.existsById(project.getId()))
+                    throw new ResourceNotFoundException("Project", "Id", project.getId());
+                project = setRateCardDetail(project);
+                projectList.add(project);
+            }
+        });
+
+        Set<Project> projectSet = projectRepository.saveAll(projectList).stream().collect(Collectors.toCollection(HashSet::new));
+
+        return projectSet;
     }
 
     @Override

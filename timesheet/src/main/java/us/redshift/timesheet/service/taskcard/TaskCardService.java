@@ -10,7 +10,9 @@ import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
+import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.feignclient.EmployeeFeign;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.reposistory.ratecard.RateCardDetailRepository;
 import us.redshift.timesheet.reposistory.task.TaskRepository;
@@ -44,8 +46,10 @@ public class TaskCardService implements ITaskCardService {
 
     private final TimeSheetRepository timeSheetRepository;
 
+    private final EmployeeFeign employeeFeign;
 
-    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository, ProjectRepository projectRepository, TaskCardDetailRepository taskCardDetailRepository, TaskService taskService, TimeSheetRepository timeSheetRepository) {
+
+    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository, ProjectRepository projectRepository, TaskCardDetailRepository taskCardDetailRepository, TaskService taskService, TimeSheetRepository timeSheetRepository, EmployeeFeign employeeFeign) {
         this.taskCardRepository = taskCardRepository;
         this.rateCardDetailRepository = rateCardDetailRepository;
         this.taskRepository = taskRepository;
@@ -55,6 +59,7 @@ public class TaskCardService implements ITaskCardService {
         this.timeSheetRepository = timeSheetRepository;
 
 
+        this.employeeFeign = employeeFeign;
     }
 
 
@@ -131,10 +136,17 @@ public class TaskCardService implements ITaskCardService {
             if (task.getProject().getRateCard() != null)
                 rateCardId = task.getProject().getRateCard().getId();
 
+
 //      Assign ratePerHour
             if (card.getLocation().getId() != null && card.getSkillId() != null && card.getEmployeeId() != null) {
+//      Get Employee Designation
+                Long designationId = Long.valueOf(1);
+                EmployeeDto employeeDto = employeeFeign.getEmployeeById(card.getEmployeeId()).getBody();
+                if (employeeDto.getDesignation() != null)
+                    designationId = employeeDto.getDesignation().getId();
+//       TODo Add RateCard Id
                 RateCardDetail rateCardDetail = rateCardDetailRepository.findByLocationIdAndSkillIdAndDesignationId
-                        (card.getLocation().getId(), card.getSkillId(), Long.valueOf(1));
+                        (card.getLocation().getId(), card.getSkillId(), designationId);
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
 

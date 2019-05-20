@@ -58,7 +58,7 @@ public class TaskController {
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {
             Set<Task> tasks = taskService.getAllTaskByPagination(page, limits, orderBy, fields);
-            return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
+            return new ResponseEntity<>(taskAssembler.convertToDto1(tasks), HttpStatus.OK);
         }
 
     }

@@ -29,6 +29,14 @@ public class ClientAssembler {
         return mapper.map(client, ClientDto.class);
     }
 
+    public Set<Client> convertToEntity(Set<ClientDto> clientDtos) throws ParseException {
+        Type targetListType = new TypeToken<Set<Client>>() {
+        }.getType();
+        Set<Client> set = mapper.map(clientDtos, targetListType);
+        return set;
+    }
+
+
     public Set<ClientListDto> convertToDto(Set<Client> clients) throws ParseException {
         Type targetListType = new TypeToken<Set<ClientListDto>>() {
         }.getType();
