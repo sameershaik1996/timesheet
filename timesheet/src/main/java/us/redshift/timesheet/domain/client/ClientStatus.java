@@ -1,9 +1,10 @@
 package us.redshift.timesheet.domain.client;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum ClientStatus {
+public enum ClientStatus implements Serializable {
     ACTIVE("ACTIVE"), INACTIVE("INACTIVE");
 
     //Lookup table

@@ -8,6 +8,7 @@ import us.redshift.timesheet.domain.ratecard.RateCard;
 import us.redshift.timesheet.domain.client.Client;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Project extends BaseEntity {
+public class Project extends BaseEntity implements Serializable {
 
     @Column(nullable = false, unique = true)
     private String projectCode;
@@ -63,11 +64,11 @@ public class Project extends BaseEntity {
     @Column(nullable = false)
     private Long managerId;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
     @JoinColumn(name = "rate_card_id")
     private RateCard rateCard;
 

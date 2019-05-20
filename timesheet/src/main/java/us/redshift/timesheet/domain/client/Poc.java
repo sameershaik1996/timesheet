@@ -8,13 +8,14 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "pss_pocs")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Poc extends BaseEntity {
+public class Poc extends BaseEntity implements Serializable {
 
     private String name;
     private String phoneNumber;

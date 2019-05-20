@@ -91,6 +91,12 @@ public class TaskCardService implements ITaskCardService {
     }
 
     @Override
+    public Set<TaskCard> getTaskCardByStatusAndType(TimeSheetStatus status, TaskType type) {
+        return taskCardRepository.findByStatusAndType(status,type);
+    }
+
+
+    @Override
     public TaskCard getTaskCardById(Long id) {
         return taskCardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TaskCard", "ID", id));
     }

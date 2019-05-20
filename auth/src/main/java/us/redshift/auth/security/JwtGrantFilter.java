@@ -62,7 +62,7 @@ public class JwtGrantFilter extends OncePerRequestFilter {
     private String getPermission(String api,String role) {
         String[] split=api.split("/");
         StringBuilder permission=new StringBuilder();
-        if(split[1].equals("save")||split[1].equals("update")){
+        if(split[1].equals("save")||split[1].equals("update")||split[1].equals("delete")){
             permission.append(split[0]+"_"+"crud");
         }
         else if(split[1].equals("get")&&!role.equals("EMPLOYEE"))

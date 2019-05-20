@@ -24,7 +24,6 @@ public class RateCardService implements IRateCardService {
         List<RateCardDetail> rateCardDetails = new ArrayList<>(rateCard.getRateCardDetails());
         System.out.println(rateCardDetails.size());
         rateCardDetails.forEach(cardDetail -> {
-            System.out.println(cardDetail.getLocation().getId());
             rateCard.addRateCardDetail(cardDetail);
         });
         return rateCardRepository.save(rateCard);

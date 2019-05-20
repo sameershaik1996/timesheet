@@ -53,7 +53,7 @@ public class UserController {
     {
         if(user.getRole()==null){
             Role role=new Role();
-            Long id=new Long(3);
+            Long id=new Long(1);
             role.setId(id);
             user.setRole(role);
         }

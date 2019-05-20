@@ -2,7 +2,9 @@ package us.redshift.timesheet.service.timesheet;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import us.redshift.timesheet.assembler.TimeSheetCloneAssembler;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeOff;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
@@ -35,14 +37,23 @@ public class TimeSheetService implements ITimeSheetService {
     private final TaskCardDetailRepository taskCardDetailRepository;
     private final TaskCardRepository taskCardRepository;
     private final TaskService taskService;
+    private final TimeSheetCloneAssembler timeSheetCloneAssembler;
+    private final Calendar calendar;
 
-
-    public TimeSheetService(TimeSheetRepository timeSheetRepository, TaskCardService taskCardService, TaskCardDetailRepository taskCardDetailRepository, TaskCardRepository taskCardRepository, TaskService taskService) {
+    public TimeSheetService(TimeSheetRepository timeSheetRepository,
+                            TaskCardService taskCardService,
+                            TaskCardDetailRepository taskCardDetailRepository,
+                            TaskCardRepository taskCardRepository,
+                            TaskService taskService,
+                            Calendar calendar,
+                            TimeSheetCloneAssembler timeSheetCloneAssembler) {
         this.timeSheetRepository = timeSheetRepository;
         this.taskCardService = taskCardService;
         this.taskCardDetailRepository = taskCardDetailRepository;
         this.taskCardRepository = taskCardRepository;
         this.taskService = taskService;
+        this.calendar=calendar;
+        this.timeSheetCloneAssembler=timeSheetCloneAssembler;
     }
 
 
@@ -115,6 +126,34 @@ public class TimeSheetService implements ITimeSheetService {
             }
         }
         return timeSheet;
+    }
+
+    @Override
+    public TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year) {
+        return timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(id,year,weekNumber);
+    }
+
+    @Override
+    public TimeSheet cloneTimeSheet(TimeSheet timeSheet) {
+        List<TaskCard> taskCards = new ArrayList<>(timeSheet.getTaskCards());
+
+        taskCards.forEach(taskCard ->
+        {
+            Set<TaskCardDetail> cardDetails=taskCard.getTaskCardDetails();
+            cardDetails.forEach(taskCardDetail ->
+            {
+                calendar.setTime(taskCardDetail.getDate());
+                calendar.add(Calendar.DAY_OF_MONTH, 7);
+                taskCardDetail.setDate(calendar.getTime());
+                taskCard.add(taskCardDetail);
+
+            });
+            taskCard.setTaskCardDetails(cardDetails);
+            timeSheet.addTaskCard(taskCard);
+        });
+        timeSheet.setTaskCards(taskCards);
+
+        return timeSheetRepository.save(timeSheet);
     }
 
 

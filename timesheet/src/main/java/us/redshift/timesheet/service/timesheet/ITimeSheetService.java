@@ -18,4 +18,8 @@ public interface ITimeSheetService {
     TimeSheet getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber);
 
 
+    TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year);
+
+
+    TimeSheet cloneTimeSheet(TimeSheet timeSheet);
 }

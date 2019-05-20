@@ -45,7 +45,7 @@ public class TaskCard extends BaseEntity {
 
     private BigDecimal hours;
 
-    private String comment;
+    private String comment="";
 
     @ManyToOne()
     @JoinColumn(name = "project_id")

@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import us.redshift.timesheet.assembler.TaskCardAssembler;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.taskcard.TaskType;
+import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.taskcard.TaskCardDto;
 import us.redshift.timesheet.service.taskcard.ITaskCardService;
 
@@ -34,11 +36,17 @@ public class TaskCardController {
     }
 
     @GetMapping({"taskcard/get"})
-    public ResponseEntity<?> getAllTaskCardByPagination(@RequestParam(value = "managerId", defaultValue = "0") Long managerId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllTaskCardByPagination(@RequestParam(value = "managerId", defaultValue = "0") Long managerId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value="status",required = false)TimeSheetStatus status, @RequestParam(value="type",required = false)TaskType type, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (!managerId.equals(Long.valueOf(0))) {
             Set<TaskCard> taskCardSet = taskCardService.getAllTaskCardByMangerId(managerId);
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCardSet), HttpStatus.OK);
-        } else {
+        }
+
+        else if (status!=null&type!=null){
+            Set<TaskCard> taskCardSet = taskCardService.getTaskCardByStatusAndType(status,type);
+            return new ResponseEntity<>(taskCardSet, HttpStatus.OK);
+        }
+        else {
             Set<TaskCard> taskCardSet = taskCardService.getAllTaskCardByPagination(page, limits, orderBy, fields);
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCardSet), HttpStatus.OK);
         }

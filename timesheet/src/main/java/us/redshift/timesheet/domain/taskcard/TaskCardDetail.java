@@ -26,13 +26,13 @@ public class TaskCardDetail extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TimeSheetStatus status;
 
-    private String comment;
+    private String comment="";
 
-    private String rejectedComment;
+    private String rejectedComment="";
 
     @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "task_card_id")
-    @JsonIgnoreProperties(value = {"taskCardDetails"})
+    @JsonIgnoreProperties(value = {"taskCardDetails","project","client"})
     private TaskCard taskCard;
 
     public void setStatus(TimeSheetStatus status) {
