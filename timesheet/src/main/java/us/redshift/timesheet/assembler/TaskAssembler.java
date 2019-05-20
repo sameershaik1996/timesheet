@@ -38,22 +38,26 @@ public class TaskAssembler {
         Converter<Set<EmployeeListDto>, Set<Long>> EmployeeToLongSet = mappingContext -> {
 
             Set<EmployeeListDto> source = new HashSet<>();
-            if (mappingContext.getSource() != null)
+            if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-
-            Set<Long> dest = source.stream().map(employeeListDto -> employeeListDto.getId()).collect(Collectors.toSet());
-            return dest;
+                //System.out.println("Task Assembler employee long set");
+                Set<Long> dest = source.stream().map(employeeListDto -> employeeListDto.getId()).collect(Collectors.toSet());
+                return dest;
+            }
+            return null;
         };
 
 //      SkillDto to Long set
         Converter<Set<SkillDto>, Set<Long>> SkillToLongSet = mappingContext -> {
 
             Set<SkillDto> source = new HashSet<>();
-            if (mappingContext.getSource() != null)
+            if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-
-            Set<Long> dest = source.stream().map(skillDto -> skillDto.getId()).collect(Collectors.toSet());
-            return dest;
+                //System.out.println("Task Assembler skill long set");
+                Set<Long> dest = source.stream().map(skillDto -> skillDto.getId()).collect(Collectors.toSet());
+                return dest;
+            }
+            return null;
         };
 
 //      adding EmployeeListDto to long set conversion property
@@ -69,16 +73,17 @@ public class TaskAssembler {
             Set<Long> source = new HashSet<>();
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
+                //          Feign Client Call to get EmployeeDto
+                Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+                Type targetType = new TypeToken<Set<EmployeeListDto>>() {
+                }.getType();
+                //System.out.println("Task Assembler employee set");
+//          Convert EmployeeDto to EmployeeListDto
+                Set<EmployeeListDto> dest = mapper.map(employees, targetType);
+                return dest;
             }
 
-//          Feign Client Call to get EmployeeDto
-            Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
-            Type targetType = new TypeToken<Set<EmployeeListDto>>() {
-            }.getType();
-
-//          Convert EmployeeDto to EmployeeListDto
-            Set<EmployeeListDto> dest = mapper.map(employees, targetType);
-            return dest;
+            return null;
         };
 
 //      Long to SkillDto set
@@ -86,17 +91,19 @@ public class TaskAssembler {
             Set<Long> source = new HashSet<>();
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-            }
-
+                //System.out.println("Task Assembler skill set");
 //          Feign Client Call to get SkillDto
-            Set<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source).getBody();
+                Set<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source).getBody();
 
-            return dest;
+                return dest;
+            }
+            return null;
         };
 
 //      adding long to EmployeeListDto set conversion property
         this.mapper.addMappings(new PropertyMap<Task, TaskDto>() {
             protected void configure() {
+
                 using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
                 using(LongToSkillSet).map(source.getSkillId()).setSkills(null);
             }

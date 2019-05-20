@@ -1,13 +1,71 @@
 package us.redshift.timesheet;
 
-//@Configuration
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import us.redshift.timesheet.domain.timesheet.TimeSheet;
+import us.redshift.timesheet.dto.common.EmployeeDto;
+import us.redshift.timesheet.dto.common.EmployeeListDto;
+import us.redshift.timesheet.dto.timesheet.TimeSheetBasicListDto;
+import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
+import us.redshift.timesheet.dto.timesheet.TimeSheetListDto;
+import us.redshift.timesheet.feignclient.EmployeeFeign;
+
+@Configuration
 public class ModelMapperConfig {
 
-       /* @Bean
+    private final EmployeeFeign employeeFeign;
+
+    public ModelMapperConfig(EmployeeFeign employeeFeign) {
+        this.employeeFeign = employeeFeign;
+    }
+
+
+    @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
 
+        //      Long to EmployeeListDto
+        Converter<Long, EmployeeListDto> LongToEmployee = mappingContext -> {
+            Long source;
+            if (mappingContext.getSource() != null) {
+                source = mappingContext.getSource();
+                //System.out.println("TimeSheet Assembler employee");
+                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
+                return dest;
+            }
+            return null;
+        };
 
+        //      adding long to EmployeeListDto  conversion property
+        mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetDto>() {
+            protected void configure() {
+                using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
+            }
+        });
+
+        //      adding long to EmployeeListDto  conversion property
+        mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetListDto>() {
+            protected void configure() {
+                using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
+            }
+        });
+
+        //      adding long to EmployeeListDto  conversion property
+        mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetBasicListDto>() {
+            protected void configure() {
+                using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
+            }
+        });
+
+        return mapper;
+    }
+
+
+/*
 //      BaseDto to Long
         Converter<Set<BaseDto>, Set<Long>> BaseToLong = mappingContext -> {
 

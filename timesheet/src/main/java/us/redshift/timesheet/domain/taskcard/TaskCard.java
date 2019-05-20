@@ -47,6 +47,7 @@ public class TaskCard extends BaseEntity {
 
     private String comment="";
 
+
     @ManyToOne()
     @JoinColumn(name = "project_id")
     private Project project;
@@ -62,7 +63,7 @@ public class TaskCard extends BaseEntity {
 
     @ManyToOne()
     @JoinColumn(name = "time_sheet_id")
-    @JsonIgnoreProperties(value = "taskCard")
+    @JsonIgnoreProperties(value = "taskCards")
     private TimeSheet timeSheet;
 
     public void add(TaskCardDetail taskCardDetail) {

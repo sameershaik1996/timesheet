@@ -29,14 +29,6 @@ public class TimesheetApplication {
     }
 
 
-    @Bean
-    public ModelMapper modelMapper() {
-
-
-        ModelMapper mapper = new ModelMapper();
-//        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-        return mapper;
-    }
 
 
 }

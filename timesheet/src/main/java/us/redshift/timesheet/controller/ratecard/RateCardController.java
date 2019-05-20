@@ -1,17 +1,23 @@
 package us.redshift.timesheet.controller.ratecard;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import us.redshift.timesheet.domain.project.ProjectType;
 import us.redshift.timesheet.domain.ratecard.RateCard;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
+import us.redshift.timesheet.dto.ratecard.RateCardDetailDto;
 import us.redshift.timesheet.reposistory.ratecard.RateCardDetailRepository;
 import us.redshift.timesheet.service.ratecard.IRateCardService;
 
 import javax.validation.Valid;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -53,12 +59,23 @@ public class RateCardController {
     @GetMapping("ratecard/group")
     public ResponseEntity<?> getRateCardGroupBy() {
 
-        List<RateCardDetail> rateCardDetails = rateCardDetailRepository.findAll();
+        Set<RateCardDetail> rateCardDetails = rateCardDetailRepository.findAllByRateCard_ProjectTypeAndRateCard_IsDefaultOrderByLocation(ProjectType.FIXED_BID, true);
 
-        Map<Long, List<RateCardDetail>> groupByPriceMap =
-                rateCardDetails.stream().collect(Collectors.groupingBy(RateCardDetail::getSkillId));
+        Type targetSetType = new TypeToken<Set<RateCardDetailDto>>() {
+        }.getType();
 
-        return new ResponseEntity<>(groupByPriceMap, HttpStatus.OK);
+
+        this.mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
+            protected void configure() {
+                map().setLocationId(source.getLocation().getId());
+            }
+        });
+
+        Set<RateCardDetailDto> detailDtos = mapper.map(rateCardDetails, targetSetType);
+
+        Map<Long, List<RateCardDetailDto>> groupByRateCard = detailDtos.stream().collect(Collectors.groupingBy(RateCardDetailDto::getLocationId));
+
+        return new ResponseEntity<>(groupByRateCard, HttpStatus.OK);
     }
 
 

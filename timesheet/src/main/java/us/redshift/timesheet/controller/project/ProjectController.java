@@ -58,6 +58,7 @@ public class ProjectController {
             Set<Project> projectSet = projectService.getClientProjectsByPagination(clientId, page, limits, orderBy, fields);
             return new ResponseEntity<>(projectAssembler.convertToDto(projectSet), HttpStatus.OK);
         } else if (employeeId != 0 && !("ALL".equalsIgnoreCase(status))) {
+            System.out.println(ProjectStatus.get(status.toUpperCase()));
             Set<Project> projectSet = projectService.findAllByEmployeeId(employeeId, ProjectStatus.get(status.toUpperCase()));
             return new ResponseEntity<>(projectAssembler.convertToDto(projectSet), HttpStatus.OK);
         } else {

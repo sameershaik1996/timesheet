@@ -17,6 +17,8 @@ public interface ITimeSheetService {
 
     TimeSheet getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber);
 
+    Set<TimeSheet> getAllTimeSheetByProjectId(Long projectId);
+
 
     TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year);
 

@@ -12,6 +12,7 @@ import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -23,13 +24,16 @@ public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE pss_task_cards SET status=?1 WHERE id = ?2", nativeQuery = true)
+    @Query(value = "UPDATE pss_task_cards SET status=?1 WHERE time_sheet_id = ?2", nativeQuery = true)
     int setStatusForTaskCard(String status, Long id);
 
 
     Set<TaskCard> findByStatusNotLikeAndProjectIn(TimeSheetStatus status, Set<Project> projectSet);
 
     Set<TaskCard> findByStatusAndType(TimeSheetStatus status, TaskType taskType);
+
+    List<TaskCard> findByStatusNotLikeAndProject_IdOrderByEmployeeIdAscTaskCardDetailsAsc(TimeSheetStatus status, Long projectId);
+
 
 
 }
