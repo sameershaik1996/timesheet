@@ -174,7 +174,7 @@ public class TaskCardService implements ITaskCardService {
     }
 
     public void TimeSheetStatus(TimeSheet timeSheet) {
-
+        System.out.println("TimeSheet Status");
         int taskCardApprove = 0, taskCardReject = 0;
         int size = timeSheet.getTaskCards().size();
 
@@ -184,7 +184,13 @@ public class TaskCardService implements ITaskCardService {
             else if (taskCard1.getStatus().equals(TimeSheetStatus.REJECTED))
                 taskCardReject++;
         }
+
+        System.out.println(taskCardApprove + " qwertyuiop " + taskCardReject + " qwertyuiop " + size);
+
         if (taskCardApprove == size) {
+
+            System.out.println(timeSheet.getId());
+
             timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.APPROVED.name(), timeSheet.getId());
         } else if (taskCardReject > 1) {
             timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());

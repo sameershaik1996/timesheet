@@ -21,12 +21,12 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
 
     TimeSheet findFirstByEmployeeIdAndStatusOrderByFromDateDesc(Long employeeId, TimeSheetStatus status);
 
-    Set<TimeSheet> findAllByTaskCardsInOrderByFromDateAsc(Set<TaskCard> taskCardSet);
+    Set<TimeSheet> findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(Set<TaskCard> taskCardSet, TimeSheetStatus status);
 
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE pss_time_sheets SET status=?1 WHERE id = ?2", nativeQuery = true)
+    @Query(value = "UPDATE pss_timesheets SET status=?1 WHERE id = ?2", nativeQuery = true)
     int setStatusForTimeSheet(String status, Long id);
 
 

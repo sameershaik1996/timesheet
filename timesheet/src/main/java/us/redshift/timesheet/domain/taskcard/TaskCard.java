@@ -34,6 +34,7 @@ public class TaskCard extends BaseEntity {
     private Long approverId;
     private Long employeeId;
     private Long skillId;
+    private Long designationId;
 
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)

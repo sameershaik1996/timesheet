@@ -116,7 +116,21 @@ public class TimeSheetService implements ITimeSheetService {
 
         Set<TaskCard> taskCardSet = new HashSet<>(taskCardService.getAllTaskCardByProject(projectId));
 
-        return timeSheetRepository.findAllByTaskCardsInOrderByFromDateAsc(taskCardSet);
+        Set<TimeSheet> timeSheetSet = timeSheetRepository.findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(taskCardSet, TimeSheetStatus.PENDING);
+
+        Set<TimeSheet> projectTimeSheet = new HashSet<>();
+
+        timeSheetSet.forEach(timeSheet -> {
+            Set<TaskCard> taskCards = new HashSet<>();
+            timeSheet.getTaskCards().forEach(taskCard -> {
+                if (taskCard.getProject().getId() == projectId) {
+                    taskCards.add(taskCard);
+                }
+            });
+            projectTimeSheet.add(timeSheet);
+        });
+
+        return projectTimeSheet;
     }
 
 

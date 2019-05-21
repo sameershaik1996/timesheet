@@ -28,6 +28,7 @@ public class TaskListDto extends BaseDto {
     private Date startDate;
     private Date endDate;
     private BigDecimal billableHour;
-    private BigDecimal usedHours;
+    private BigDecimal nonBillableHour;
+    private BigDecimal usedHour;
     private Set<SkillDto> skills;
 }

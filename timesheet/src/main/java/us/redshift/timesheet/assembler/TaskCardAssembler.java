@@ -6,6 +6,7 @@ import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
+import us.redshift.timesheet.dto.common.DesignationDto;
 import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
 import us.redshift.timesheet.dto.common.SkillDto;
@@ -109,22 +110,50 @@ public class TaskCardAssembler {
         };
 
 
+        //      Long to designation
+        Converter<Long, DesignationDto> LongToDesignation = mappingContext -> {
+            Long source;
+            if (mappingContext.getSource() != null) {
+                source = mappingContext.getSource();
+                DesignationDto dest = this.employeeFeign.getDesignationById(source).getBody();
+                return dest;
+            }
+            return null;
+
+        };
+
+        //      get designation from employee
+        Converter<EmployeeListDto, Long> designationToLong = mappingContext -> {
+            Long source;
+            if (mappingContext.getSource() != null) {
+                source = mappingContext.getSource().getId();
+                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                return employee.getDesignation().getId();
+            }
+            return null;
+        };
+
+
+
         //      adding long to EmployeeListDto  conversion property
         this.mapper.addMappings(new PropertyMap<TaskCard, TaskCardDto>() {
             protected void configure() {
+
                 using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
                 using(LongToSkill).map(source.getSkillId()).setSkill(null);
-
-
+                using(LongToDesignation).map(source.getDesignationId()).setDesignation(null);
             }
         });
 
+
         //      adding long to EmployeeListDto  conversion property
         this.mapper.addMappings(new PropertyMap<TaskCardDto, TaskCard>() {
+
             protected void configure() {
                 using(EmployeeToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillToLong).map(source.getSkill()).setSkillId(null);
                 using(taskCardDetailConvertor).map(source.getTaskCardDetails()).setTaskCardDetails(null);
+                using(designationToLong).map(source.getEmployee()).setDesignationId(null);
 
             }
         });
@@ -135,6 +164,7 @@ public class TaskCardAssembler {
             protected void configure() {
                 using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
                 using(LongToSkill).map(source.getSkillId()).setSkill(null);
+                using(LongToDesignation).map(source.getDesignationId()).setDesignation(null);
 
             }
         });
@@ -144,6 +174,7 @@ public class TaskCardAssembler {
             protected void configure() {
                 using(EmployeeToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillToLong).map(source.getSkill()).setSkillId(null);
+
 
             }
         });

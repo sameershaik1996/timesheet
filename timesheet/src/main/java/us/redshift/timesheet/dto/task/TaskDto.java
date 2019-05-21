@@ -33,7 +33,7 @@ public class TaskDto extends BaseDto {
     private Date endDate;
     private Date startedOn;
     private Date endedOn;
-
+    private BigDecimal usedHour;
     private BigDecimal billableHour;
 
     private BigDecimal nonBillableHour;
