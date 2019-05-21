@@ -28,7 +28,7 @@ public class AuthRequestInterceptor implements RequestInterceptor {
         if (token == null) {
             return;
         }
-        System.out.println("asd:"+token);
+
 
         requestTemplate.header(AUTHORIZATION_HEADER, token);
         requestTemplate.header("RequestTo", request.getRequestURI());

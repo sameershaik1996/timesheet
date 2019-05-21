@@ -16,7 +16,7 @@ public class InvoiceService implements IInvoiceService {
     InvoiceRepository invoiceRepository;
 
     @Override
-    public Invoice createIvoice(Invoice invoice) {
+    public Invoice createInvoice(Invoice invoice) {
 
         List<InvoiceDetails> invoiceDetails=new ArrayList<>(invoice.getInvoiceDetails());
         invoiceDetails.forEach(invoiceDetail ->{

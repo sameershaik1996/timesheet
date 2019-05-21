@@ -41,9 +41,10 @@ public class PreFilter extends ZuulFilter {
         HttpServletRequest request=requestContext.getRequest();
         try{
 
-            if(request.getRequestURI().contains("v1/api")&&!request.getRequestURI().contains("/auth")) {
+            if(request.getRequestURI().contains("v1/api")&&!request.getRequestURI().contains("/login")) {
                 UserDetails ud = authClient.validateToken();
                 request.setAttribute("userDetails",ud);
+                //requestContext.req("userDetails",ud);
             }
         }
         catch (Exception e){

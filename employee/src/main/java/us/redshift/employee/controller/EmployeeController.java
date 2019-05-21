@@ -82,8 +82,9 @@ public class EmployeeController {
 
 
     @GetMapping("get/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable Long id)
+    public ResponseEntity<?> getEmployeeById(@PathVariable Long id,HttpServletRequest req)
     {
+        System.out.println("details:"+req.getHeader("userDetails"));
 
         return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
 

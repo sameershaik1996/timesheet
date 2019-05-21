@@ -9,9 +9,14 @@ import org.springframework.web.server.ResponseStatusException;
 import us.redshift.timesheet.domain.common.Location;
 import us.redshift.timesheet.domain.invoice.Invoice;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
+import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.service.invoice.IInvoiceService;
 import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -22,13 +27,20 @@ public class InvoiceController {
     IInvoiceService invoiceService;
 
     @Autowired
-    ITaskCardDetailService taskCardDetailService;
+    TaskCardDetailRepository taskCardDetailRepository;
 
     @PostMapping("save")
     public ResponseEntity<?> raiseInvoice(@RequestBody Invoice invoice){
-        Invoice savedInvoice=invoiceService.createIvoice(invoice);
+        Invoice savedInvoice=invoiceService.createInvoice(invoice);
+        List<Long> taskCardDetailsId=new ArrayList<>();
+        invoice.getTaskCardDetails().forEach(taskCardDetail -> {
+            taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.getStatus()  ,taskCardDetail.getId());
+        });
+        System.out.println(taskCardDetailsId);
+        //int d=taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.getStatus()  ,taskCardDetailsId);
+        //System.out.println(d);
 
-        return new ResponseEntity<>(invoiceService.createIvoice(invoice),HttpStatus.CREATED);
+        return new ResponseEntity<>(savedInvoice,HttpStatus.CREATED);
     }
 
     @PutMapping("update")
@@ -44,7 +56,7 @@ public class InvoiceController {
     }
 
     @GetMapping("get/{id}")
-    public ResponseEntity<?> updateInvoice(@PathVariable Long id){
+    public ResponseEntity<?> getInvoiceById(@PathVariable Long id){
         return new ResponseEntity<>(invoiceService.getInvoiceById(id), HttpStatus.OK);
     }
 
