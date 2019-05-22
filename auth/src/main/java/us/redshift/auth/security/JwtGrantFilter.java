@@ -47,13 +47,15 @@ public class JwtGrantFilter extends OncePerRequestFilter {
             System.out.println(authorities);
             if (!authorities.contains(permissionFromUri)) {
                 httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"you don't have enough permissions to access this resource");
-
+                throw new Exception("you don't have enough permissions to access this resource");
             }
 
         }
     }
     catch (Exception ex){
         ex.printStackTrace();
+        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"you don't have enough permissions to access this resource");
+
     }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
 

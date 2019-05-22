@@ -1,7 +1,6 @@
 package us.redshift.timesheet.controller.ratecard;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,15 +45,16 @@ public class RateCardController {
         return new ResponseEntity<>(rateCardService.updateRateCard(rateCard), HttpStatus.OK);
     }
 
-    @GetMapping({"ratecard"})
-    public ResponseEntity<?> getAllRateCard() {
-        return new ResponseEntity<>(rateCardService.getAllRateCard(), HttpStatus.OK);
+    @GetMapping({"ratecard/get"})
+    public ResponseEntity<?> getAllRateCard(@RequestParam(value = "projectType", required = false) String projectType, @RequestParam(value = "isDefault", defaultValue = "false", required = false) Boolean isDefault, @RequestParam(value = "id", required = false) Long id) {
+        if (projectType != null && isDefault != false)
+            return new ResponseEntity<>(rateCardService.getRateCardByProjectTypeAndIsDefault(ProjectType.get(projectType.toUpperCase()), isDefault), HttpStatus.OK);
+        else if (id != null)
+            return new ResponseEntity<>(rateCardService.getRateCard(id), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(rateCardService.getAllRateCard(), HttpStatus.OK);
     }
 
-    @GetMapping("ratecard/{id}")
-    public ResponseEntity<?> getRateCard(@PathVariable Long id) {
-        return new ResponseEntity<>(rateCardService.getRateCard(id), HttpStatus.OK);
-    }
 
     @GetMapping("ratecard/group")
     public ResponseEntity<?> getRateCardGroupBy() {
@@ -65,11 +65,7 @@ public class RateCardController {
         }.getType();
 
 
-        this.mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
-            protected void configure() {
-                map().setLocationId(source.getLocation().getId());
-            }
-        });
+//
 
         Set<RateCardDetailDto> detailDtos = mapper.map(rateCardDetails, targetSetType);
 

@@ -21,14 +21,21 @@ public interface TaskCardDetailRepository extends JpaRepository<TaskCardDetail, 
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE id = ?2", nativeQuery = true)
+    @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE task_card_id = ?2", nativeQuery = true)
     int setStatusForTaskCardDetail(String status, Long taskCardId);
+
 
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE task_card_id in (?2)", nativeQuery = true)
-    int setStatusForTaskCardDetail(String status, List<Long> taskCardId);
+    @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE id in (?2)", nativeQuery = true)
+    int setStatusForTaskCardDetail(String status, List<Long> id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE id = ?2", nativeQuery = true)
+    int setStatusForTaskCardDetailById(String status, Long taskCardDetailId);
+
 
     List<TaskCardDetail> findAllByTaskCard_TimeSheet_IdAndTaskCard_Project_IdAndStatusNotLikeOrderByDate(Long timeSheetId, Long projectId, TimeSheetStatus status);
 

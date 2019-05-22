@@ -52,7 +52,7 @@ public class Invoice extends BaseEntity implements Serializable {
     private BigDecimal totalAmount;
 
     @JsonIgnoreProperties(value="employees")
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     @JoinTable(name = "pss_invoice_task_card_details",
             joinColumns = @JoinColumn(name = "invoice_id"),
             inverseJoinColumns = @JoinColumn(name = "task_card_detail_id"))

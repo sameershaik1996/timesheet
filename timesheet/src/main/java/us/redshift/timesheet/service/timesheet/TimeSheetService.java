@@ -52,8 +52,8 @@ public class TimeSheetService implements ITimeSheetService {
         this.taskCardDetailRepository = taskCardDetailRepository;
         this.taskCardRepository = taskCardRepository;
         this.taskService = taskService;
-        this.calendar=calendar;
-        this.timeSheetCloneAssembler=timeSheetCloneAssembler;
+        this.calendar = calendar;
+        this.timeSheetCloneAssembler = timeSheetCloneAssembler;
     }
 
 
@@ -74,8 +74,11 @@ public class TimeSheetService implements ITimeSheetService {
         timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
         timeSheet.setStatus(status);
         TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
-        timeSheet.getTaskCards().forEach(taskCard ->
-                System.out.println(taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId())));
+        timeSheet.getTaskCards().forEach(taskCard -> {
+            System.out.println(taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId()));
+            System.out.println(taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId()));
+        });
+
         return SaveTimeSheet;
     }
 
@@ -124,7 +127,7 @@ public class TimeSheetService implements ITimeSheetService {
 
     @Override
     public TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year) {
-        return timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(id,year,weekNumber);
+        return timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(id, year, weekNumber);
     }
 
     @Override
@@ -149,11 +152,27 @@ public class TimeSheetService implements ITimeSheetService {
 
         return timeSheetRepository.save(timeSheet);
     }
+
     public Set<TimeSheet> getAllTimeSheetByProjectId(Long projectId) {
 
         Set<TaskCard> taskCardSet = new HashSet<>(taskCardService.getAllTaskCardByProject(projectId));
 
-        return timeSheetRepository.findAllByTaskCardsInOrderByFromDateAsc(taskCardSet);
+
+        Set<TimeSheet> timeSheetSet = timeSheetRepository.findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(taskCardSet, TimeSheetStatus.PENDING);
+
+        Set<TimeSheet> projectTimeSheet = new HashSet<>();
+
+        timeSheetSet.forEach(timeSheet -> {
+            Set<TaskCard> taskCards = new HashSet<>();
+            timeSheet.getTaskCards().forEach(taskCard -> {
+                if (taskCard.getProject().getId() == projectId) {
+                    taskCards.add(taskCard);
+                }
+            });
+            projectTimeSheet.add(timeSheet);
+        });
+
+        return projectTimeSheet;
 
     }
 

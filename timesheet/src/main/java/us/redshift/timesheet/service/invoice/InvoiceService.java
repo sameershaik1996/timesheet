@@ -27,6 +27,10 @@ public class InvoiceService implements IInvoiceService {
 
     @Override
     public Invoice updateInvoice(Invoice invoice) {
+        List<InvoiceDetails> invoiceDetails=new ArrayList<>(invoice.getInvoiceDetails());
+        invoiceDetails.forEach(invoiceDetail ->{
+            invoice.addInvoiceDetail(invoiceDetail);
+        });
         return invoiceRepository.save(invoice);
     }
 

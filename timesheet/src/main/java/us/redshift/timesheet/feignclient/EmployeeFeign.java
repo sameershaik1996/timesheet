@@ -14,7 +14,7 @@ import us.redshift.timesheet.dto.common.SkillDto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@FeignClient(url = "${zuul.url}", value = "Employee-Service", fallback = EmployeeFeignFallback.class)
+@FeignClient(url = "${zuul.employee.url}", value = "Employee-Service", fallback = EmployeeFeignFallback.class)
 public interface EmployeeFeign {
 
     @GetMapping("/employee/v1/api/employee/get/{id}")

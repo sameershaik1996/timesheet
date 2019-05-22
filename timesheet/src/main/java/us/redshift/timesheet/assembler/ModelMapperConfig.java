@@ -1,13 +1,15 @@
-package us.redshift.timesheet;
+package us.redshift.timesheet.assembler;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
+import us.redshift.timesheet.dto.ratecard.RateCardDetailDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetBasicListDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetListDto;
@@ -58,6 +60,12 @@ public class ModelMapperConfig {
         mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetBasicListDto>() {
             protected void configure() {
                 using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
+            }
+        });
+
+        mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
+            protected void configure() {
+                map().setLocationId(source.getLocation().getId());
             }
         });
 

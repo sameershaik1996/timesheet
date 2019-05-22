@@ -12,7 +12,8 @@ public interface IProjectService {
 
     Project saveProjectByClientId(Long clientId, Project project);
 
-    Project updateProject(Project project);
+
+    Set<Project> updateProject(Set<Project> clients, ProjectStatus status);
 
     Project getProjectById(Long id);
 

@@ -1,5 +1,6 @@
 package us.redshift.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,13 @@ public class Role {
     @NaturalId
     @Column(length = 60,unique = true)
     private RoleName name;
+
+
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy="role")
+    private Set<User> users=new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = "permissions")

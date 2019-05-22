@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class RateCardDetailDto extends BaseDto {
 
+    private Long id;
     private BigDecimal value;
     private long skillId;
     private long designationId;

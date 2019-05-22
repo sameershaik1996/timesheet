@@ -1,6 +1,7 @@
 package us.redshift.auth.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import us.redshift.auth.domain.Role;
 import us.redshift.auth.domain.User;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByUserNameOrEmail(String userName, String email);
 
     List<User> findByIdIn(List<Long> userIds);
+
+    List<User> findByRole(Role role);
 
     Optional<User> findByUserName(String username);
 

@@ -40,9 +40,9 @@ public class ProjectController {
     }
 
     @PutMapping("project/update")
-    public ResponseEntity<?> updateProject(@Valid @RequestBody ProjectDto projectDto) throws ParseException {
-        Project project = projectAssembler.convertToEntity(projectDto);
-        Project projectSaved = projectService.updateProject(project);
+    public ResponseEntity<?> updateProject(@Valid @RequestBody Set<ProjectDto> projectDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
+        Set<Project> projectSet = projectAssembler.convertToEntity(projectDtos);
+        Set<Project> projectSaved = projectService.updateProject(projectSet, ProjectStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(projectAssembler.convertToDto(projectSaved), HttpStatus.OK);
     }
 

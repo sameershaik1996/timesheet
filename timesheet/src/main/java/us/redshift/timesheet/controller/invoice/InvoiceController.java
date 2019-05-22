@@ -33,11 +33,13 @@ public class InvoiceController {
     public ResponseEntity<?> raiseInvoice(@RequestBody Invoice invoice){
         Invoice savedInvoice=invoiceService.createInvoice(invoice);
         List<Long> taskCardDetailsId=new ArrayList<>();
-        invoice.getTaskCardDetails().forEach(taskCardDetail -> {
+        invoice.getTaskCardDetails().forEach(taskCardDetail -> /*{
             taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.getStatus()  ,taskCardDetail.getId());
-        });
+        }*/
+            taskCardDetailsId.add(taskCardDetail.getId())
+        );
         System.out.println(taskCardDetailsId);
-        //int d=taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.getStatus()  ,taskCardDetailsId);
+        int d=taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString() ,taskCardDetailsId);
         //System.out.println(d);
 
         return new ResponseEntity<>(savedInvoice,HttpStatus.CREATED);

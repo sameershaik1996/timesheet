@@ -6,6 +6,7 @@ import java.util.Map;
 public enum TimeSheetStatus {
     PENDING("PENDING"), SUBMITTED("SUBMITTED"), APPROVED("APPROVED"), REJECTED("REJECTED"),INVOICE_RAISED("INVOICE RAISED");
 
+
     //Lookup table
     private static final Map<String, TimeSheetStatus> lookup = new HashMap<>();
 

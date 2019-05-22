@@ -20,6 +20,7 @@ import us.redshift.auth.domain.User;
 import us.redshift.auth.dto.JwtAuthenticationResponse;
 import us.redshift.auth.dto.LoginDto;
 import us.redshift.auth.dto.UserDto;
+import us.redshift.auth.repository.RoleRepository;
 import us.redshift.auth.security.CurrentUser;
 import us.redshift.auth.security.CustomUserDetailsService;
 import us.redshift.auth.security.JwtTokenProvider;
@@ -29,7 +30,9 @@ import us.redshift.auth.service.IUserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -42,6 +45,9 @@ public class UserController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
+    @Autowired
+    RoleRepository roleRepository;
+
    @Autowired
     ModelMapper modelMapper;
 
@@ -49,11 +55,11 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping("save")
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user, HttpServletRequest servletRequest)
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, @RequestParam(value = "roleId",required = false)Long roleId,HttpServletRequest servletRequest)
     {
         if(user.getRole()==null){
             Role role=new Role();
-            Long id=new Long(1);
+            Long id=new Long(roleId);
             role.setId(id);
             user.setRole(role);
         }
@@ -71,6 +77,24 @@ public class UserController {
     public ResponseEntity<?> getUserByEmpId( @PathVariable Long employeeId)
     {
         UserDto userDto=modelMapper.map(userService.loadUserByEmployeeId(employeeId),UserDto.class);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+
+
+
+    @GetMapping("get")
+    public ResponseEntity<?> getUserByRole( @RequestParam(value = "roleName",required = false) RoleName roleName)
+    {
+        List<UserDto> userDto=new ArrayList<>();
+        if(roleName!=null) {
+             Role role= roleRepository.findByName(roleName);
+            userService.findUserByRole(role).forEach(user -> userDto.add(modelMapper.map(user,UserDto.class)));
+        }
+        else
+        {
+            userService.findAllUsers().forEach(user -> userDto.add(modelMapper.map(user,UserDto.class)));
+        }
+
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 

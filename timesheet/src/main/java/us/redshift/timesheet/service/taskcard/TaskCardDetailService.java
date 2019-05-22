@@ -48,33 +48,37 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     public List<TaskCardDetail> updateTaskCardDetail(List<TaskCardDetail> taskCardDetails, TimeSheetStatus status) {
 
         List<TaskCardDetail> taskCardDetailList = new ArrayList<>();
-
+        System.out.println(status);
         taskCardDetails.forEach(taskCardDetail -> {
             if (!taskCardDetailRepository.existsById(taskCardDetail.getId()))
                 throw new ResourceNotFoundException("TaskCardDetail", "ID", taskCardDetail.getId());
-            taskCardDetail.setStatus(status);
-            TaskCardDetail SavedTaskCardDetail = taskCardDetailRepository.save(taskCardDetail);
-            taskCardDetailList.add(SavedTaskCardDetail);
+//            taskCardDetail.setStatus(status);
+            taskCardDetailRepository.setStatusForTaskCardDetailById(status.name(), taskCardDetail.getId());
+//            taskCardDetailList.add(SavedTaskCardDetail);
+        });
+        taskCardDetails.forEach(taskCardDetail -> {
             TaskCard taskCard = taskCardRepository.findById(taskCardDetail.getTaskCard().getId()).orElseThrow(() -> new ResourceNotFoundException("TaskCard", "ID", taskCardDetail.getTaskCard().getId()));
             TimeSheet timeSheet = timeSheetRepository.findById(taskCard.getTimeSheet().getId()).get();
             if (!status.equals(TimeSheetStatus.REJECTED)) {
                 List<TaskCardDetail> cardDetailList = taskCardDetailRepository.findTaskCardDetailsByTaskCard_Id(taskCardDetail.getTaskCard().getId());
-                int taskDetailApprove = 0, taskDetailReject = 0, size = taskCardDetails.size();
+                int taskDetailApprove = 0, taskDetailReject = 0, size = cardDetailList.size();
                 for (TaskCardDetail taskCardDetail1 : cardDetailList) {
                     if (taskCardDetail1.getStatus().equals(TimeSheetStatus.APPROVED))
                         taskDetailApprove++;
                     else if (taskCardDetail1.getStatus().equals(TimeSheetStatus.REJECTED))
                         taskDetailReject++;
                 }
+
+                System.out.println(taskDetailApprove + " taskCardDetail " + taskDetailReject + " Size " + size);
 //                Set status to taskCard
                 if (taskDetailApprove == size) {
 //                update used hours to task
+                    taskCard.setStatus(TimeSheetStatus.APPROVED);
                     if (taskCard.getType().equals(TaskType.BILLABLE)) {
-                        taskCard.setStatus(TimeSheetStatus.APPROVED);
-                        TaskCard taskCard1 = taskCardService.calculateAmount(taskCard);
-                        taskCardRepository.save(taskCard1);
-                        taskService.updateTaskHours(taskCard.getTask().getId(), taskCard1.getHours());
+                        taskCard = taskCardService.calculateAmount(taskCard);
+                        taskService.updateTaskHours(taskCard.getTask().getId(), taskCard.getHours());
                     }
+                    taskCardRepository.save(taskCard);
 //                timeSheet status update
                     taskCardService.TimeSheetStatus(timeSheet);
                 } else if (taskDetailReject > 0) {

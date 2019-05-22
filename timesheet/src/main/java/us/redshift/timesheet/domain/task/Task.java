@@ -50,9 +50,9 @@ public class Task extends BaseEntity {
     private Date endedOn;
 
 
-    private BigDecimal billableHour;
+    private BigDecimal billableHour=new BigDecimal(0);
 
-    private BigDecimal nonBillableHour;
+    private BigDecimal nonBillableHour=new BigDecimal(0);
 
     private BigDecimal usedHour = new BigDecimal(0);
 

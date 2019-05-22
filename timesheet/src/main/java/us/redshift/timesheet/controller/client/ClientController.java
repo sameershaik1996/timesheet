@@ -42,9 +42,9 @@ public class ClientController {
     }
 
     @PutMapping("client/update")
-    public ResponseEntity<?> updateClient(@Valid @RequestBody ClientDto clientDto) throws ParseException {
-        Client client = clientAssembler.convertToEntity(clientDto);
-        Client clientSaved = clientService.updateClient(client);
+    public ResponseEntity<?> updateClient(@Valid @RequestBody Set<ClientDto> clientDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
+        Set<Client> clients = clientAssembler.convertToEntity(clientDtos);
+        Set<Client> clientSaved = clientService.updateClient(clients, ClientStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
     }
 

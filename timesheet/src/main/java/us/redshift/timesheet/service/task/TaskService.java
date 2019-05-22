@@ -58,14 +58,18 @@ public class TaskService implements ITaskService {
     public void updateTaskHours(Long taskId, BigDecimal usedHour) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
 
-        BigDecimal oldUsedHour = task.getUsedHour();
+        BigDecimal oldUsedHour=new BigDecimal(0);
+        if(task.getUsedHour()!=null)
+         oldUsedHour= task.getUsedHour();
 
         BigDecimal newUsedHour = oldUsedHour.add(usedHour);
         task.setUsedHour(newUsedHour);
 
+/*
         if (task.getBillableHour().compareTo(newUsedHour) < 0) {
             System.out.println("Task Billable hours Exceeds");
         }
+*/
 
         taskRepository.save(task);
     }
