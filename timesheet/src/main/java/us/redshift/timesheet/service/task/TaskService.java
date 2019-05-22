@@ -55,7 +55,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void updateTaskHours(Long taskId, BigDecimal usedHour) {
+    public void
+    updateTaskHours(Long taskId, BigDecimal usedHour) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
 
         BigDecimal oldUsedHour = task.getUsedHour();
