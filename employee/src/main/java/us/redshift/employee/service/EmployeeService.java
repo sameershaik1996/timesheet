@@ -2,11 +2,14 @@ package us.redshift.employee.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.repository.EmployeeRespository;
 import us.redshift.employee.util.DTO;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -32,6 +35,12 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public Employee getEmployeeById(Long id) {
+
+
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        System.out.println(request.getRequestURI());
+
         return employeeRespository.findById(id).get();
     }
 

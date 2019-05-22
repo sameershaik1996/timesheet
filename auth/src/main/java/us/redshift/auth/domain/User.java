@@ -54,7 +54,6 @@ public class User extends BaseEntity implements Serializable {
         private String password;
 
         @ManyToOne(fetch = FetchType.EAGER)
-
         @JoinColumn(name="role_id")
         private Role role;
 

@@ -42,10 +42,11 @@ public class EmployeeController {
     IUserClient userClient;
 
     @PostMapping("/save")
-    public ResponseEntity<?> createEmployee(@Valid @RequestBody Employee employee){
+    public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeeDto employee){
     try {
-        Employee emp = employeeService.createEmployee(employee);
-        userClient.createUser(generateUserDto(emp));
+        Employee newEmp = mapper.map(employee,Employee.class);
+        Employee emp = employeeService.createEmployee(newEmp);
+        userClient.createUser(generateUserDto(emp),employee.getRoleId());
         return new ResponseEntity<>(emp, HttpStatus.CREATED);//send mail
     }
     catch (Exception e){
@@ -82,8 +83,9 @@ public class EmployeeController {
 
 
     @GetMapping("get/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable Long id)
+    public ResponseEntity<?> getEmployeeById(@PathVariable Long id,HttpServletRequest req)
     {
+        System.out.println("details:"+req.getHeader("userDetails"));
 
         return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
 

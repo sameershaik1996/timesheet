@@ -20,4 +20,8 @@ public interface ITimeSheetService {
     Set<TimeSheet> getAllTimeSheetByProjectId(Long projectId);
 
 
+    TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year);
+
+
+    TimeSheet cloneTimeSheet(TimeSheet timeSheet);
 }

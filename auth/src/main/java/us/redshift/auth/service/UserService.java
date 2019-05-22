@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import us.redshift.auth.domain.Role;
 import us.redshift.auth.domain.User;
 import us.redshift.auth.dto.LoginDto;
 import us.redshift.auth.repository.UserRepository;
@@ -18,6 +19,7 @@ import us.redshift.auth.security.JwtTokenProvider;
 import us.redshift.auth.security.UserPrincipal;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -64,5 +66,15 @@ public class UserService implements IUserService {
     public User updateUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> findUserByRole(Role role) {
+        return userRepository.findByRole(role);
+    }
+
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 }

@@ -4,13 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import us.redshift.timesheet.assembler.TimeSheetAssembler;
+import us.redshift.timesheet.assembler.TimeSheetCloneAssembler;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
+import us.redshift.timesheet.dto.timesheet.TimesheetCloneDto;
 import us.redshift.timesheet.service.timesheet.ITimeSheetService;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Set;
 
 @RestController
@@ -19,10 +22,17 @@ public class TimeSheetController {
 
     private final ITimeSheetService timeSheetService;
     private final TimeSheetAssembler timeSheetAssembler;
+    private final TimeSheetCloneAssembler timeSheetCloneAssembler;
+    private final Calendar calendar;
 
-    public TimeSheetController(ITimeSheetService timeSheetService, TimeSheetAssembler timeSheetAssembler) {
+    public TimeSheetController(ITimeSheetService timeSheetService,
+                               TimeSheetAssembler timeSheetAssembler,
+                               Calendar calendar,
+                               TimeSheetCloneAssembler timeSheetCloneAssembler) {
         this.timeSheetService = timeSheetService;
         this.timeSheetAssembler = timeSheetAssembler;
+        this.calendar = calendar;
+        this.timeSheetCloneAssembler = timeSheetCloneAssembler;
     }
 
 
@@ -57,4 +67,22 @@ public class TimeSheetController {
             return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheet), HttpStatus.OK);
         }
     }
+
+    @PutMapping("timesheet/clone")
+    public ResponseEntity<?> cloneTimesheet(@Valid @RequestBody TimeSheetDto timeSheetDto, @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
+
+
+        if (timeSheetDto.getTaskCards().size() > 0) {
+            new ResponseEntity<>("Cannot clone timesheet, entries already exist", HttpStatus.BAD_REQUEST);
+        }
+        TimeSheet previousTimeSheet = timeSheetService.getTimeSheetByWeekNumberAndEmpId(timeSheetDto.getEmployee().getId(), timeSheetDto.getWeekNumber() - 1, timeSheetDto.getYear());
+
+        TimesheetCloneDto timesheetCloneDto = timeSheetCloneAssembler.convertToCloneDto(previousTimeSheet);
+        timesheetCloneDto.setId(timeSheetDto.getId());
+        timesheetCloneDto.setWeekNumber(timeSheetDto.getWeekNumber());
+        TimeSheet timeSheet = timeSheetCloneAssembler.convertCloneToEntity(timesheetCloneDto);
+
+        return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetService.cloneTimeSheet(timeSheet)), HttpStatus.OK);
+    }
+
 }

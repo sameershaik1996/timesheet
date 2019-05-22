@@ -9,9 +9,7 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "pss_timesheets",
@@ -25,7 +23,7 @@ public class TimeSheet extends BaseEntity {
 
     private String name;
 
-    private String comment;
+    private String comment = "";
 
     @Enumerated(EnumType.STRING)
     private TimeSheetStatus status = TimeSheetStatus.PENDING;
@@ -48,7 +46,7 @@ public class TimeSheet extends BaseEntity {
 
     @JsonIgnoreProperties(value = "timeSheet", allowSetters = true)
     @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.ALL})
-    private Set<TaskCard> taskCards = new HashSet<>();
+    private List<TaskCard> taskCards = new ArrayList<>();
 
     @JsonIgnoreProperties(value = "timeSheet", allowSetters = true)
     @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.ALL})

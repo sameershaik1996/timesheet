@@ -48,7 +48,7 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     public List<TaskCardDetail> updateTaskCardDetail(List<TaskCardDetail> taskCardDetails, TimeSheetStatus status) {
 
         List<TaskCardDetail> taskCardDetailList = new ArrayList<>();
-
+        System.out.println(status);
         taskCardDetails.forEach(taskCardDetail -> {
             if (!taskCardDetailRepository.existsById(taskCardDetail.getId()))
                 throw new ResourceNotFoundException("TaskCardDetail", "ID", taskCardDetail.getId());

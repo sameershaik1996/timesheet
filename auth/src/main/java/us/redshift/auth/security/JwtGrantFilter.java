@@ -47,13 +47,15 @@ public class JwtGrantFilter extends OncePerRequestFilter {
             System.out.println(authorities);
             if (!authorities.contains(permissionFromUri)) {
                 httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"you don't have enough permissions to access this resource");
-
+                throw new Exception("you don't have enough permissions to access this resource");
             }
 
         }
     }
     catch (Exception ex){
         ex.printStackTrace();
+        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"you don't have enough permissions to access this resource");
+
     }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
 
@@ -62,7 +64,7 @@ public class JwtGrantFilter extends OncePerRequestFilter {
     private String getPermission(String api,String role) {
         String[] split=api.split("/");
         StringBuilder permission=new StringBuilder();
-        if(split[1].equals("save")||split[1].equals("update")){
+        if(split[1].equals("save")||split[1].equals("update")||split[1].equals("delete")){
             permission.append(split[0]+"_"+"crud");
         }
         else if(split[1].equals("get")&&!role.equals("EMPLOYEE"))

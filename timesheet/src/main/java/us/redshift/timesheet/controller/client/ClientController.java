@@ -67,7 +67,7 @@ public class ClientController {
     public ResponseEntity<?> getClientById(@PathVariable(value = "id") Long id) throws ParseException {
         Client client = clientService.getClientById(id);
         ClientDto clientDto = clientAssembler.convertToDto(client);
-        return new ResponseEntity<>(clientDto, HttpStatus.OK);
+        return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
 

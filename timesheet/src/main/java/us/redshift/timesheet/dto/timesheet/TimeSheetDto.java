@@ -27,7 +27,7 @@ public class TimeSheetDto extends BaseDto {
     private Date fromDate;
     private Date toDate;
     private Integer weekNumber;
-    private Long year;
+    private Integer year;
     @JsonIgnoreProperties("timeSheet")
     private Set<TaskCardDto> taskCards;
     @JsonIgnoreProperties("timeSheet")

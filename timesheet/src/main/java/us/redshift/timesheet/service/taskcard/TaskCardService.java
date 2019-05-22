@@ -113,6 +113,11 @@ public class TaskCardService implements ITaskCardService {
     }
 
     @Override
+
+    public Set<TaskCard> getTaskCardByStatusAndType(TimeSheetStatus status, TaskType type) {
+        return taskCardRepository.findByStatusAndType(status, type);
+    }
+
     public List<TaskCard> getAllTaskCardByProject(Long projectId) {
         return taskCardRepository.findByStatusNotLikeAndProject_IdOrderByEmployeeIdAscTaskCardDetailsAsc(TimeSheetStatus.PENDING, projectId);
     }

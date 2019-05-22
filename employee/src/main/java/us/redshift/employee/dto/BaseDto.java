@@ -15,10 +15,14 @@ public class BaseDto implements Serializable {
 
     private Long id;
 
-    @JsonIgnoreProperties(allowGetters = true)
-    private Instant createdAt;
+    private String createdTimeStamp;
 
-    @JsonIgnoreProperties(allowGetters = true)
-    private Instant updatedAt;
+    private String updatedTimeStamp;
+
+    private Long createdBy;
+
+
+
+    private Long updatedBy;
 
 }

@@ -5,7 +5,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+import java.util.Calendar;
 
 @SpringBootApplication
 @EnableJpaAuditing
@@ -17,14 +20,13 @@ public class TimesheetApplication {
         SpringApplication.run(TimesheetApplication.class, args);
     }
 
-//    @Bean
-//    public ModelMapper modelMapper() {
-//
-//
-//        ModelMapper mapper = new ModelMapper();
-////        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-//        return mapper;
-//    }
+    @Bean
+    public Calendar getCalenderInstance() {
+        Calendar c = Calendar.getInstance();
+        return c;
+    }
+
+
 
 
 }

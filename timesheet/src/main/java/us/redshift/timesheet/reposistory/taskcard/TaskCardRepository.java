@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
 
 
     Set<TaskCard> findByStatusNotLikeAndProjectIn(TimeSheetStatus status, Set<Project> projectSet);
+
+    Set<TaskCard> findByStatusAndType(TimeSheetStatus status, TaskType taskType);
 
     List<TaskCard> findByStatusNotLikeAndProject_IdOrderByEmployeeIdAscTaskCardDetailsAsc(TimeSheetStatus status, Long projectId);
 

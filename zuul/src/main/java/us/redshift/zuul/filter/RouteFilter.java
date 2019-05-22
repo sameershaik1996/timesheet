@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
+import us.redshift.zuul.model.UserDetails;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
@@ -31,6 +33,11 @@ public class RouteFilter extends ZuulFilter {
     public Object run() {
 
         System.out.println("Inside route Filter");
-        return null;
+        RequestContext requestContext = RequestContext.getCurrentContext();
+        HttpServletRequest request=requestContext.getRequest();
+        UserDetails ud=(UserDetails) request.getAttribute("userDetails");
+        if(ud!=null)
+            requestContext.addZuulRequestHeader("userDetails",ud.toString());
+        return requestContext;
     }
 }

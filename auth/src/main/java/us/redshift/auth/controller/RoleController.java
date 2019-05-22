@@ -38,4 +38,11 @@ public class RoleController {
 
     }
 
+    @GetMapping("get")
+    public ResponseEntity<?> getRole(){
+
+        return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
+
+    }
+
 }
