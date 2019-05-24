@@ -36,8 +36,14 @@ public class RouteFilter extends ZuulFilter {
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request=requestContext.getRequest();
         UserDetails ud=(UserDetails) request.getAttribute("userDetails");
-        if(ud!=null)
-            requestContext.addZuulRequestHeader("userDetails",ud.toString());
+        if(ud!=null) {
+            System.out.println(ud.getRole().getName().toString());
+            requestContext.addZuulRequestHeader("userName",ud.getUserName());
+            requestContext.addZuulRequestHeader("employeeId",ud.getEmployeeId().toString());
+            requestContext.addZuulRequestHeader("roleName",ud.getRole().getName().toString());
+            requestContext.addZuulRequestHeader("emailId",ud.getEmail());
+        }
+
         return requestContext;
     }
 }

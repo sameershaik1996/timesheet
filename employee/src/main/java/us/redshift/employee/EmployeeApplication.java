@@ -29,7 +29,7 @@ import java.util.TimeZone;
 		EmployeeApplication.class,
 		Jsr310JpaConverters.class
 })
-
+@EnableJpaAuditing
 public class EmployeeApplication {
 
 	@Value( "${spring.jackson.time-zone}" )

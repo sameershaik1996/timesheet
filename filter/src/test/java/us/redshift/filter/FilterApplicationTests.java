@@ -1,4 +1,4 @@
-package us.auth.filter;
+package us.redshift.filter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

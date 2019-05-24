@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.persistence.*;
 import javax.servlet.ServletContext;
@@ -39,14 +41,19 @@ public class BaseEntity implements Serializable {
     private Instant updatedTimeStamp;
 
     @CreatedBy
-    @Column(nullable = true,updatable = false)
-    private Long createdBy;
+    @Column(updatable = false)
+    private String createdBy;
 
 
     @LastModifiedBy
-    @Column(nullable = true)
-    private Long updatedBy;
+    @Column()
+    private String updatedBy;
 
-
+  /*  @PrePersist
+    public void prePersist() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        //createdBy=
+    }*/
 
 }

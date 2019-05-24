@@ -4,6 +4,7 @@ package us.redshift.employee.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,15 @@ import us.redshift.employee.feignclient.IUserClient;
 import us.redshift.employee.helper.IDTOHelper;
 import us.redshift.employee.repository.EmployeeRespository;
 import us.redshift.employee.service.IEmployeeService;
+import us.redshift.filter.model.UserDetails;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("employee/v1/api/employee")
@@ -42,17 +47,14 @@ public class EmployeeController {
     IUserClient userClient;
 
     @PostMapping("/save")
-    public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeeDto employee){
-    try {
+    public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeeDto employee)throws ConstraintViolationException,DataIntegrityViolationException {
+
         Employee newEmp = mapper.map(employee,Employee.class);
         Employee emp = employeeService.createEmployee(newEmp);
         userClient.createUser(generateUserDto(emp),employee.getRoleId());
         return new ResponseEntity<>(emp, HttpStatus.CREATED);//send mail
-    }
-    catch (Exception e){
-        e.printStackTrace();
-        return new ResponseEntity<>("try again later", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
+
     }
 
     private SignUpDto generateUserDto(Employee emp) {
@@ -83,7 +85,7 @@ public class EmployeeController {
 
 
     @GetMapping("get/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable Long id,HttpServletRequest req)
+    public ResponseEntity<?> getEmployeeById(@PathVariable Long id,HttpServletRequest req)throws NoSuchElementException, EntityNotFoundException
     {
         System.out.println("details:"+req.getHeader("userDetails"));
 
@@ -92,12 +94,26 @@ public class EmployeeController {
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getAllEmployee(@RequestParam(value="id",required = false) List<Long> id)
+    public ResponseEntity<?> getAllEmployee(@RequestParam(value="id",required = false) List<Long> id,@RequestParam(value="roleName",required = false)String roleName)
     {
-        if(id==null)
-            return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
-        else
+        if(id!=null)
             return new ResponseEntity<>(employeeService.getEmployeeByIds(id), HttpStatus.OK);
+        else if(roleName!=null)
+        {
+            List<UserDetails> ud=(List<UserDetails>) userClient.getUser(roleName);
+            List<Long> empIds=new ArrayList<>();
+            ud.forEach(u -> {
+                if(u.getEmployeeId()!=0)
+                    empIds.add(u.getEmployeeId());
+            });
+            return new ResponseEntity<>(employeeService.getEmployeeByIds(empIds), HttpStatus.OK);
+
+        }
+
+
+        else
+            return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
+
 
     }
 
