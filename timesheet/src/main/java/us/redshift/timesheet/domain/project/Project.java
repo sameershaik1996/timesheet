@@ -3,9 +3,9 @@ package us.redshift.timesheet.domain.project;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.ratecard.RateCard;
-import us.redshift.timesheet.domain.client.Client;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -68,20 +68,16 @@ public class Project extends BaseEntity implements Serializable {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToOne(cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "rate_card_id")
     private RateCard rateCard;
 
     public void setStatus(ProjectStatus status) {
-        if (status == null)
-            status = ProjectStatus.INACTIVE;
-        this.status = status;
+        this.status = status == null ? ProjectStatus.ACTIVE : status;
     }
 
     public void setType(ProjectType type) {
-        if (type == null)
-            type = ProjectType.FIXED_BID;
-        this.type = type;
+        this.type = type == null ? ProjectType.FIXED_BID : type;
     }
 
 

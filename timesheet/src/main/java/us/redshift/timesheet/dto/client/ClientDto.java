@@ -5,6 +5,7 @@ import us.redshift.timesheet.domain.client.ClientStatus;
 import us.redshift.timesheet.dto.common.AddressDto;
 import us.redshift.timesheet.dto.common.BaseDto;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -19,11 +20,11 @@ public class ClientDto extends BaseDto {
     private String clientCode;
     @NonNull
     private String name;
-    private Set<PocDto> pocs;
+    private Set<PocDto> pocs = new HashSet<>();
     private String url;
     private ClientStatus status;
     private IndustryDto industry;
-    private Set<FocusAreaDto> focusAreas;
+    private Set<FocusAreaDto> focusAreas = new HashSet<>();
     private String futureFocus;
     private String about;
     private Boolean addressFlag;

@@ -11,7 +11,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "pss_rate_card_details")
+@Table(name = "pss_rate_card_details", uniqueConstraints =
+@UniqueConstraint(columnNames = {"skill_id", "designation_id", "location_id", "rate_card_id"}))
 @Getter
 @Setter
 @NoArgsConstructor

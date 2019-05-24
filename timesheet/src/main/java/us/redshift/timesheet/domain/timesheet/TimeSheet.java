@@ -9,7 +9,9 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "pss_timesheets",
@@ -23,12 +25,13 @@ public class TimeSheet extends BaseEntity {
 
     private String name;
 
-    private String comment="";
+    private String comment = "";
 
     @Enumerated(EnumType.STRING)
     private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
-//    private Long approverId;
+//    @Column(name = "approver_id")
+//    private Set<Long> approverId;
 
     @Column(name = "employee_id", nullable = false)
     private Long employeeId;
@@ -50,17 +53,19 @@ public class TimeSheet extends BaseEntity {
 
     @JsonIgnoreProperties(value = "timeSheet", allowSetters = true)
     @OneToMany(mappedBy = "timeSheet", cascade = {CascadeType.ALL})
-    private Set<TimeOff> timeOffs = new HashSet<>();
+    private List<TimeOff> timeOffs = new ArrayList<>();
 
 
     public void addTaskCard(TaskCard taskCard) {
+//        this.taskCards.add(taskCard);
         taskCard.setTimeSheet(this);
-        this.taskCards.add(taskCard);
+
     }
 
     public void addTimeOff(TimeOff timeOff) {
+//        this.timeOffs.add(timeOff);
         timeOff.setTimeSheet(this);
-        this.timeOffs.add(timeOff);
+
     }
 
 }

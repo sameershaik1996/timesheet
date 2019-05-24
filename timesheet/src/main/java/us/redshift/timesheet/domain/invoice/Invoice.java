@@ -28,13 +28,13 @@ public class Invoice extends BaseEntity implements Serializable {
 
     @ManyToOne()
     @JoinColumn(name = "client_id", nullable = false)
-    @JsonIgnoreProperties({"pocs","industry","focusAreas","address","billingAddress"})
+    @JsonIgnoreProperties({"pocs", "industry", "focusAreas", "address", "billingAddress"})
     private Client client;
 
 
     @ManyToOne()
     @JoinColumn(name = "project_id", nullable = false)
-    @JsonIgnoreProperties({"client","rateCard"})
+    @JsonIgnoreProperties({"client", "rateCard"})
     private Project project;
 
     @Column(name = "from_date")
@@ -45,19 +45,18 @@ public class Invoice extends BaseEntity implements Serializable {
     private Date toDate;
 
     @Temporal(TemporalType.DATE)
-    private Date sentToClient   ;
+    private Date sentToClient;
 
     private BigDecimal totalHours;
 
     private BigDecimal totalAmount;
 
-    @JsonIgnoreProperties(value="employees")
+    @JsonIgnoreProperties(value = "employees")
     @OneToMany
     @JoinTable(name = "pss_invoice_task_card_details",
             joinColumns = @JoinColumn(name = "invoice_id"),
             inverseJoinColumns = @JoinColumn(name = "task_card_detail_id"))
     private Set<TaskCardDetail> taskCardDetails = new HashSet<>();
-
 
 
     @OneToMany(mappedBy = "invoice",

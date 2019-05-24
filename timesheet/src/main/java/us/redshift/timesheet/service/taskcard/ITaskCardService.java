@@ -2,7 +2,6 @@ package us.redshift.timesheet.service.taskcard;
 
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskType;
-
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
 import java.util.List;

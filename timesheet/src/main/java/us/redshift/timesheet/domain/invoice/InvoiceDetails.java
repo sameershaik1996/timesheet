@@ -2,17 +2,12 @@ package us.redshift.timesheet.domain.invoice;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.common.BaseEntity;
-import us.redshift.timesheet.domain.common.Location;
 import us.redshift.timesheet.domain.task.Task;
-import us.redshift.timesheet.domain.taskcard.TaskCard;
-import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,7 +18,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="pss_invoice_details")
+@Table(name = "pss_invoice_details")
 public class InvoiceDetails extends BaseEntity implements Serializable {
 
 
@@ -49,8 +44,6 @@ public class InvoiceDetails extends BaseEntity implements Serializable {
     private BigDecimal ratePerHour;
 
     private BigDecimal taskAmount;
-
-
 
 
 }

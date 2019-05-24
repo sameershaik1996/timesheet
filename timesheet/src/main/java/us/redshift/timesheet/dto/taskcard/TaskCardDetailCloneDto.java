@@ -1,6 +1,5 @@
 package us.redshift.timesheet.dto.taskcard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
@@ -17,7 +16,7 @@ public class TaskCardDetailCloneDto {
     private Date date;
     @NonNull
     private BigDecimal hours;
-    private TimeSheetStatus status=TimeSheetStatus.PENDING;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
 
 }

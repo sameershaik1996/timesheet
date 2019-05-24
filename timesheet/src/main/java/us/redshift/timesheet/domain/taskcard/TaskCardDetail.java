@@ -27,15 +27,26 @@ public class TaskCardDetail extends BaseEntity {
     private BigDecimal hours;
 
     @Enumerated(EnumType.STRING)
-    private TimeSheetStatus status = TimeSheetStatus.PENDING;
+    private TimeSheetStatus status;
 
-    private String comment="";
+    private String comment = "";
 
-    private String rejectedComment="";
+    private String rejectedComment = "";
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne()
     @JoinColumn(name = "task_card_id")
-    @JsonIgnoreProperties(value = {"taskCardDetails","project","client"})
+    @JsonIgnoreProperties(value = {"taskCardDetails", "project", "client"})
     private TaskCard taskCard;
 
+    public void setStatus(TimeSheetStatus status) {
+        this.status = status == null ? TimeSheetStatus.PENDING : status;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment == null ? "" : comment;
+    }
+
+    public void setRejectedComment(String rejectedComment) {
+        this.rejectedComment = rejectedComment == null ? "" : rejectedComment;
+    }
 }

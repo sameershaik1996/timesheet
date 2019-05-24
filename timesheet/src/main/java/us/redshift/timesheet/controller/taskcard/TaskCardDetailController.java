@@ -35,7 +35,7 @@ public class TaskCardDetailController {
     @PutMapping("taskcarddetail/update")
     public ResponseEntity<?> updateTaskCardDetail(@Valid @RequestBody List<TaskCardDetailDto> taskCardDetailDtos, @RequestParam(value = "status", defaultValue = "SUBMITTED") String status) throws ParseException {
         List<TaskCardDetail> taskCardDetails = taskCardDetailAssembler.convertToEntity(taskCardDetailDtos);
-        System.out.println("stat:"+status+" "+TimeSheetStatus.get(status));
+        System.out.println("stat:" + status + " " + TimeSheetStatus.get(status));
         List<TaskCardDetail> dtos = taskCardDetailService.updateTaskCardDetail(taskCardDetails, TimeSheetStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(taskCardDetailAssembler.convertToDto(dtos), HttpStatus.OK);
     }

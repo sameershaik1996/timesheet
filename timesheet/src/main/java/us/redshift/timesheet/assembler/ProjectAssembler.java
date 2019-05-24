@@ -142,7 +142,7 @@ public class ProjectAssembler {
 
     public Set<SkillDto> convertToSkillDto(Set<Long> ids) {
 
-        Set<SkillDto> dtos = employeeFeign.getAllSkillByEmployeeIds(ids).getBody();
+        Set<SkillDto> dtos = employeeFeign.getAllSkillsByIds(null, ids).getBody();
         return dtos;
     }
 

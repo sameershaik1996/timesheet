@@ -128,11 +128,13 @@ public class TaskCardAssembler {
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource().getId();
                 EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
-                return employee.getDesignation().getId();
+                if (employee.getDesignation() != null)
+                    return employee.getDesignation().getId();
+                else
+                    return Long.valueOf(1);
             }
             return null;
         };
-
 
 
         //      adding long to EmployeeListDto  conversion property

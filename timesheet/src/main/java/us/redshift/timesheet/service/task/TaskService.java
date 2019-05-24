@@ -1,5 +1,7 @@
 package us.redshift.timesheet.service.task;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.project.Project;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskService implements ITaskService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
@@ -55,21 +59,21 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void updateTaskHours(Long taskId, BigDecimal usedHour) {
+    public void
+    updateTaskHours(Long taskId, BigDecimal usedHour) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
 
-        BigDecimal oldUsedHour=new BigDecimal(0);
-        if(task.getUsedHour()!=null)
-         oldUsedHour= task.getUsedHour();
+        BigDecimal oldUsedHour = new BigDecimal(0);
+        if (task.getUsedHour() != null)
+            oldUsedHour = task.getUsedHour();
 
         BigDecimal newUsedHour = oldUsedHour.add(usedHour);
+        LOGGER.info("OldUsedHour {} and NewUsedHour {} for the task Id {}", oldUsedHour, newUsedHour, taskId);
         task.setUsedHour(newUsedHour);
 
-/*
         if (task.getBillableHour().compareTo(newUsedHour) < 0) {
-            System.out.println("Task Billable hours Exceeds");
+            LOGGER.warn("Task Billable hours Exceeds");
         }
-*/
 
         taskRepository.save(task);
     }

@@ -1,15 +1,13 @@
 package us.redshift.timesheet.dto.client;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import us.redshift.timesheet.dto.common.BaseDto;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class PocDto extends BaseDto {
 
     private Long id;

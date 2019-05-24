@@ -9,7 +9,6 @@ import us.redshift.timesheet.dto.common.LocationDto;
 import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectListDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
-import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -21,7 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class TaskCardCloneDto {
 
-    private TimeSheetStatus status=TimeSheetStatus.PENDING;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
     @NonNull
     private TaskType type;

@@ -46,7 +46,7 @@ public class TaskCard extends BaseEntity {
 
     private BigDecimal hours;
 
-    private String comment="";
+    private String comment;
 
 
     @ManyToOne()
@@ -68,20 +68,20 @@ public class TaskCard extends BaseEntity {
     private TimeSheet timeSheet;
 
     public void add(TaskCardDetail taskCardDetail) {
-        this.taskCardDetails.add(taskCardDetail);
+//        this.taskCardDetails.add(taskCardDetail);
         taskCardDetail.setTaskCard(this);
     }
 
     public void setStatus(TimeSheetStatus status) {
-        if (status == null)
-            status = TimeSheetStatus.PENDING;
-        this.status = status;
+
+        this.status = status == null ? TimeSheetStatus.PENDING : status;
     }
 
     public void setType(TaskType type) {
-        if (type == null)
-            type = TaskType.BILLABLE;
-        this.type = type;
+        this.type = type == null ? TaskType.BILLABLE : type;
     }
 
+    public void setComment(String comment) {
+        this.comment = comment == null ? "" : comment;
+    }
 }

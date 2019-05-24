@@ -1,5 +1,7 @@
 package us.redshift.timesheet.service.taskcard;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class TaskCardDetailService implements ITaskCardDetailService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskCardDetailService.class);
 
     private final TaskCardDetailRepository taskCardDetailRepository;
     private final TaskCardRepository taskCardRepository;
@@ -48,49 +51,59 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     public List<TaskCardDetail> updateTaskCardDetail(List<TaskCardDetail> taskCardDetails, TimeSheetStatus status) {
 
         List<TaskCardDetail> taskCardDetailList = new ArrayList<>();
-        System.out.println(status);
         taskCardDetails.forEach(taskCardDetail -> {
             if (!taskCardDetailRepository.existsById(taskCardDetail.getId()))
                 throw new ResourceNotFoundException("TaskCardDetail", "ID", taskCardDetail.getId());
-//            taskCardDetail.setStatus(status);
-            taskCardDetailRepository.setStatusForTaskCardDetailById(status.name(), taskCardDetail.getId());
-//            taskCardDetailList.add(SavedTaskCardDetail);
+            LOGGER.info("UpdateTaskCardDetails  status Update {}", taskCardDetail.getId());
+            taskCardDetail.setStatus(status);
+//            taskCardDetailRepository.save(taskCardDetail);
+            taskCardDetailList.add(taskCardDetail);
+//            taskCardDetailRepository.setStatusForTaskCardDetailById(status.name(), taskCardDetail.getId());
         });
+        taskCardDetailRepository.saveAll(taskCardDetailList);
+        List<Long> checkList = new ArrayList<>();
         taskCardDetails.forEach(taskCardDetail -> {
-            TaskCard taskCard = taskCardRepository.findById(taskCardDetail.getTaskCard().getId()).orElseThrow(() -> new ResourceNotFoundException("TaskCard", "ID", taskCardDetail.getTaskCard().getId()));
-            TimeSheet timeSheet = timeSheetRepository.findById(taskCard.getTimeSheet().getId()).get();
-            if (!status.equals(TimeSheetStatus.REJECTED)) {
-                List<TaskCardDetail> cardDetailList = taskCardDetailRepository.findTaskCardDetailsByTaskCard_Id(taskCardDetail.getTaskCard().getId());
-                int taskDetailApprove = 0, taskDetailReject = 0, size = cardDetailList.size();
-                for (TaskCardDetail taskCardDetail1 : cardDetailList) {
-                    if (taskCardDetail1.getStatus().equals(TimeSheetStatus.APPROVED))
-                        taskDetailApprove++;
-                    else if (taskCardDetail1.getStatus().equals(TimeSheetStatus.REJECTED))
-                        taskDetailReject++;
-                }
-
-                System.out.println(taskDetailApprove + " taskCardDetail " + taskDetailReject + " Size " + size);
-//                Set status to taskCard
-                if (taskDetailApprove == size) {
-//                update used hours to task
-                    taskCard.setStatus(TimeSheetStatus.APPROVED);
-                    if (taskCard.getType().equals(TaskType.BILLABLE)) {
-                        taskCard = taskCardService.calculateAmount(taskCard);
-                        taskService.updateTaskHours(taskCard.getTask().getId(), taskCard.getHours());
+            if (!checkList.contains(taskCardDetail.getTaskCard().getId())) {
+                checkList.add(taskCardDetail.getTaskCard().getId());
+                TaskCard taskCard = taskCardRepository.findById(taskCardDetail.getTaskCard().getId()).orElseThrow(() -> new ResourceNotFoundException("TaskCard", "ID", taskCardDetail.getTaskCard().getId()));
+                TimeSheet timeSheet = timeSheetRepository.findById(taskCard.getTimeSheet().getId()).get();
+                if (!status.equals(TimeSheetStatus.REJECTED)) {
+                    List<TaskCardDetail> cardDetailList = taskCardDetailRepository.findTaskCardDetailsByTaskCard_Id(taskCardDetail.getTaskCard().getId());
+                    int taskDetailApprove = 0, taskDetailReject = 0, size = cardDetailList.size();
+                    for (TaskCardDetail taskCardDetail1 : cardDetailList) {
+                        if (taskCardDetail1.getStatus().equals(TimeSheetStatus.APPROVED))
+                            taskDetailApprove++;
+                        else if (taskCardDetail1.getStatus().equals(TimeSheetStatus.REJECTED))
+                            taskDetailReject++;
                     }
-                    taskCardRepository.save(taskCard);
+
+//                Set status to taskCard
+                    if (taskDetailApprove == size) {
+//                update used hours to task
+                        LOGGER.info("Size of taskCardDetails {}", taskDetailApprove);
+                        taskCard.setStatus(TimeSheetStatus.APPROVED);
+                        if (taskCard.getType().equals(TaskType.BILLABLE)) {
+                            LOGGER.info("UpdateTaskCardDetails calculateAmount {}", taskCard.getId());
+                            taskCard = taskCardService.calculateAmount(taskCard);
+                            LOGGER.info("UpdateTaskCardDetails updateTask Hour With {}", taskCard.getHours());
+                            taskService.updateTaskHours(taskCard.getTask().getId(), taskCard.getHours());
+                        }
+                        taskCardRepository.save(taskCard);
 //                timeSheet status update
-                    taskCardService.TimeSheetStatus(timeSheet);
-                } else if (taskDetailReject > 0) {
+                        taskCardService.TimeSheetStatus(timeSheet);
+                    } else if (taskDetailReject > 0) {
+                        LOGGER.info("UpdateTaskCardDetails status Updated as Rejected {}", taskCard.getId());
+                        taskCardRepository.setStatusForTaskCard(TimeSheetStatus.REJECTED.name(), taskCard.getId());
+                        timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
+                    }
+                } else {
+                    LOGGER.info("UpdateTaskCardDetails status Updated as Rejected {}", taskCard.getId());
                     taskCardRepository.setStatusForTaskCard(TimeSheetStatus.REJECTED.name(), taskCard.getId());
                     timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
                 }
-            } else {
-                taskCardRepository.setStatusForTaskCard(TimeSheetStatus.REJECTED.name(), taskCard.getId());
-                timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
             }
         });
-        return taskCardDetailList;
+        return new ArrayList<>();
     }
 
     @Override

@@ -32,11 +32,16 @@ public class RateCard extends BaseEntity {
     private List<RateCardDetail> rateCardDetails = new ArrayList<>();
 
 
-
     public void addRateCardDetail(RateCardDetail rateCardDetail) {
         rateCardDetail.setRateCard(this);
-        rateCardDetails.add(rateCardDetail);
+//        rateCardDetails.add(rateCardDetail);
     }
 
+    public void setDefault(Boolean isDefault) {
+        this.isDefault = isDefault == null ? false : isDefault;
+    }
 
+    public void setProjectType(ProjectType projectType) {
+        this.projectType = projectType == null ? ProjectType.FIXED_BID : projectType;
+    }
 }

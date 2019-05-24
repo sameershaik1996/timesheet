@@ -35,5 +35,4 @@ public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
     List<TaskCard> findByStatusNotLikeAndProject_IdOrderByEmployeeIdAscTaskCardDetailsAsc(TimeSheetStatus status, Long projectId);
 
 
-
 }
