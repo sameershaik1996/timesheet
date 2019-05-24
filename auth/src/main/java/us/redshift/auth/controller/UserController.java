@@ -20,6 +20,7 @@ import us.redshift.auth.domain.User;
 import us.redshift.auth.dto.JwtAuthenticationResponse;
 import us.redshift.auth.dto.LoginDto;
 import us.redshift.auth.dto.UserDto;
+import us.redshift.auth.exception.BadRequestException;
 import us.redshift.auth.repository.RoleRepository;
 import us.redshift.auth.security.CurrentUser;
 import us.redshift.auth.security.CustomUserDetailsService;
@@ -83,12 +84,15 @@ public class UserController {
 
 
     @GetMapping("get")
-    public ResponseEntity<?> getUserByRole( @RequestParam(value = "roleName",required = false) RoleName roleName)
+    public ResponseEntity<?> getUserByRole( @RequestParam(value = "roleName",required = false) String roleName)
     {
         List<UserDto> userDto=new ArrayList<>();
         if(roleName!=null) {
-             Role role= roleRepository.findByName(roleName);
-            userService.findUserByRole(role).forEach(user -> userDto.add(modelMapper.map(user,UserDto.class)));
+             Role role= roleRepository.findByName(RoleName.get(roleName.toUpperCase()));
+             if(role!=null)
+                userService.findUserByRole(role).forEach(user -> userDto.add(modelMapper.map(user,UserDto.class)));
+             else
+                 return new ResponseEntity<>(new BadRequestException("Role doesn't exist"), HttpStatus.BAD_REQUEST);
         }
         else
         {

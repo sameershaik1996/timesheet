@@ -58,11 +58,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-		<!--<dependency>
+		<dependency>
 			<groupId>us.redshift</groupId>
-			<artifactId>auth-utility</artifactId>
+			<artifactId>filter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>-->
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>

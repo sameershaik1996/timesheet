@@ -1,4 +1,4 @@
-package us.redshift.zuul.model;
+package us.redshift.filter.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,7 +25,7 @@ public class UserDetails implements Serializable {
 
     private Long employeeId;
 
-    private Role role;
+    private String roleName;
 
     @Override
     public String toString() {
@@ -33,7 +33,7 @@ public class UserDetails implements Serializable {
                 "userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", employeeId=" + employeeId +
-                ", roles=" + role.toString() +
+                ", roles=" + roleName +
                 '}';
     }
 }

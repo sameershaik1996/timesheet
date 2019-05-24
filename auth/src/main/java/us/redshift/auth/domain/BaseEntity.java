@@ -37,11 +37,11 @@ public class BaseEntity implements Serializable {
     private Instant updatedTimeStamp;
 
 
-    @Column(nullable = true,updatable = false)
-    private Long createdBy;
+    @Column(updatable = false)
+    private String createdBy;
 
-    @Column(nullable = true)
-    private Long updatedBy;
+    @Column
+    private String updatedBy;
 
 
 

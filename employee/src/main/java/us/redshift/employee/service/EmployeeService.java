@@ -1,6 +1,8 @@
 package us.redshift.employee.service;
 
+import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -9,9 +11,13 @@ import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.repository.EmployeeRespository;
 import us.redshift.employee.util.DTO;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -21,10 +27,18 @@ public class EmployeeService implements IEmployeeService {
     EmployeeRespository employeeRespository;
 
     @Override
-    public Employee createEmployee(Employee employee) {
-        Employee emp=employeeRespository.findTopByOrderByIdDesc();
-        employee.setEmployeeId(generateEmployeeId(emp));
-        return employeeRespository.save(employee);
+    public Employee createEmployee(Employee employee)  throws ConstraintViolationException,DataIntegrityViolationException {
+        try {
+            Employee emp = employeeRespository.findTopByOrderByIdDesc();
+            employee.setEmployeeId(generateEmployeeId(emp));
+            return employeeRespository.save(employee);
+        }
+        catch (ConstraintViolationException e){
+            throw e;
+        }
+        catch (DataIntegrityViolationException e){
+            throw new DataIntegrityViolationException("Value Already Exists",e);
+        }
     }
 
 
@@ -34,14 +48,15 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public Employee getEmployeeById(Long id) {
+    public Employee getEmployeeById(Long id)throws NoSuchElementException, EntityNotFoundException {
+        try{
+            Employee employee= employeeRespository.findById(id).get();
+            return employee;
+        }
+        catch (NoSuchElementException ex){
 
-
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = requestAttributes.getRequest();
-        System.out.println(request.getRequestURI());
-
-        return employeeRespository.findById(id).get();
+            throw new NoSuchElementException( "Employee not found");
+        }
     }
 
     @Override
