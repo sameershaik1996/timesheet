@@ -37,7 +37,7 @@ public class TaskCardController {
     }
 
     @GetMapping({"taskcard/get"})
-    public ResponseEntity<?> getAllTaskCardByPagination(@RequestParam(value = "managerId", defaultValue = "0") Long managerId, @RequestParam(value = "projectId", defaultValue = "0") Long projectId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllTaskCardByPagination(@RequestParam(value = "managerId", defaultValue = "0") Long managerId, @RequestParam(value = "projectId", defaultValue = "0") Long projectId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (!managerId.equals(Long.valueOf(0))) {
             Set<TaskCard> taskCardSet = taskCardService.getAllTaskCardByMangerId(managerId);
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCardSet), HttpStatus.OK);

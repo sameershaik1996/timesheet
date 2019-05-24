@@ -9,6 +9,7 @@ import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.Date;
 import java.util.Set;
 
 @Repository
@@ -28,6 +29,9 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
     @Modifying
     @Query(value = "UPDATE pss_timesheets SET status=?1 WHERE id = ?2", nativeQuery = true)
     int setStatusForTimeSheet(String status, Long id);
+
+
+    Set<TimeSheet> findAllByStatusAndFromDateBefore(TimeSheetStatus status, Date localDate);
 
 
 }

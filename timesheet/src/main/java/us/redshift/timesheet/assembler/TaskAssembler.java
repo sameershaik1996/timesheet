@@ -93,7 +93,7 @@ public class TaskAssembler {
                 source = mappingContext.getSource();
                 //System.out.println("Task Assembler skill set");
 //          Feign Client Call to get SkillDto
-                Set<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source).getBody();
+                Set<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source, null).getBody();
 
                 return dest;
             }

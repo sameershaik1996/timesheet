@@ -43,11 +43,6 @@ public class TimeSheetController {
         return new ResponseEntity<>(timeSheetAssembler.convertToDto(savedTimeSheet), HttpStatus.OK);
     }
 
-    @GetMapping({"timesheet"})
-    public ResponseEntity<?> getAllTimeSheetByPagination(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-        Set<TimeSheet> timeSheets = timeSheetService.getAllTimeSheetByPagination(page, limits, orderBy, fields);
-        return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheets), HttpStatus.OK);
-    }
 
     @GetMapping("timesheet/get/{id}")
     public ResponseEntity<?> getTimeSheet(@PathVariable(value = "id") Long id) throws ParseException {
@@ -58,13 +53,16 @@ public class TimeSheetController {
 
 
     @GetMapping({"timesheet/get"})
-    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber) throws ParseException {
+    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber, @RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (projectId != 0) {
             Set<TimeSheet> timeSheetSet = timeSheetService.getAllTimeSheetByProjectId(projectId);
             return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetSet), HttpStatus.OK);
-        } else {
+        } else if (employeeId != null) {
             TimeSheet timeSheet = timeSheetService.getTimeSheetByWeekNumber(employeeId, year, weekNumber);
             return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheet), HttpStatus.OK);
+        } else {
+            Set<TimeSheet> timeSheetSet = timeSheetService.getAllTimeSheetByPagination(page, limits, orderBy, fields);
+            return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetSet), HttpStatus.OK);
         }
     }
 

@@ -73,15 +73,11 @@ public class Project extends BaseEntity implements Serializable {
     private RateCard rateCard;
 
     public void setStatus(ProjectStatus status) {
-        if (status == null)
-            status = ProjectStatus.INACTIVE;
-        this.status = status;
+        this.status = status == null ? ProjectStatus.ACTIVE : status;
     }
 
     public void setType(ProjectType type) {
-        if (type == null)
-            type = ProjectType.FIXED_BID;
-        this.type = type;
+        this.type = type == null ? ProjectType.FIXED_BID : type;
     }
 
 

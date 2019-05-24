@@ -50,11 +50,11 @@ public class Task extends BaseEntity {
     private Date endedOn;
 
 
-    private BigDecimal billableHour = new BigDecimal(0);
+    private BigDecimal billableHour;
 
-    private BigDecimal nonBillableHour = new BigDecimal(0);
+    private BigDecimal nonBillableHour;
 
-    private BigDecimal usedHour = new BigDecimal(0);
+    private BigDecimal usedHour;
 
     @ElementCollection(targetClass = Long.class)
     @JoinTable(name = "pss_task_skills")
@@ -72,32 +72,22 @@ public class Task extends BaseEntity {
 
 
     public void setStatus(TaskStatus status) {
-        if (status == null)
-            status = TaskStatus.ACTIVE;
-        this.status = status;
+        this.status = status == null ? TaskStatus.ACTIVE : status;
     }
 
     public void setType(TaskType type) {
-        if (type == null)
-            type = TaskType.BILLABLE;
-        this.type = type;
-    }
-
-    public void setBillableHour(BigDecimal billableHour) {
-        if (billableHour == null)
-            this.billableHour = new BigDecimal(0);
-        this.billableHour = billableHour;
-    }
-
-    public void setNonBillableHour(BigDecimal nonBillableHour) {
-        if (nonBillableHour == null)
-            this.nonBillableHour = new BigDecimal(0);
-        this.nonBillableHour = nonBillableHour;
+        this.type = type == null ? TaskType.BILLABLE : type;
     }
 
     public void setUsedHour(BigDecimal usedHour) {
-        if (usedHour == null)
-            this.usedHour = new BigDecimal(0);
-        this.usedHour = usedHour;
+        this.usedHour = usedHour == null ? BigDecimal.valueOf(0) : usedHour;
+    }
+
+    public void setBillableHour(BigDecimal billableHour) {
+        this.billableHour = billableHour == null ? BigDecimal.valueOf(0) : billableHour;
+    }
+
+    public void setNonBillableHour(BigDecimal nonBillableHour) {
+        this.nonBillableHour = nonBillableHour == null ? BigDecimal.valueOf(0) : nonBillableHour;
     }
 }

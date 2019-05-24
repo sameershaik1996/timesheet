@@ -1,5 +1,6 @@
 package us.redshift.timesheet.service.client;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.client.Client;
@@ -71,11 +72,11 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public Set<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields) {
+    public Page<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields) {
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<Client> projectList = clientRepository.findAll(pageable).getContent();
-        Set<Client> clientSet = projectList.stream().collect(Collectors.toCollection(HashSet::new));
-        return clientSet;
+        Page<Client> projectList = clientRepository.findAll(pageable);
+//        Set<Client> clientSet = projectList.stream().collect(Collectors.toCollection(HashSet::new));
+        return projectList;
     }
 
     @Override

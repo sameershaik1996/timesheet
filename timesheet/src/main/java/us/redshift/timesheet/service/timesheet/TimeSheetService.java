@@ -1,5 +1,7 @@
 package us.redshift.timesheet.service.timesheet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.assembler.TimeSheetCloneAssembler;
@@ -31,6 +33,7 @@ import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 @Service
 public class TimeSheetService implements ITimeSheetService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeSheetService.class);
 
     private final TimeSheetRepository timeSheetRepository;
     private final TaskCardService taskCardService;
@@ -59,15 +62,28 @@ public class TimeSheetService implements ITimeSheetService {
 
     @Override
     public TimeSheet updateTimeSheet(TimeSheet timeSheet, TimeSheetStatus status) {
-        timeSheetRepository.findById(timeSheet.getId()).orElseThrow(() -> new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId()));
+        System.out.println(timeSheet.getTaskCards().size());
+        if (!timeSheetRepository.existsById(timeSheet.getId()))
+            throw new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId());
+        if (TimeSheetStatus.APPROVED.equals(status)) {
+            int count = timeSheetRepository.findAllByStatusAndFromDateBefore(TimeSheetStatus.PENDING, timeSheet.getFromDate()).size();
+            if (count > 0) {
+                LOGGER.info(" previous unSubmitted TimeSheets {}", count);
+                throw new ValidationException("Please submit previous TimeSheet (" + count + ")");
+            }
+        }
+
         Set<TaskCard> taskCards = new HashSet<>(timeSheet.getTaskCards());
         taskCards.forEach(taskCard -> {
             TaskCard card = taskCardService.calculateAmount(taskCard);
             card.setStatus(status);
-            timeSheet.addTaskCard(card);
+            timeSheet.addTaskCard(taskCard);
             if (status.equals(TimeSheetStatus.APPROVED)) {
-                if (card.getType().equals(TaskType.BILLABLE))
+                if (card.getType().equals(TaskType.BILLABLE)) {
+                    LOGGER.info(" UpdateTimeSheet updateTask Hour With {}", taskCard.getHours());
+//                    Update usedHour
                     taskService.updateTaskHours(card.getTask().getId(), taskCard.getHours());
+                }
             }
         });
         Set<TimeOff> timeOffs = new HashSet<>(timeSheet.getTimeOffs());
@@ -75,8 +91,7 @@ public class TimeSheetService implements ITimeSheetService {
         timeSheet.setStatus(status);
         TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
         timeSheet.getTaskCards().forEach(taskCard -> {
-            System.out.println(taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId()));
-            System.out.println(taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId()));
+            LOGGER.info("UpdateTimeSheet TaskCardDetails Status Updated {}", taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId()));
         });
 
         return SaveTimeSheet;
@@ -132,7 +147,7 @@ public class TimeSheetService implements ITimeSheetService {
 
     @Override
     public TimeSheet cloneTimeSheet(TimeSheet timeSheet) {
-        List<TaskCard> taskCards = new ArrayList<>(timeSheet.getTaskCards());
+        List<TaskCard> taskCards = timeSheet.getTaskCards();
 
         taskCards.forEach(taskCard ->
         {
@@ -157,18 +172,18 @@ public class TimeSheetService implements ITimeSheetService {
 
         Set<TaskCard> taskCardSet = new HashSet<>(taskCardService.getAllTaskCardByProject(projectId));
 
-
         Set<TimeSheet> timeSheetSet = timeSheetRepository.findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(taskCardSet, TimeSheetStatus.PENDING);
 
         Set<TimeSheet> projectTimeSheet = new HashSet<>();
 
+        List<TaskCard> taskCards = new ArrayList<>();
         timeSheetSet.forEach(timeSheet -> {
-            Set<TaskCard> taskCards = new HashSet<>();
             timeSheet.getTaskCards().forEach(taskCard -> {
                 if (taskCard.getProject().getId() == projectId) {
                     taskCards.add(taskCard);
                 }
             });
+            timeSheet.setTaskCards(taskCards);
             projectTimeSheet.add(timeSheet);
         });
 

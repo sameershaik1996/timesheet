@@ -1,5 +1,6 @@
 package us.redshift.timesheet.service.client;
 
+import org.springframework.data.domain.Page;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.client.ClientStatus;
 
@@ -14,7 +15,7 @@ public interface IClientService {
 
     Client getClientById(Long id);
 
-    Set<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields);
+    Page<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields);
 
     ClientStatus[] getAllClientStatus();
 

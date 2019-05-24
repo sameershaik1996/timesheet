@@ -1,5 +1,7 @@
 package us.redshift.timesheet.service.taskcard;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.project.Project;
@@ -10,9 +12,7 @@ import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
-import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
-import us.redshift.timesheet.feignclient.EmployeeFeign;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.reposistory.ratecard.RateCardDetailRepository;
 import us.redshift.timesheet.reposistory.task.TaskRepository;
@@ -31,25 +31,24 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskCardService implements ITaskCardService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskCardService.class);
 
     private final TaskCardRepository taskCardRepository;
-
     private final RateCardDetailRepository rateCardDetailRepository;
-
     private final TaskRepository taskRepository;
-
     private final ProjectRepository projectRepository;
-
     private final TaskCardDetailRepository taskCardDetailRepository;
-
     private final TaskService taskService;
-
     private final TimeSheetRepository timeSheetRepository;
 
-    private final EmployeeFeign employeeFeign;
 
-
-    public TaskCardService(TaskCardRepository taskCardRepository, RateCardDetailRepository rateCardDetailRepository, TaskRepository taskRepository, ProjectRepository projectRepository, TaskCardDetailRepository taskCardDetailRepository, TaskService taskService, TimeSheetRepository timeSheetRepository, EmployeeFeign employeeFeign) {
+    public TaskCardService(TaskCardRepository taskCardRepository,
+                           RateCardDetailRepository rateCardDetailRepository,
+                           TaskRepository taskRepository,
+                           ProjectRepository projectRepository,
+                           TaskCardDetailRepository taskCardDetailRepository,
+                           TaskService taskService,
+                           TimeSheetRepository timeSheetRepository) {
         this.taskCardRepository = taskCardRepository;
         this.rateCardDetailRepository = rateCardDetailRepository;
         this.taskRepository = taskRepository;
@@ -57,9 +56,6 @@ public class TaskCardService implements ITaskCardService {
         this.taskCardDetailRepository = taskCardDetailRepository;
         this.taskService = taskService;
         this.timeSheetRepository = timeSheetRepository;
-
-
-        this.employeeFeign = employeeFeign;
     }
 
 
@@ -76,8 +72,11 @@ public class TaskCardService implements ITaskCardService {
             taskCardList.add(savedTaskCard);
             if (status.equals(TimeSheetStatus.APPROVED)) {
                 taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.APPROVED.name(), taskCard.getId());
-                if (taskCard.getType().equals(TaskType.BILLABLE))
+                if (taskCard.getType().equals(TaskType.BILLABLE)) {
+//                    Update usedHour
+                    LOGGER.info(" UpdateTaskCard {} updateTask Hour With ", taskCard.getHours());
                     taskService.updateTaskHours(taskCard.getTask().getId(), taskCard.getHours());
+                }
 //                timeSheet status update
                 TimeSheetStatus(timeSheet);
             } else {
@@ -103,12 +102,12 @@ public class TaskCardService implements ITaskCardService {
         if (!taskCardRepository.existsById(id))
             throw new ResourceNotFoundException("TaskCard", "ID", id);
         taskCardRepository.deleteById(id);
+        LOGGER.info(" Deleted TaskCard id {}", id);
     }
 
     @Override
     public Set<TaskCard> getAllTaskCardByMangerId(Long managerId) {
         Set<Project> projectSet = projectRepository.findAllByManagerId(managerId);
-
         return taskCardRepository.findByStatusNotLikeAndProjectIn(TimeSheetStatus.PENDING, projectSet);
     }
 
@@ -143,20 +142,20 @@ public class TaskCardService implements ITaskCardService {
 
 
 //      Assign ratePerHour
-            if (card.getLocation().getId() != null && card.getSkillId() != null && card.getEmployeeId() != null) {
+            if (card.getLocation().getId() != null && card.getSkillId() != null && card.getEmployeeId() != null && card.getDesignationId() != null) {
+/*
 //      Get Employee Designation
                 Long designationId = Long.valueOf(1);
                 EmployeeDto employeeDto = employeeFeign.getEmployeeById(card.getEmployeeId()).getBody();
                 if (employeeDto.getDesignation() != null)
                     designationId = employeeDto.getDesignation().getId();
+*/
 //       TODo Add RateCard Id
                 RateCardDetail rateCardDetail = rateCardDetailRepository.findByLocationIdAndSkillIdAndDesignationId
-                        (card.getLocation().getId(), card.getSkillId(), designationId);
+                        (card.getLocation().getId(), card.getSkillId(), card.getDesignationId());
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
-
-                System.out.println(ratePerHour);
-
+                LOGGER.info(" UpdateTaskCard Calculate Amount RatePerHour {}", ratePerHour);
                 card.setRatePerHour(ratePerHour);
             }
         }
@@ -172,6 +171,7 @@ public class TaskCardService implements ITaskCardService {
         cardDetails.forEach(taskCardDetail -> card.add(taskCardDetail));
 
 //      SetAmount and Hour
+        LOGGER.info(" UpdateTaskCard Calculate Amount Total Hours{}", hours);
         card.setHours(hours);
         card.setAmount(Reusable.multiplyRates(hours, ratePerHour));
         card.setTask(task);
@@ -179,7 +179,6 @@ public class TaskCardService implements ITaskCardService {
     }
 
     public void TimeSheetStatus(TimeSheet timeSheet) {
-        System.out.println("TimeSheet Status");
         int taskCardApprove = 0, taskCardReject = 0;
         int size = timeSheet.getTaskCards().size();
 
@@ -190,14 +189,11 @@ public class TaskCardService implements ITaskCardService {
                 taskCardReject++;
         }
 
-        System.out.println(taskCardApprove + " qwertyuiop " + taskCardReject + " qwertyuiop " + size);
-
         if (taskCardApprove == size) {
-
-            System.out.println(timeSheet.getId());
-
+            LOGGER.info(" TimeSheet Status -> Approved TimeSheet {} ", timeSheet.getId());
             timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.APPROVED.name(), timeSheet.getId());
         } else if (taskCardReject > 1) {
+            LOGGER.info(" TimeSheet Status -> Rejected TimeSheet {} ", timeSheet.getId());
             timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
         }
 

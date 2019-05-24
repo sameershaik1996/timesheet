@@ -62,15 +62,11 @@ public class Client extends BaseEntity implements Serializable {
     }
 
     public void setStatus(ClientStatus status) {
-        if (status == null)
-            status = ClientStatus.ACTIVE;
-        this.status = status;
+        this.status = status == null ? ClientStatus.ACTIVE : status;
     }
 
     public void setFocusAreas(Set<FocusArea> focusAreas) {
-        if (focusAreas == null)
-            this.focusAreas = new HashSet<>();
-        this.focusAreas = focusAreas;
+        this.focusAreas = focusAreas == null ? new HashSet<>() : focusAreas;
     }
 
     //    //    @JsonManagedReference
