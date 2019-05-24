@@ -34,13 +34,13 @@ public class Client extends BaseEntity implements Serializable {
     private ClientStatus status;
     private String url;
 
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "industry_id", nullable = false)
     private Industry industry;
 
 
     @JsonIgnoreProperties(value = "clients")
-    @ManyToMany()
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "pss_clients_focus_area",
             joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "focus_area_id"))

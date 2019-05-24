@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "pss_focus_areas")
+@Table(name = "pss_focus_areas", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +26,6 @@ public class FocusArea extends BaseEntity {
 
     @JsonIgnoreProperties({"focusAreas"})
     @JsonIgnore
-    @ManyToMany(mappedBy = "focusAreas", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
+    @ManyToMany(mappedBy = "focusAreas")
     private Set<Client> clients = new HashSet<>();
 }
