@@ -4,6 +4,9 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.project.Project;
@@ -19,8 +22,8 @@ import us.redshift.timesheet.feignclient.EmployeeFeign;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,84 +37,83 @@ public class TaskAssembler {
         this.employeeFeign = employeeFeign;
 
 
-//      EmployeeListDto to Long set
-        Converter<Set<EmployeeListDto>, Set<Long>> EmployeeToLongSet = mappingContext -> {
+//      EmployeeListDto to Long list
+        Converter<List<EmployeeListDto>, List<Long>> EmployeeToLongList = mappingContext -> {
 
-            Set<EmployeeListDto> source = new HashSet<>();
+            List<EmployeeListDto> source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-                //System.out.println("Task Assembler employee long set");
-                Set<Long> dest = source.stream().map(employeeListDto -> employeeListDto.getId()).collect(Collectors.toSet());
+                //System.out.println("Task Assembler employee long list");
+                List<Long> dest = source.stream().map(employeeListDto -> employeeListDto.getId()).collect(Collectors.toList());
                 return dest;
             }
             return null;
         };
 
-//      SkillDto to Long set
-        Converter<Set<SkillDto>, Set<Long>> SkillToLongSet = mappingContext -> {
+//      SkillDto to Long list
+        Converter<List<SkillDto>, List<Long>> SkillToLongList = mappingContext -> {
 
-            Set<SkillDto> source = new HashSet<>();
+            List<SkillDto> source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-                //System.out.println("Task Assembler skill long set");
-                Set<Long> dest = source.stream().map(skillDto -> skillDto.getId()).collect(Collectors.toSet());
+                //System.out.println("Task Assembler skill long list");
+                List<Long> dest = source.stream().map(skillDto -> skillDto.getId()).collect(Collectors.toList());
                 return dest;
             }
             return null;
         };
 
-//      adding EmployeeListDto to long set conversion property
+//      adding EmployeeListDto to long list conversion property
         this.mapper.addMappings(new PropertyMap<TaskDto, Task>() {
             protected void configure() {
-                using(EmployeeToLongSet).map(source.getEmployees()).setEmployeeId(null);
-                using(SkillToLongSet).map(source.getSkills()).setSkillId(null);
+                using(EmployeeToLongList).map(source.getEmployees()).setEmployeeId(null);
+                using(SkillToLongList).map(source.getSkills()).setSkillId(null);
             }
         });
 
-//      Long to EmployeeListDto set
-        Converter<Set<Long>, Set<EmployeeListDto>> LongToEmployeeSet = mappingContext -> {
-            Set<Long> source = new HashSet<>();
+//      Long to EmployeeListDto list
+        Converter<List<Long>, List<EmployeeListDto>> LongToEmployeeList = mappingContext -> {
+            List<Long> source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
                 //          Feign Client Call to get EmployeeDto
-                Set<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
-                Type targetType = new TypeToken<Set<EmployeeListDto>>() {
+                List<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+                Type targetType = new TypeToken<List<EmployeeListDto>>() {
                 }.getType();
-                //System.out.println("Task Assembler employee set");
+                //System.out.println("Task Assembler employee list");
 //          Convert EmployeeDto to EmployeeListDto
-                Set<EmployeeListDto> dest = mapper.map(employees, targetType);
+                List<EmployeeListDto> dest = mapper.map(employees, targetType);
                 return dest;
             }
 
             return null;
         };
 
-//      Long to SkillDto set
-        Converter<Set<Long>, Set<SkillDto>> LongToSkillSet = mappingContext -> {
-            Set<Long> source = new HashSet<>();
+//      Long to SkillDto list
+        Converter<List<Long>, List<SkillDto>> LongToSkillList = mappingContext -> {
+            List<Long> source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-                //System.out.println("Task Assembler skill set");
 //          Feign Client Call to get SkillDto
-                Set<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source, null).getBody();
+                List<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source, null).getBody();
 
                 return dest;
             }
             return null;
         };
 
-//      adding long to EmployeeListDto set conversion property
+//      adding long to EmployeeListDto list conversion property
         this.mapper.addMappings(new PropertyMap<Task, TaskDto>() {
             protected void configure() {
 
-                using(LongToEmployeeSet).map(source.getEmployeeId()).setEmployees(null);
-                using(LongToSkillSet).map(source.getSkillId()).setSkills(null);
+                using(LongToEmployeeList).map(source.getEmployeeId()).setEmployees(null);
+                using(LongToSkillList).map(source.getSkillId()).setSkills(null);
             }
         });
-//      adding long to EmployeeListDto set conversion property
+//      adding long to EmployeeListDto list conversion property
         this.mapper.addMappings(new PropertyMap<Task, TaskListDto>() {
             protected void configure() {
-                using(LongToSkillSet).map(source.getSkillId()).setSkills(null);
+                using(LongToSkillList).map(source.getSkillId()).setSkills(null);
             }
         });
 
@@ -153,19 +155,46 @@ public class TaskAssembler {
         return mapper.map(task, TaskDto.class);
     }
 
-    public Set<TaskListDto> convertToDto(Set<Task> tasks) throws ParseException {
-        Type targetSetType = new TypeToken<Set<TaskListDto>>() {
+    public List<TaskListDto> convertToDto(List<Task> tasks) throws ParseException {
+        Type targetListType = new TypeToken<List<TaskListDto>>() {
         }.getType();
-        Set<TaskListDto> set = mapper.map(tasks, targetSetType);
-        return set;
+        List<TaskListDto> list = mapper.map(tasks, targetListType);
+        return list;
     }
 
-    public Set<ProjectTaskListDto> convertToDto1(Set<Task> tasks) throws ParseException {
+    public List<ProjectTaskListDto> convertToDto1(List<Task> tasks) throws ParseException {
 
-        Set<ProjectTaskListDto> set = tasks.stream().map(task -> {
+        List<ProjectTaskListDto> list = tasks.stream().map(task -> {
             return mapper.map(task, ProjectTaskListDto.class);
-        }).collect(Collectors.toCollection(HashSet::new));
+        }).collect(Collectors.toCollection(ArrayList::new));
 
-        return set;
+        return list;
     }
+
+    public Page<ProjectTaskListDto> convertToPagedDto(Page<Task> taskPage) {
+
+        Type targetListType = new TypeToken<List<ProjectTaskListDto>>() {
+        }.getType();
+        List<ProjectTaskListDto> dtos = mapper.map(taskPage.getContent(), targetListType);
+
+        Page<ProjectTaskListDto> page = new PageImpl<>(dtos,
+                new PageRequest(taskPage.getPageable().getPageNumber(), taskPage.getPageable().getPageSize(), taskPage.getPageable().getSort()),
+                dtos.size());
+
+        return page;
+    }
+
+    public Page<TaskListDto> convertToPagedDto1(Page<Task> taskPage) {
+
+        Type targetListType = new TypeToken<List<TaskListDto>>() {
+        }.getType();
+        List<TaskListDto> dtos = mapper.map(taskPage.getContent(), targetListType);
+
+        Page<TaskListDto> page = new PageImpl<>(dtos,
+                new PageRequest(taskPage.getPageable().getPageNumber(), taskPage.getPageable().getPageSize(), taskPage.getPageable().getSort()),
+                dtos.size());
+
+        return page;
+    }
+
 }

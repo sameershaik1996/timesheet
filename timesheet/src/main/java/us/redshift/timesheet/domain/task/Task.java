@@ -10,7 +10,7 @@ import us.redshift.timesheet.domain.taskcard.TaskType;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 
 @Entity
@@ -59,12 +59,12 @@ public class Task extends BaseEntity {
     @ElementCollection(targetClass = Long.class)
     @JoinTable(name = "pss_task_skills")
     @JoinColumn(nullable = false)
-    private Set<Long> skillId;
+    private List<Long> skillId;
 
     @ElementCollection(targetClass = Long.class)
     @JoinTable(name = "pss_task_employees")
     @JoinColumn(nullable = false)
-    private Set<Long> employeeId;
+    private List<Long> employeeId;
 
     @ManyToOne()
     @JoinColumn(name = "project_id", nullable = false)

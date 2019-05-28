@@ -16,7 +16,6 @@ import javax.validation.Valid;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,15 +58,15 @@ public class RateCardController {
     @GetMapping("ratecard/group")
     public ResponseEntity<?> getRateCardGroupBy() {
 
-        Set<RateCardDetail> rateCardDetails = rateCardDetailRepository.findAllByRateCard_ProjectTypeAndRateCard_IsDefaultOrderByLocation(ProjectType.FIXED_BID, true);
+        List<RateCardDetail> rateCardDetails = rateCardDetailRepository.findAllByRateCard_ProjectTypeAndRateCard_IsDefaultOrderByLocation(ProjectType.FIXED_BID, true);
 
-        Type targetSetType = new TypeToken<Set<RateCardDetailDto>>() {
+        Type targetSetType = new TypeToken<List<RateCardDetailDto>>() {
         }.getType();
 
 
 //
 
-        Set<RateCardDetailDto> detailDtos = mapper.map(rateCardDetails, targetSetType);
+        List<RateCardDetailDto> detailDtos = mapper.map(rateCardDetails, targetSetType);
 
         Map<Long, List<RateCardDetailDto>> groupByRateCard = detailDtos.stream().collect(Collectors.groupingBy(RateCardDetailDto::getLocationId));
 

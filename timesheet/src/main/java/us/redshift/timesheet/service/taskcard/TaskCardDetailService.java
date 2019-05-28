@@ -2,6 +2,7 @@ package us.redshift.timesheet.service.taskcard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
@@ -17,10 +18,7 @@ import us.redshift.timesheet.service.task.TaskService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskCardDetailService implements ITaskCardDetailService {
@@ -42,10 +40,6 @@ public class TaskCardDetailService implements ITaskCardDetailService {
         this.taskCardService = taskCardService;
     }
 
-    @Override
-    public TaskCardDetail saveTaskCardDetail(TaskCardDetail taskCardDetail) {
-        return taskCardDetailRepository.save(taskCardDetail);
-    }
 
     @Override
     public List<TaskCardDetail> updateTaskCardDetail(List<TaskCardDetail> taskCardDetails, TimeSheetStatus status) {
@@ -77,7 +71,7 @@ public class TaskCardDetailService implements ITaskCardDetailService {
                             taskDetailReject++;
                     }
 
-//                Set status to taskCard
+//                List status to taskCard
                     if (taskDetailApprove == size) {
 //                update used hours to task
                         LOGGER.info("Size of taskCardDetails {}", taskDetailApprove);
@@ -112,6 +106,13 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     }
 
     @Override
+    public Page<TaskCardDetail> getTaskCardDetailsByTimeSheetId_ProjectId_statusNotLike(Long timeSheetId, Long projectId, TimeSheetStatus status, int page, int limits, String orderBy, String... fields) {
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+        return taskCardDetailRepository.findAllByTaskCard_TimeSheet_IdAndTaskCard_Project_IdAndStatusNotLikeOrderByDate(timeSheetId, projectId, status, pageable);
+    }
+
+
+    @Override
     public void deleteTaskCardDetailById(Long id) {
 
         if (!taskCardDetailRepository.existsById(id))
@@ -121,14 +122,17 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     }
 
     @Override
-    public Set<TaskCardDetail> getTaskCardTaskCardDetailsByPagination(Long taskCardId, int page, int limits, String
+    public int setStatusForTaskCardDetail(String toString, List<Long> taskCardDetailsId) {
+        return taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString(), taskCardDetailsId);
+    }
+
+    @Override
+    public Page<TaskCardDetail> getTaskCardTaskCardDetailsByPagination(Long taskCardId, int page, int limits, String
             orderBy, String... fields) {
         if (!taskCardRepository.existsById(taskCardId))
             throw new ResourceNotFoundException("TaskCard", "ID", taskCardId);
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<TaskCardDetail> taskCardDetailList = taskCardDetailRepository.findTaskCardDetailsByTaskCard_Id(taskCardId, pageable).getContent();
-        Set<TaskCardDetail> taskCardDetailSet = taskCardDetailList.stream().collect(Collectors.toCollection(HashSet::new));
-        return taskCardDetailSet;
+        return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Id(taskCardId, pageable);
     }
 
 

@@ -9,7 +9,7 @@ import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,7 +36,7 @@ public class ProjectDto extends BaseDto {
     private Date startedOn;
     private Date endedOn;
     @NonNull
-    private Set<EmployeeListDto> employees;
+    private List<EmployeeListDto> employees;
     private EmployeeListDto manager;
     @NonNull
     private ClientListDto client;

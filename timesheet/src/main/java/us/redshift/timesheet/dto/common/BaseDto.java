@@ -22,8 +22,8 @@ public class BaseDto implements Serializable {
     @JsonIgnoreProperties(value = "updatedTimeStamp", allowGetters = true)
     private Instant updatedTimeStamp;
     @JsonIgnoreProperties(value = "createdBy", allowGetters = true)
-    private Long createdBy;
+    private String createdBy;
     @JsonIgnoreProperties(value = "updatedBy", allowGetters = true)
-    private Long updatedBy;
+    private String updatedBy;
 
 }

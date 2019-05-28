@@ -3,6 +3,9 @@ package us.redshift.timesheet.assembler;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
@@ -17,9 +20,7 @@ import us.redshift.timesheet.feignclient.EmployeeFeign;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,10 +35,10 @@ public class TaskCardAssembler {
         this.employeeFeign = employeeFeign;
 
 
-        Converter<Set<TaskCardDetailDto>, Set<TaskCardDetail>> taskCardDetailConvertor = mappingContext -> {
+        Converter<List<TaskCardDetailDto>, List<TaskCardDetail>> taskCardDetailConvertor = mappingContext -> {
 
-            Set<TaskCardDetailDto> source;
-            Set<TaskCardDetail> dest = new HashSet<>();
+            List<TaskCardDetailDto> source;
+            List<TaskCardDetail> dest = new ArrayList<>();
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
 
@@ -193,23 +194,32 @@ public class TaskCardAssembler {
         return taskCardDto;
     }
 
-    public Set<TaskCard> convertToEntity(Set<TaskCardDto> taskCardDtoSet) throws ParseException {
-        Set<TaskCard> taskCardSet = taskCardDtoSet.stream().map(taskCardDto -> {
+    public List<TaskCard> convertToEntity(List<TaskCardDto> taskCardDtoList) throws ParseException {
+        List<TaskCard> taskCardList = taskCardDtoList.stream().map(taskCardDto -> {
             return mapper.map(taskCardDto, TaskCard.class);
-        }).collect(Collectors.toCollection(HashSet::new));
-        return taskCardSet;
+        }).collect(Collectors.toCollection(ArrayList::new));
+        return taskCardList;
     }
 
-    public Set<TaskCardDto> convertToDto(Set<TaskCard> taskCardSet) throws ParseException {
-        Set<TaskCardDto> taskCardDtoSet = taskCardSet.stream().map(taskCard -> {
+    public List<TaskCardDto> convertToDto(List<TaskCard> taskCardList) throws ParseException {
+        List<TaskCardDto> taskCardDtoList = taskCardList.stream().map(taskCard -> {
             return mapper.map(taskCard, TaskCardDto.class);
-        }).collect(Collectors.toCollection(HashSet::new));
-        return taskCardDtoSet;
+        }).collect(Collectors.toCollection(ArrayList::new));
+        return taskCardDtoList;
     }
 
-    public List<TaskCardDto> convertToDto1(List<TaskCard> taskCards) throws ParseException {
-        List<TaskCardDto> taskCardDtos = taskCards.stream().map(taskCard -> mapper.map(taskCard, TaskCardDto.class)).collect(Collectors.toCollection(ArrayList::new));
-        return taskCardDtos;
+
+    public Page<TaskCardDto> convertToPagedDto(Page<TaskCard> taskCardPage) {
+
+        List<TaskCardDto> dtos = taskCardPage.getContent().stream().map(taskCard -> {
+            return mapper.map(taskCard, TaskCardDto.class);
+        }).collect(Collectors.toCollection(ArrayList::new));
+
+        Page<TaskCardDto> page = new PageImpl<>(dtos,
+                new PageRequest(taskCardPage.getPageable().getPageNumber(), taskCardPage.getPageable().getPageSize(), taskCardPage.getPageable().getSort()),
+                dtos.size());
+
+        return page;
     }
 
 

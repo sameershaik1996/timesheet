@@ -2,6 +2,7 @@ package us.redshift.timesheet.service.task;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.project.Project;
@@ -14,10 +15,7 @@ import us.redshift.timesheet.reposistory.task.TaskRepository;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskService implements ITaskService {
@@ -38,13 +36,6 @@ public class TaskService implements ITaskService {
     @Override
     public Task saveTask(Task task) {
         Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
-        taskValidate(project, task);
-        return taskRepository.save(task);
-    }
-
-    @Override
-    public Task saveTaskByProjectId(Long projectId, Task task) {
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", projectId));
         taskValidate(project, task);
         return taskRepository.save(task);
     }
@@ -84,21 +75,21 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Set<Task> getAllTaskByPagination(int page, int limits, String orderBy, String... fields) {
+    public Page<Task> getAllTaskByPagination(int page, int limits, String orderBy, String... fields) {
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<Task> taskList = taskRepository.findAll(pageable).getContent();
-        Set<Task> taskSet = taskList.stream().collect(Collectors.toCollection(HashSet::new));
-        return taskSet;
+//        List<Task> taskList = taskRepository.findAll(pageable).getContent();
+//        Set<Task> taskSet = taskList.stream().collect(Collectors.toCollection(HashSet::new));
+        return taskRepository.findAll(pageable);
     }
 
     @Override
-    public Set<Task> getProjectTasksByPagination(Long projectId, int page, int limits, String orderBy, String... fields) {
+    public Page<Task> getProjectTasksByPagination(Long projectId, int page, int limits, String orderBy, String... fields) {
         if (!projectRepository.existsById(projectId))
             throw new ResourceNotFoundException("Project", "Id", projectId);
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<Task> taskList = taskRepository.findTaskByProject_Id(projectId, pageable).getContent();
-        Set<Task> taskSet = taskList.stream().collect(Collectors.toCollection(HashSet::new));
-        return taskSet;
+//        List<Task> taskList = taskRepository.findTaskByProject_Id(projectId, pageable).getContent();
+//        Set<Task> taskSet = taskList.stream().collect(Collectors.toCollection(HashSet::new));
+        return taskRepository.findTaskByProject_Id(projectId, pageable);
     }
 
     @Override
@@ -107,12 +98,12 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Set<Task> findAllByStatus(TaskStatus status) {
+    public List<Task> findAllByStatus(TaskStatus status) {
         return taskRepository.findAllByStatusOrderByIdAsc(status);
     }
 
     @Override
-    public Set<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status) {
+    public List<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status) {
         return taskRepository.findAllByProjectIdAndEmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
     }
 

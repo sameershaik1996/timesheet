@@ -41,12 +41,12 @@ public class BaseEntity implements Serializable {
     @CreatedBy
     @Column(updatable = false, nullable = false)
     @JsonIgnoreProperties(value = "createdBy", allowGetters = true)
-    private Long createdBy;
+    private String createdBy;
 
 
     @LastModifiedBy
     @Column(nullable = false)
     @JsonIgnoreProperties(value = "updatedBy", allowGetters = true)
-    private Long updatedBy;
+    private String updatedBy;
 
 }

@@ -42,27 +42,27 @@ public class ModelMapperConfig {
             return null;
         };
 
-        //      adding long to EmployeeListDto  conversion property
+        //      adding long to EmployeeListDto  conversion property(TimeSheet, TimeSheetDto)
         mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetDto>() {
             protected void configure() {
                 using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
             }
         });
 
-        //      adding long to EmployeeListDto  conversion property
+        //      adding long to EmployeeListDto  conversion property(TimeSheet, TimeSheetListDto)
         mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetListDto>() {
             protected void configure() {
                 using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
             }
         });
 
-        //      adding long to EmployeeListDto  conversion property
+        //      adding long to EmployeeListDto  conversion property (TimeSheet, TimeSheetBasicListDto)
         mapper.addMappings(new PropertyMap<TimeSheet, TimeSheetBasicListDto>() {
             protected void configure() {
                 using(LongToEmployee).map(source.getEmployeeId()).setEmployee(null);
             }
         });
-
+//       RateCard
         mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
             protected void configure() {
                 map().setLocationId(source.getLocation().getId());

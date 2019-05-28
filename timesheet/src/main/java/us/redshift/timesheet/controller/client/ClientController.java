@@ -1,5 +1,7 @@
 package us.redshift.timesheet.controller.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -15,7 +17,7 @@ import us.redshift.timesheet.service.client.IClientService;
 
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("timesheet/v1/api/")
@@ -24,46 +26,45 @@ public class ClientController {
     private final IClientService clientService;
     private final ClientAssembler clientAssembler;
 
+    private final ObjectMapper objectMapper;
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 
-    public ClientController(IClientService clientService, ClientAssembler clientAssembler) {
+    public ClientController(IClientService clientService, ClientAssembler clientAssembler, ObjectMapper objectMapper) {
         this.clientService = clientService;
         this.clientAssembler = clientAssembler;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("client/save")
-    public ResponseEntity<?> saveClient(@Valid @RequestBody ClientDto clientDto) throws ParseException {
-        System.out.println(clientDto);
+    public ResponseEntity<?> saveClient(@Valid @RequestBody ClientDto clientDto) throws ParseException, JsonProcessingException {
+        LOGGER.info("Client Insert {} ", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clientDto));
         Client client = clientAssembler.convertToEntity(clientDto);
-        System.out.println(client);
         Client clientSaved = clientService.saveClient(client);
-
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.CREATED);
     }
 
     @PutMapping("client/update")
-    public ResponseEntity<?> updateClient(@Valid @RequestBody Set<ClientDto> clientDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
-        clientDtos.forEach(clientDto -> System.out.println(clientDto));
-        System.out.println(status);
-        System.out.println(ClientStatus.get(status.toUpperCase()));
-        Set<Client> clients = clientAssembler.convertToEntity(clientDtos);
-        Set<Client> clientSaved = clientService.updateClient(clients, ClientStatus.get(status.toUpperCase()));
+    public ResponseEntity<?> updateClient(@Valid @RequestBody List<ClientDto> clientDtos, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
+        LOGGER.info("Client Update {} ", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clientDtos));
+        List<Client> clients = clientAssembler.convertToEntity(clientDtos);
+        List<Client> clientSaved = clientService.updateClient(clients, ClientStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
     }
 
     @GetMapping("client/get")
-    public ResponseEntity<?> getAllClientByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllClientByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
         if ("ALL".equalsIgnoreCase(status)) {
             Page<Client> clients = clientService.getAllClientByPagination(page, limits, orderBy, fields);
-//            Set<ClientListDto> set = clientAssembler.convertToDto(clients);
-            return new ResponseEntity<>(clients, HttpStatus.OK);
+//            List<ClientListDto> list = clientAssembler.convertToDto(clients.getContent());
+            return new ResponseEntity<>(clientAssembler.convertToPagedDto(clients), HttpStatus.OK);
         } else {
-            Set<Client> clients = clientService.findAllByStatus(ClientStatus.get(status.toUpperCase()));
-            Set<ClientListDto> set = clientAssembler.convertToDto(clients);
-            return new ResponseEntity<>(set, HttpStatus.OK);
+            List<Client> clients = clientService.findAllByStatus(ClientStatus.get(status.toUpperCase()));
+            List<ClientListDto> list = clientAssembler.convertToDto(clients);
+            return new ResponseEntity<>(list, HttpStatus.OK);
         }
 
     }

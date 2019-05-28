@@ -4,14 +4,14 @@ import org.springframework.data.domain.Page;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.client.ClientStatus;
 
-import java.util.Set;
+import java.util.List;
 
 
 public interface IClientService {
 
     Client saveClient(Client client);
 
-    Set<Client> updateClient(Set<Client> clients, ClientStatus status);
+    List<Client> updateClient(List<Client> clients, ClientStatus status);
 
     Client getClientById(Long id);
 
@@ -19,6 +19,6 @@ public interface IClientService {
 
     ClientStatus[] getAllClientStatus();
 
-    Set<Client> findAllByStatus(ClientStatus status);
+    List<Client> findAllByStatus(ClientStatus status);
 
 }

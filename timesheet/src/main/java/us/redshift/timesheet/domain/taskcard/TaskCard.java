@@ -14,8 +14,8 @@ import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pss_task_cards")
@@ -60,7 +60,7 @@ public class TaskCard extends BaseEntity {
     @OneToMany(mappedBy = "taskCard",
             cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "taskCard")
-    private Set<TaskCardDetail> taskCardDetails = new HashSet<>();
+    private List<TaskCardDetail> taskCardDetails = new ArrayList<>();
 
     @ManyToOne()
     @JoinColumn(name = "time_sheet_id")

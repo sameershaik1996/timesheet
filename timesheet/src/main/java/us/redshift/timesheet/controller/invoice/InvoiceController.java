@@ -10,6 +10,7 @@ import us.redshift.timesheet.domain.invoice.Invoice;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.service.invoice.IInvoiceService;
+import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +23,19 @@ public class InvoiceController {
     IInvoiceService invoiceService;
 
     @Autowired
+    ITaskCardDetailService taskCardDetailService;
+
+    @Autowired
     TaskCardDetailRepository taskCardDetailRepository;
 
     @PostMapping("save")
-    public ResponseEntity<?> raiseInvoice(@RequestBody Invoice invoice) {
+    public ResponseEntity<?> createInvoice(@RequestBody Invoice invoice,@RequestParam(value = "fromDate",required = false)String fromDate) {
         Invoice savedInvoice = invoiceService.createInvoice(invoice);
         List<Long> taskCardDetailsId = new ArrayList<>();
-        invoice.getTaskCardDetails().forEach(taskCardDetail -> /*{
-            taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.getStatus()  ,taskCardDetail.getId());
-        }*/
+        invoice.getTaskCardDetails().forEach(taskCardDetail ->
                 taskCardDetailsId.add(taskCardDetail.getId())
         );
-        System.out.println(taskCardDetailsId);
-        int d = taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString(), taskCardDetailsId);
-        //System.out.println(d);
+        int d = taskCardDetailService.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString(), taskCardDetailsId);
 
         return new ResponseEntity<>(savedInvoice, HttpStatus.CREATED);
     }

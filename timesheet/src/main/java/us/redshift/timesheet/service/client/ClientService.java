@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService implements IClientService {
@@ -39,7 +38,7 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public Set<Client> updateClient(Set<Client> clients, ClientStatus status) {
+    public List<Client> updateClient(List<Client> clients, ClientStatus status) {
         List<Client> clientList = new ArrayList<>();
         clients.forEach(client -> {
             if (status != null) {
@@ -58,9 +57,8 @@ public class ClientService implements IClientService {
             }
         });
 
-        Set<Client> clientSet = clientRepository.saveAll(clientList).stream().collect(Collectors.toCollection(HashSet::new));
-
-        return clientSet;
+//        Set<Client> clientSet = clientRepository.saveAll(clientList).stream().collect(Collectors.toCollection(HashSet::new));
+        return clientRepository.saveAll(clientList);
     }
 
 
@@ -85,7 +83,7 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public Set<Client> findAllByStatus(ClientStatus status) {
+    public List<Client> findAllByStatus(ClientStatus status) {
         return clientRepository.findAllByStatusOrderByIdAsc(status);
     }
 }

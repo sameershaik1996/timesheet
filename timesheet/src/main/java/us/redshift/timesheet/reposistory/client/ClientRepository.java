@@ -5,12 +5,14 @@ import org.springframework.stereotype.Repository;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.client.ClientStatus;
 
-import java.util.Set;
+import java.util.List;
 
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    Set<Client> findAllByStatusOrderByIdAsc(ClientStatus status);
+    List<Client> findAllByStatusOrderByIdAsc(ClientStatus status);
+
+    Client findByClientCode(String clientCode);
 
 }

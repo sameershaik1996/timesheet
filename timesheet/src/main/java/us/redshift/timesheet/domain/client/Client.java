@@ -7,8 +7,8 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -26,25 +26,25 @@ public class Client extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @JsonIgnoreProperties(value = "poc")
+    @JsonIgnoreProperties(value = "client")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
-    private Set<Poc> pocs = new HashSet<>();
+    private List<Poc> pocs;
 
     @Enumerated(EnumType.STRING)
     private ClientStatus status;
     private String url;
 
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "industry_id", nullable = false)
     private Industry industry;
 
 
     @JsonIgnoreProperties(value = "clients")
-    @ManyToMany()
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "pss_clients_focus_area",
             joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "focus_area_id"))
-    private Set<FocusArea> focusAreas;
+    private List<FocusArea> focusAreas = new ArrayList<>();
 
 
     private String futureFocus;
@@ -65,8 +65,12 @@ public class Client extends BaseEntity implements Serializable {
         this.status = status == null ? ClientStatus.ACTIVE : status;
     }
 
-    public void setFocusAreas(Set<FocusArea> focusAreas) {
-        this.focusAreas = focusAreas == null ? new HashSet<>() : focusAreas;
+    public void setFocusAreas(List<FocusArea> focusAreas) {
+        this.focusAreas = focusAreas == null ? new ArrayList<>() : focusAreas;
+    }
+
+    public void setPocs(List<Poc> pocs) {
+        this.pocs = pocs == null ? new ArrayList<>() : pocs;
     }
 
     //    //    @JsonManagedReference

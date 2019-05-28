@@ -1,10 +1,12 @@
 package us.redshift.timesheet.dto.client;
 
 import lombok.*;
+import org.springframework.lang.NonNull;
 import us.redshift.timesheet.domain.client.ClientStatus;
 import us.redshift.timesheet.dto.common.AddressDto;
 import us.redshift.timesheet.dto.common.BaseDto;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +18,7 @@ import java.util.Set;
 public class ClientDto extends BaseDto {
 
     private Long id;
-    @NonNull
+    @NotNull(message = "clientCode can't be NULL")
     private String clientCode;
     @NonNull
     private String name;

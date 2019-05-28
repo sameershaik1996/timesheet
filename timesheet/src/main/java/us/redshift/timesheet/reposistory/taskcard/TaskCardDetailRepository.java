@@ -34,7 +34,7 @@ public interface TaskCardDetailRepository extends JpaRepository<TaskCardDetail, 
     int setStatusForTaskCardDetailById(String status, Long taskCardDetailId);
 
 
-    List<TaskCardDetail> findAllByTaskCard_TimeSheet_IdAndTaskCard_Project_IdAndStatusNotLikeOrderByDate(Long timeSheetId, Long projectId, TimeSheetStatus status);
+    Page<TaskCardDetail> findAllByTaskCard_TimeSheet_IdAndTaskCard_Project_IdAndStatusNotLikeOrderByDate(Long timeSheetId, Long projectId, TimeSheetStatus status, Pageable pageable);
 
     List<TaskCardDetail> findTaskCardDetailsByTaskCard_Id(Long taskCardId);
 

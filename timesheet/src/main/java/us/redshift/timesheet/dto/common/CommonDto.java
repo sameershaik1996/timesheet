@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommonDto extends BaseDto{
+public class CommonDto {
     private Long id;
     private String name;
     private String code;

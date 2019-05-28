@@ -10,9 +10,9 @@ import us.redshift.timesheet.domain.ratecard.RateCard;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "pss_projects")
@@ -59,7 +59,7 @@ public class Project extends BaseEntity implements Serializable {
     @Column(nullable = false)
     @ElementCollection(targetClass = Long.class)
     @JoinTable(name = "pss_project_employees")
-    private Set<Long> employeeId = new HashSet<>();
+    private List<Long> employeeId = new ArrayList<>();
 
     @Column(nullable = false)
     private Long managerId;
@@ -88,7 +88,7 @@ public class Project extends BaseEntity implements Serializable {
 
 
 //    public void add(Task task) {
-//        if (task == null)
+//        if (tasks == null)
 //            tasks = new ArrayList<>();
 //        task.setProject(this);
 //        tasks.add(task);

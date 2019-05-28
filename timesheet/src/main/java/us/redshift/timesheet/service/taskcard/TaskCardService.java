@@ -2,6 +2,7 @@ package us.redshift.timesheet.service.taskcard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.project.Project;
@@ -24,10 +25,7 @@ import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskCardService implements ITaskCardService {
@@ -60,7 +58,7 @@ public class TaskCardService implements ITaskCardService {
 
 
     @Override
-    public Set<TaskCard> updateTaskCard(Set<TaskCard> taskCards, TimeSheetStatus status) {
+    public List<TaskCard> updateTaskCard(List<TaskCard> taskCards, TimeSheetStatus status) {
         List<TaskCard> taskCardList = new ArrayList<>();
 
         taskCards.forEach(taskCard -> {
@@ -84,16 +82,16 @@ public class TaskCardService implements ITaskCardService {
                 timeSheetRepository.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
             }
         });
-        Set<TaskCard> cardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
-        return cardSet;
+//        Set<TaskCard> cardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
+        return taskCardList;
     }
 
     @Override
-    public Set<TaskCard> getAllTaskCardByPagination(int page, int limits, String orderBy, String... fields) {
+    public Page<TaskCard> getAllTaskCardByPagination(int page, int limits, String orderBy, String... fields) {
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<TaskCard> taskCardList = taskCardRepository.findAll(pageable).getContent();
-        Set<TaskCard> taskCardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
-        return taskCardSet;
+//        List<TaskCard> taskCardList = taskCardRepository.findAll(pageable).getContent();
+//        Set<TaskCard> taskCardSet = taskCardList.stream().collect(Collectors.toCollection(HashSet::new));
+        return taskCardRepository.findAll(pageable);
 
     }
 
@@ -106,14 +104,13 @@ public class TaskCardService implements ITaskCardService {
     }
 
     @Override
-    public Set<TaskCard> getAllTaskCardByMangerId(Long managerId) {
-        Set<Project> projectSet = projectRepository.findAllByManagerId(managerId);
-        return taskCardRepository.findByStatusNotLikeAndProjectIn(TimeSheetStatus.PENDING, projectSet);
+    public List<TaskCard> getAllTaskCardByMangerId(Long managerId) {
+        List<Project> projectList = projectRepository.findAllByManagerId(managerId);
+        return taskCardRepository.findByStatusNotLikeAndProjectIn(TimeSheetStatus.PENDING, projectList);
     }
 
     @Override
-
-    public Set<TaskCard> getTaskCardByStatusAndType(TimeSheetStatus status, TaskType type) {
+    public List<TaskCard> getTaskCardByStatusAndType(TimeSheetStatus status, TaskType type) {
         return taskCardRepository.findByStatusAndType(status, type);
     }
 
@@ -162,7 +159,7 @@ public class TaskCardService implements ITaskCardService {
 
 //      sum of hours
         BigDecimal hours = new BigDecimal(0);
-        Set<TaskCardDetail> cardDetails = new HashSet<>(card.getTaskCardDetails());
+        List<TaskCardDetail> cardDetails = card.getTaskCardDetails();
         for (TaskCardDetail cardDetail : cardDetails) {
             hours = hours.add(cardDetail.getHours());
         }

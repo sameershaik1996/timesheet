@@ -6,11 +6,11 @@ import lombok.*;
 import us.redshift.timesheet.domain.common.BaseEntity;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "pss_focus_areas")
+@Table(name = "pss_focus_areas", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +26,6 @@ public class FocusArea extends BaseEntity {
 
     @JsonIgnoreProperties({"focusAreas"})
     @JsonIgnore
-    @ManyToMany(mappedBy = "focusAreas", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
-    private Set<Client> clients = new HashSet<>();
+    @ManyToMany(mappedBy = "focusAreas")
+    private List<Client> clients = new ArrayList<>();
 }

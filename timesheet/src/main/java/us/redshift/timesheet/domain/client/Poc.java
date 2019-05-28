@@ -1,5 +1,6 @@
 package us.redshift.timesheet.domain.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import javax.validation.constraints.Email;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "pss_pocs")
+@Table(name = "pss_pocs", uniqueConstraints = @UniqueConstraint(columnNames = {"client_id", "phoneNumber"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,8 +23,8 @@ public class Poc extends BaseEntity implements Serializable {
     @Email
     private String email;
 
-
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @JsonIgnore
+    @ManyToOne()
     @JoinColumn(name = "client_id", nullable = false)
     @JsonIgnoreProperties(value = {"pocs"}, allowSetters = true)
     private Client client;

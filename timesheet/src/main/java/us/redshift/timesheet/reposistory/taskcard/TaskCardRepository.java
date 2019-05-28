@@ -13,7 +13,6 @@ import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
@@ -28,9 +27,9 @@ public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
     int setStatusForTaskCard(String status, Long id);
 
 
-    Set<TaskCard> findByStatusNotLikeAndProjectIn(TimeSheetStatus status, Set<Project> projectSet);
+    List<TaskCard> findByStatusNotLikeAndProjectIn(TimeSheetStatus status, List<Project> projectSet);
 
-    Set<TaskCard> findByStatusAndType(TimeSheetStatus status, TaskType taskType);
+    List<TaskCard> findByStatusAndType(TimeSheetStatus status, TaskType taskType);
 
     List<TaskCard> findByStatusNotLikeAndProject_IdOrderByEmployeeIdAscTaskCardDetailsAsc(TimeSheetStatus status, Long projectId);
 

@@ -10,7 +10,7 @@ import us.redshift.timesheet.dto.task.TaskListDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetListDto;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,6 +40,6 @@ public class TaskCardDto extends BaseDto {
     private ProjectListDto project;
     @NonNull
     @JsonIgnoreProperties("taskCard")
-    private Set<TaskCardDetailDto> taskCardDetails;
+    private List<TaskCardDetailDto> taskCardDetails;
     private TimeSheetListDto timeSheet;
 }
