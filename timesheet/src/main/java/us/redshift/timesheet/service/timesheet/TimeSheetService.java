@@ -2,6 +2,9 @@ package us.redshift.timesheet.service.timesheet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.assembler.TimeSheetCloneAssembler;
@@ -98,11 +101,11 @@ public class TimeSheetService implements ITimeSheetService {
     }
 
     @Override
-    public Set<TimeSheet> getAllTimeSheetByPagination(int page, int limits, String orderBy, String... fields) {
+    public Page<TimeSheet> getAllTimeSheetByPagination(int page, int limits, String orderBy, String... fields) {
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<TimeSheet> timeSheetList = timeSheetRepository.findAll(pageable).getContent();
-        Set<TimeSheet> timeSheetSet = timeSheetList.stream().collect(Collectors.toCollection(HashSet::new));
-        return timeSheetSet;
+//        List<TimeSheet> timeSheetList = timeSheetRepository.findAll(pageable).getContent();
+//        Set<TimeSheet> timeSheetSet = timeSheetList.stream().collect(Collectors.toCollection(HashSet::new));
+        return timeSheetRepository.findAll(pageable);
     }
 
     @Override
@@ -151,7 +154,7 @@ public class TimeSheetService implements ITimeSheetService {
 
         taskCards.forEach(taskCard ->
         {
-            Set<TaskCardDetail> cardDetails = taskCard.getTaskCardDetails();
+            List<TaskCardDetail> cardDetails = taskCard.getTaskCardDetails();
             cardDetails.forEach(taskCardDetail ->
             {
                 calendar.setTime(taskCardDetail.getDate());
@@ -168,13 +171,17 @@ public class TimeSheetService implements ITimeSheetService {
         return timeSheetRepository.save(timeSheet);
     }
 
-    public Set<TimeSheet> getAllTimeSheetByProjectId(Long projectId) {
+    @Override
+    public Page<TimeSheet> getAllTimeSheetByProjectId(Long projectId, int page, int limits, String orderBy, String... fields) {
 
         Set<TaskCard> taskCardSet = new HashSet<>(taskCardService.getAllTaskCardByProject(projectId));
 
-        Set<TimeSheet> timeSheetSet = timeSheetRepository.findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(taskCardSet, TimeSheetStatus.PENDING);
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+        Page<TimeSheet> timeSheetPage = timeSheetRepository.findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(taskCardSet, TimeSheetStatus.PENDING, pageable);
 
-        Set<TimeSheet> projectTimeSheet = new HashSet<>();
+        Set<TimeSheet> timeSheetSet = timeSheetPage.getContent().stream().collect(Collectors.toCollection(LinkedHashSet::new));
+        List<TimeSheet> projectTimeSheet = new ArrayList<>();
+
 
         List<TaskCard> taskCards = new ArrayList<>();
         timeSheetSet.forEach(timeSheet -> {
@@ -187,7 +194,9 @@ public class TimeSheetService implements ITimeSheetService {
             projectTimeSheet.add(timeSheet);
         });
 
-        return projectTimeSheet;
+        Page<TimeSheet> ProjectTimeSheetPage = new PageImpl<>(projectTimeSheet, new PageRequest(timeSheetPage.getPageable().getPageNumber(), timeSheetPage.getPageable().getPageSize(), timeSheetPage.getPageable().getSort()),
+                projectTimeSheet.size());
+        return ProjectTimeSheetPage;
 
     }
 

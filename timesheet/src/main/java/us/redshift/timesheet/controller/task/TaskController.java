@@ -1,6 +1,7 @@
 package us.redshift.timesheet.controller.task;
 
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import us.redshift.timesheet.service.task.ITaskService;
 
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("timesheet/v1/api/")
@@ -48,17 +49,17 @@ public class TaskController {
     }
 
     @GetMapping({"task/get"})
-    public ResponseEntity<?> getAllTaskByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId, @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllTaskByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId, @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
         if (projectId != 0 && employeeId == 0) {
-            Set<Task> tasks = taskService.getProjectTasksByPagination(projectId, page, limits, orderBy, fields);
-            return new ResponseEntity<>(taskAssembler.convertToDto1(tasks), HttpStatus.OK);
+            Page<Task> taskPage = taskService.getProjectTasksByPagination(projectId, page, limits, orderBy, fields);
+            return new ResponseEntity<>(taskAssembler.convertToPagedDto1(taskPage), HttpStatus.OK);
         } else if (projectId != 0 && employeeId != 0 && !("ALL".equalsIgnoreCase(status))) {
-            Set<Task> tasks = taskService.findAllByProjectIdAndEmployeeId(projectId, employeeId, TaskStatus.get(status.toUpperCase()));
+            List<Task> tasks = taskService.findAllByProjectIdAndEmployeeId(projectId, employeeId, TaskStatus.get(status.toUpperCase()));
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {
-            Set<Task> tasks = taskService.getAllTaskByPagination(page, limits, orderBy, fields);
-            return new ResponseEntity<>(taskAssembler.convertToDto1(tasks), HttpStatus.OK);
+            Page<Task> taskPage = taskService.getAllTaskByPagination(page, limits, orderBy, fields);
+            return new ResponseEntity<>(taskAssembler.convertToPagedDto1(taskPage), HttpStatus.OK);
         }
 
     }

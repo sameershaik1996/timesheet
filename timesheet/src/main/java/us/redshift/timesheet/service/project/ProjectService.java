@@ -1,8 +1,8 @@
 package us.redshift.timesheet.service.project;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectService implements IProjectService {
@@ -36,16 +35,7 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public Project saveProjectByClientId(Long clientId, Project project) {
-        Client client = clientRepository.findById(clientId).orElseThrow(() -> new ResourceNotFoundException("Project", "ClientId", clientId));
-        project.setClient(client);
-        project = setRateCardDetail(project);
-        return projectRepository.save(project);
-    }
-
-
-    @Override
-    public Set<Project> updateProject(Set<Project> projects, ProjectStatus status) {
+    public List<Project> updateProject(List<Project> projects, ProjectStatus status) {
 
 
         List<Project> projectList = new ArrayList<>();
@@ -62,9 +52,9 @@ public class ProjectService implements IProjectService {
             }
         });
 
-        Set<Project> projectSet = projectRepository.saveAll(projectList).stream().collect(Collectors.toCollection(HashSet::new));
+//        Set<Project> projectSet = projectRepository.saveAll(projectList).stream().collect(Collectors.toCollection(HashSet::new));
 
-        return projectSet;
+        return projectRepository.saveAll(projectList);
     }
 
     @Override
@@ -74,34 +64,34 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public Set<Project> getAllProjectByPagination(int page, int limits, String orderBy, String... fields) {
+    public Page<Project> getAllProjectByPagination(int page, int limits, String orderBy, String... fields) {
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<Project> projectList = projectRepository.findAll(pageable).getContent();
-        Set<Project> projectSet = projectList.stream().collect(Collectors.toCollection(HashSet::new));
-        return projectSet;
+//        List<Project> projectList = projectRepository.findAll(pageable).getContent();
+//        Set<Project> projectSet = projectList.stream().collect(Collectors.toCollection(HashSet::new));
+        return projectRepository.findAll(pageable);
     }
 
     @Override
-    public Set<Project> getClientProjectsByPagination(Long clientId, int page, int limits, String orderBy, String... fields) {
+    public Page<Project> getClientProjectsByPagination(Long clientId, int page, int limits, String orderBy, String... fields) {
         if (!clientRepository.existsById(clientId))
             throw new ResourceNotFoundException("Project", "ClientId", clientId);
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
-        List<Project> projectList = projectRepository.findProjectsByClient_Id(clientId, pageable).getContent();
-        Set<Project> projectSet = projectList.stream().collect(Collectors.toCollection(HashSet::new));
-        return projectSet;
+//        List<Project> projectList = projectRepository.findProjectsByClient_Id(clientId, pageable).getContent();
+//        Set<Project> projectSet = projectList.stream().collect(Collectors.toCollection(HashSet::new));
+        return projectRepository.findProjectsByClient_Id(clientId, pageable);
     }
 
     @Override
-    public Set<Project> findAllByEmployeeId(Long employeeId, ProjectStatus status) {
+    public List<Project> findAllByEmployeeId(Long employeeId, ProjectStatus status) {
         return projectRepository.findAllByEmployeeIdAndStatusOrderByIdAsc(employeeId, status);
     }
 
 
     @Override
-    public Set<Long> findAllEmployeesByProjectId(Long projectId) {
+    public List<Long> findAllEmployeesByProjectId(Long projectId) {
         if (!projectRepository.existsById(projectId))
             throw new ResourceNotFoundException("Project", "Id", projectId);
-        Set<Long> ids = projectRepository.findById(projectId).get().getEmployeeId();
+        List<Long> ids = projectRepository.findById(projectId).get().getEmployeeId();
         return ids;
     }
 
@@ -112,7 +102,7 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public Set<Project> findAllByStatus(ProjectStatus status) {
+    public List<Project> findAllByStatus(ProjectStatus status) {
         return projectRepository.findAllByStatusOrderByIdAsc(status);
     }
 

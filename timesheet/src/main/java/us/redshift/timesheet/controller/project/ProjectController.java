@@ -1,5 +1,6 @@
 package us.redshift.timesheet.controller.project;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import us.redshift.timesheet.util.Reusable;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 
 @RestController
@@ -40,9 +41,9 @@ public class ProjectController {
     }
 
     @PutMapping("project/update")
-    public ResponseEntity<?> updateProject(@Valid @RequestBody Set<ProjectDto> projectDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
-        Set<Project> projectSet = projectAssembler.convertToEntity(projectDtos);
-        Set<Project> projectSaved = projectService.updateProject(projectSet, ProjectStatus.get(status.toUpperCase()));
+    public ResponseEntity<?> updateProject(@Valid @RequestBody List<ProjectDto> projectDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
+        List<Project> projectList = projectAssembler.convertToEntity(projectDtos);
+        List<Project> projectSaved = projectService.updateProject(projectList, ProjectStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(projectAssembler.convertToDto(projectSaved), HttpStatus.OK);
     }
 
@@ -53,39 +54,38 @@ public class ProjectController {
     }
 
     @GetMapping({"project/get"})
-    public ResponseEntity<?> getAllProjectByPagination(@RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId, @RequestParam(value = "employees", defaultValue = "false", required = false) Boolean employees, @RequestParam(value = "skills", defaultValue = "false", required = false) Boolean skills, @RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "clientId", defaultValue = "0", required = false) Long clientId, @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllProjectByPagination(@RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId, @RequestParam(value = "employees", defaultValue = "false", required = false) Boolean employees, @RequestParam(value = "skills", defaultValue = "false", required = false) Boolean skills, @RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "clientId", defaultValue = "0", required = false) Long clientId, @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (projectId != 0) {
             if (skills) {
-                Set<Long> ids = projectService.findAllEmployeesByProjectId(projectId);
+                List<Long> ids = projectService.findAllEmployeesByProjectId(projectId);
                 return new ResponseEntity<>(projectAssembler.convertToSkillDto(ids), HttpStatus.OK);
             } else if (employees) {
-                Set<Long> ids = projectService.findAllEmployeesByProjectId(projectId);
+                List<Long> ids = projectService.findAllEmployeesByProjectId(projectId);
                 return new ResponseEntity<>(projectAssembler.convertToEmployeeDto(ids), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(projectAssembler.convertToDto(projectService.getProjectById(projectId)), HttpStatus.OK);
             }
         } else if (clientId != 0 && employeeId == 0) {
-            Set<Project> projectSet = projectService.getClientProjectsByPagination(clientId, page, limits, orderBy, fields);
-            return new ResponseEntity<>(projectAssembler.convertToDto(projectSet), HttpStatus.OK);
+            Page<Project> projectPage = projectService.getClientProjectsByPagination(clientId, page, limits, orderBy, fields);
+            return new ResponseEntity<>(projectAssembler.convertToPagedDto(projectPage), HttpStatus.OK);
         } else if (employeeId != 0 && !("ALL".equalsIgnoreCase(status))) {
-            System.out.println(ProjectStatus.get(status.toUpperCase()));
-            Set<Project> projectSet = projectService.findAllByEmployeeId(employeeId, ProjectStatus.get(status.toUpperCase()));
-            return new ResponseEntity<>(projectAssembler.convertToDto(projectSet), HttpStatus.OK);
+            List<Project> projectList = projectService.findAllByEmployeeId(employeeId, ProjectStatus.get(status.toUpperCase()));
+            return new ResponseEntity<>(projectAssembler.convertToDto(projectList), HttpStatus.OK);
         } else {
-            Set<Project> projectSet = projectService.getAllProjectByPagination(page, limits, orderBy, fields);
-            return new ResponseEntity<>(projectAssembler.convertToDto(projectSet), HttpStatus.OK);
+            Page<Project> projectPage = projectService.getAllProjectByPagination(page, limits, orderBy, fields);
+            return new ResponseEntity<>(projectAssembler.convertToPagedDto(projectPage), HttpStatus.OK);
         }
     }
 
     /*@GetMapping("project/{id}/get/employees")
     public ResponseEntity<?> getProjectEmployeesById(@PathVariable("id") Long id) {
-        Set<Long> ids = projectService.findAllEmployeesByProjectId(id);
+        List<Long> ids = projectService.findAllEmployeesByProjectId(id);
         return new ResponseEntity<>(projectAssembler.convertToEmployeeDto(ids), HttpStatus.OK);
     }
 
     @GetMapping("project/{id}/get/skills")
     public ResponseEntity<?> getProjectSkillsById(@PathVariable("id") Long id) {
-        Set<Long> ids = projectService.findAllEmployeesByProjectId(id);
+        List<Long> ids = projectService.findAllEmployeesByProjectId(id);
         return new ResponseEntity<>(projectAssembler.convertToSkillDto(ids), HttpStatus.OK);
     }*/
 

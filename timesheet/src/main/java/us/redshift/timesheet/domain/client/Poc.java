@@ -1,5 +1,6 @@
 package us.redshift.timesheet.domain.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,7 @@ public class Poc extends BaseEntity implements Serializable {
     @Email
     private String email;
 
-
+    @JsonIgnore
     @ManyToOne()
     @JoinColumn(name = "client_id", nullable = false)
     @JsonIgnoreProperties(value = {"pocs"}, allowSetters = true)

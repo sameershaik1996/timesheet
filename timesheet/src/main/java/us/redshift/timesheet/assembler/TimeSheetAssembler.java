@@ -2,6 +2,9 @@ package us.redshift.timesheet.assembler;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.dto.timesheet.TimeSheetBasicListDto;
@@ -9,6 +12,7 @@ import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -31,11 +35,11 @@ public class TimeSheetAssembler {
     }
 
 
-    public Set<TimeSheetDto> convertToDto(Set<TimeSheet> timeSheets) throws ParseException {
-        Type targetSetType = new TypeToken<Set<TimeSheetDto>>() {
+    public List<TimeSheetDto> convertToDto(List<TimeSheet> timeSheets) throws ParseException {
+        Type targetSetType = new TypeToken<List<TimeSheetDto>>() {
         }.getType();
-        Set<TimeSheetDto> set = mapper.map(timeSheets, targetSetType);
-        return set;
+        List<TimeSheetDto> list = mapper.map(timeSheets, targetSetType);
+        return list;
     }
 
     public Set<TimeSheetBasicListDto> convertToDto1(Set<TimeSheet> timeSheets) throws ParseException {
@@ -43,6 +47,32 @@ public class TimeSheetAssembler {
         }.getType();
         Set<TimeSheetBasicListDto> set = mapper.map(timeSheets, targetSetType);
         return set;
+    }
+
+    public Page<TimeSheetBasicListDto> convertToPagedBasicDto(Page<TimeSheet> timeSheetPage) {
+
+        Type targetListType = new TypeToken<List<TimeSheetBasicListDto>>() {
+        }.getType();
+        List<TimeSheetBasicListDto> TimeSheetBasicListDto = mapper.map(timeSheetPage.getContent(), targetListType);
+
+        Page<TimeSheetBasicListDto> page = new PageImpl<>(TimeSheetBasicListDto,
+                new PageRequest(timeSheetPage.getPageable().getPageNumber(), timeSheetPage.getPageable().getPageSize(), timeSheetPage.getPageable().getSort()),
+                TimeSheetBasicListDto.size());
+
+        return page;
+    }
+
+    public Page<TimeSheetDto> convertToPagedDto(Page<TimeSheet> timeSheetPage) {
+
+        Type targetListType = new TypeToken<List<TimeSheetDto>>() {
+        }.getType();
+        List<TimeSheetDto> timeSheetDtos = mapper.map(timeSheetPage.getContent(), targetListType);
+
+        Page<TimeSheetDto> page = new PageImpl<>(timeSheetDtos,
+                new PageRequest(timeSheetPage.getPageable().getPageNumber(), timeSheetPage.getPageable().getPageSize(), timeSheetPage.getPageable().getSort()),
+                timeSheetDtos.size());
+
+        return page;
     }
 
 }

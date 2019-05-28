@@ -1,19 +1,13 @@
 package us.redshift.timesheet.service.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.client.Industry;
 import us.redshift.timesheet.reposistory.client.IndustryRepository;
-import us.redshift.timesheet.service.client.IIndustryService;
 
-import javax.transaction.Transactional;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-@Component
-@Transactional
+@Service
 public class IndustryService implements IIndustryService {
 
     @Autowired
@@ -30,10 +24,8 @@ public class IndustryService implements IIndustryService {
     }
 
     @Override
-    public Set<Industry> getAllIndustries() {
-        List<Industry> industries = industryRepository.findAll();
-        Set<Industry> industrySet = industries.stream().collect(Collectors.toCollection(HashSet::new));
-        return industrySet;
+    public List<Industry> getAllIndustries() {
+        return industryRepository.findAllByOrderByNameAsc();
     }
 
     @Override

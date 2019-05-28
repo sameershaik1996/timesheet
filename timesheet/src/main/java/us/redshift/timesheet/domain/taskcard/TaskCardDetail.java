@@ -1,6 +1,6 @@
 package us.redshift.timesheet.domain.taskcard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,8 +35,10 @@ public class TaskCardDetail extends BaseEntity {
 
     @ManyToOne()
     @JoinColumn(name = "task_card_id")
-    @JsonIgnoreProperties(value = {"taskCardDetails", "project", "client"})
+//    @JsonIgnoreProperties(value = {"taskCardDetails"})
+    @JsonIgnore
     private TaskCard taskCard;
+
 
     public void setStatus(TimeSheetStatus status) {
         this.status = status == null ? TimeSheetStatus.PENDING : status;

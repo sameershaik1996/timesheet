@@ -2,13 +2,22 @@ package us.redshift.timesheet;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Component
-public class AuditorAwareConfig implements AuditorAware<Long> {
+public class AuditorAwareConfig implements AuditorAware<String> {
     @Override
-    public Optional<Long> getCurrentAuditor() {
-        return Optional.ofNullable(Long.valueOf(1));
+    public Optional<String> getCurrentAuditor() {
+
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        UserDetails ud = (UserDetails) request.getAttribute("userDetails");
+//        System.out.println(ud.getUserName());
+//        return Optional.of(ud.getUserName());
+        return Optional.ofNullable("");
     }
 }

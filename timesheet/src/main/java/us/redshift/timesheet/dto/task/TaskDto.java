@@ -10,7 +10,7 @@ import us.redshift.timesheet.dto.common.SkillDto;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,9 +38,9 @@ public class TaskDto extends BaseDto {
 
     private BigDecimal nonBillableHour;
     @NonNull
-    private Set<SkillDto> skills;
+    private List<SkillDto> skills;
     @NonNull
-    private Set<EmployeeListDto> employees;
+    private List<EmployeeListDto> employees;
     @NonNull
     private CommonDto project;
 

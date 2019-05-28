@@ -1,5 +1,6 @@
 package us.redshift.timesheet.controller.timesheet;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,6 @@ import us.redshift.timesheet.service.timesheet.ITimeSheetService;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Set;
 
 @RestController
 @RequestMapping("timesheet/v1/api/")
@@ -53,16 +53,16 @@ public class TimeSheetController {
 
 
     @GetMapping({"timesheet/get"})
-    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber, @RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "limits", defaultValue = "1") int limits, @RequestParam(value = "orderBy", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (projectId != 0) {
-            Set<TimeSheet> timeSheetSet = timeSheetService.getAllTimeSheetByProjectId(projectId);
-            return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetSet), HttpStatus.OK);
+            Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByProjectId(projectId, page, limits, orderBy, fields);
+            return new ResponseEntity<>(timeSheetAssembler.convertToPagedDto(timeSheetPage), HttpStatus.OK);
         } else if (employeeId != null) {
             TimeSheet timeSheet = timeSheetService.getTimeSheetByWeekNumber(employeeId, year, weekNumber);
             return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheet), HttpStatus.OK);
         } else {
-            Set<TimeSheet> timeSheetSet = timeSheetService.getAllTimeSheetByPagination(page, limits, orderBy, fields);
-            return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetSet), HttpStatus.OK);
+            Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByPagination(page, limits, orderBy, fields);
+            return new ResponseEntity<>(timeSheetAssembler.convertToPagedBasicDto(timeSheetPage), HttpStatus.OK);
         }
     }
 

@@ -1,18 +1,13 @@
 package us.redshift.timesheet.service.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.client.FocusArea;
 import us.redshift.timesheet.reposistory.client.FocusAreaRepository;
 
-import javax.transaction.Transactional;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-@Component
-@Transactional
+@Service
 public class FocusAreaService implements IFocusAreaService {
 
     @Autowired
@@ -29,10 +24,8 @@ public class FocusAreaService implements IFocusAreaService {
     }
 
     @Override
-    public Set<FocusArea> getAllFocusAreas() {
-        List<FocusArea> focusAreaList = focusAreaRepository.findAll();
-        Set<FocusArea> focusAreaSet = focusAreaList.stream().collect(Collectors.toCollection(HashSet::new));
-        return focusAreaSet;
+    public List<FocusArea> getAllFocusAreas() {
+        return focusAreaRepository.findAllByOrderByCodeAsc();
     }
 
     @Override

@@ -6,8 +6,8 @@ import lombok.*;
 import us.redshift.timesheet.domain.common.BaseEntity;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pss_focus_areas", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
@@ -27,5 +27,5 @@ public class FocusArea extends BaseEntity {
     @JsonIgnoreProperties({"focusAreas"})
     @JsonIgnore
     @ManyToMany(mappedBy = "focusAreas")
-    private Set<Client> clients = new HashSet<>();
+    private List<Client> clients = new ArrayList<>();
 }

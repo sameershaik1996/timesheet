@@ -2,6 +2,9 @@ package us.redshift.timesheet.assembler;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.dto.client.ClientDto;
@@ -9,7 +12,7 @@ import us.redshift.timesheet.dto.client.ClientListDto;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.Set;
+import java.util.List;
 
 @Component
 public class ClientAssembler {
@@ -29,18 +32,31 @@ public class ClientAssembler {
         return mapper.map(client, ClientDto.class);
     }
 
-    public Set<Client> convertToEntity(Set<ClientDto> clientDtos) throws ParseException {
-        Type targetListType = new TypeToken<Set<Client>>() {
+    public List<Client> convertToEntity(List<ClientDto> clientDtos) throws ParseException {
+        Type targetListType = new TypeToken<List<Client>>() {
         }.getType();
-        Set<Client> set = mapper.map(clientDtos, targetListType);
-        return set;
+        List<Client> clientList = mapper.map(clientDtos, targetListType);
+        return clientList;
     }
 
 
-    public Set<ClientListDto> convertToDto(Set<Client> clients) throws ParseException {
-        Type targetListType = new TypeToken<Set<ClientListDto>>() {
+    public List<ClientListDto> convertToDto(List<Client> clients) throws ParseException {
+        Type targetListType = new TypeToken<List<ClientListDto>>() {
         }.getType();
-        Set<ClientListDto> set = mapper.map(clients, targetListType);
-        return set;
+        List<ClientListDto> clientList = mapper.map(clients, targetListType);
+        return clientList;
+    }
+
+    public Page<ClientListDto> convertToPagedDto(Page<Client> clientPage) {
+
+        Type targetListType = new TypeToken<List<ClientListDto>>() {
+        }.getType();
+        List<ClientListDto> dtos = mapper.map(clientPage.getContent(), targetListType);
+
+        Page<ClientListDto> page = new PageImpl<>(dtos,
+                new PageRequest(clientPage.getPageable().getPageNumber(), clientPage.getPageable().getPageSize(), clientPage.getPageable().getSort()),
+                dtos.size());
+
+        return page;
     }
 }

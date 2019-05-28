@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
@@ -17,11 +17,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findProjectsByClient_Id(Long clientId, Pageable pageable);
 
-    Set<Project> findAllByEmployeeIdAndStatusOrderByIdAsc(Long employeeId, ProjectStatus status);
+    List<Project> findAllByEmployeeIdAndStatusOrderByIdAsc(Long employeeId, ProjectStatus status);
 
-    Set<Project> findAllByManagerId(Long mangerId);
+    List<Project> findAllByManagerId(Long mangerId);
 
-    Set<Project> findAllByStatusOrderByIdAsc(ProjectStatus status);
+    List<Project> findAllByStatusOrderByIdAsc(ProjectStatus status);
 
 
 }

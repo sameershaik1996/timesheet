@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import us.redshift.timesheet.domain.project.ProjectType;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public interface RateCardDetailRepository extends JpaRepository<RateCardDetail, Long> {
@@ -13,7 +13,7 @@ public interface RateCardDetailRepository extends JpaRepository<RateCardDetail, 
 
     RateCardDetail findByRateCard_IdAndLocationIdAndSkillIdAndDesignationId(Long rateCardId, Long locationId, Long skillId, Long designationId);
 
-    Set<RateCardDetail> findAllByRateCard_ProjectTypeAndRateCard_IsDefaultOrderByLocation(ProjectType type, Boolean flag);
+    List<RateCardDetail> findAllByRateCard_ProjectTypeAndRateCard_IsDefaultOrderByLocation(ProjectType type, Boolean flag);
 
     RateCardDetail findByLocationIdAndSkillIdAndDesignationId(Long locationId, Long skillId, Long designationId);
 
