@@ -30,4 +30,5 @@ public class AuthRequestInterceptor implements RequestInterceptor {
         }
         requestTemplate.header(AUTHORIZATION_HEADER, token);
     }
+
 }

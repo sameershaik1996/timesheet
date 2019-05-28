@@ -13,6 +13,9 @@ public interface IProjectService {
 
     List<Project> updateProject(List<Project> projects, ProjectStatus status);
 
+    Project updateProject(Project project);
+
+
     Project getProjectById(Long id);
 
     Page<Project> getAllProjectByPagination(int page, int limits, String orderBy, String... fields);

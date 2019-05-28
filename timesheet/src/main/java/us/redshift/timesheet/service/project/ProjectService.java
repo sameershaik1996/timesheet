@@ -44,17 +44,20 @@ public class ProjectService implements IProjectService {
                 Project getProject = projectRepository.findById(project.getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", ""));
                 getProject.setStatus(status);
                 projectList.add(getProject);
-            } else {
-                if (!projectRepository.existsById(project.getId()))
-                    throw new ResourceNotFoundException("Project", "Id", project.getId());
-                project = setRateCardDetail(project);
-                projectList.add(project);
             }
         });
 
 //        Set<Project> projectSet = projectRepository.saveAll(projectList).stream().collect(Collectors.toCollection(HashSet::new));
 
         return projectRepository.saveAll(projectList);
+    }
+
+    @Override
+    public Project updateProject(Project project) {
+        if (!projectRepository.existsById(project.getId()))
+            throw new ResourceNotFoundException("Project", "Id", project.getId());
+        project = setRateCardDetail(project);
+        return projectRepository.save(project);
     }
 
     @Override

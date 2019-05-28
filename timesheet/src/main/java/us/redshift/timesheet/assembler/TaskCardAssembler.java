@@ -16,7 +16,7 @@ import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.taskcard.TaskCardDetailDto;
 import us.redshift.timesheet.dto.taskcard.TaskCardDto;
 import us.redshift.timesheet.dto.taskcard.TaskCardListDto;
-import us.redshift.timesheet.feignclient.EmployeeFeign;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,11 +28,11 @@ public class TaskCardAssembler {
 
     private final ModelMapper mapper;
 
-    private final EmployeeFeign employeeFeign;
+    private final EmployeeFeignClient employeeFeignClient;
 
-    public TaskCardAssembler(ModelMapper mapper, EmployeeFeign employeeFeign) {
+    public TaskCardAssembler(ModelMapper mapper, EmployeeFeignClient employeeFeignClient) {
         this.mapper = mapper;
-        this.employeeFeign = employeeFeign;
+        this.employeeFeignClient = employeeFeignClient;
 
 
         Converter<List<TaskCardDetailDto>, List<TaskCardDetail>> taskCardDetailConvertor = mappingContext -> {
@@ -68,7 +68,7 @@ public class TaskCardAssembler {
                 source = mappingContext.getSource();
                 //System.out.println("Task card  Assembler employee");
 
-                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                EmployeeDto employee = this.employeeFeignClient.getEmployeeById(source).getBody();
                 EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
 
                 return dest;
@@ -94,7 +94,7 @@ public class TaskCardAssembler {
 
                 //System.out.println("Task card  Assembler skill");
                 //          Feign Client Call to get SkillDto
-                SkillDto dest = this.employeeFeign.getSkillById(source).getBody();
+                SkillDto dest = this.employeeFeignClient.getSkillById(source).getBody();
 
                 return dest;
             }
@@ -116,7 +116,7 @@ public class TaskCardAssembler {
             Long source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
-                DesignationDto dest = this.employeeFeign.getDesignationById(source).getBody();
+                DesignationDto dest = this.employeeFeignClient.getDesignationById(source).getBody();
                 return dest;
             }
             return null;
@@ -128,7 +128,7 @@ public class TaskCardAssembler {
             Long source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource().getId();
-                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                EmployeeDto employee = this.employeeFeignClient.getEmployeeById(source).getBody();
                 if (employee.getDesignation() != null)
                     return employee.getDesignation().getId();
                 else

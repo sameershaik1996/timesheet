@@ -45,20 +45,24 @@ public class ClientService implements IClientService {
                 Client getClient = clientRepository.findById(client.getId()).orElseThrow(() -> new ResourceNotFoundException("Client", "Id", client.getId()));
                 getClient.setStatus(status);
                 clientList.add(getClient);
-            } else {
-                if (!clientRepository.existsById(client.getId()))
-                    throw new ResourceNotFoundException("Client", "Id", client.getId());
-                Set<Poc> pocs = new HashSet<>(client.getPocs());
-                pocs.forEach(poc -> {
-                    client.addPoc(poc);
-                });
-
-                clientList.add(client);
             }
         });
 
 //        Set<Client> clientSet = clientRepository.saveAll(clientList).stream().collect(Collectors.toCollection(HashSet::new));
         return clientRepository.saveAll(clientList);
+    }
+
+    @Override
+    public Client updateClient(Client client) {
+        if (!clientRepository.existsById(client.getId()))
+            throw new ResourceNotFoundException("Client", "Id", client.getId());
+        Set<Poc> pocs = new HashSet<>(client.getPocs());
+        pocs.forEach(poc -> {
+            client.addPoc(poc);
+        });
+
+        return clientRepository.save(client);
+
     }
 
 

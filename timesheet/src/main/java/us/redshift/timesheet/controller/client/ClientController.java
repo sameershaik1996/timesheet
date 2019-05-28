@@ -29,7 +29,7 @@ public class ClientController {
     private final ObjectMapper objectMapper;
 
 
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+    private final Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
 
 
     public ClientController(IClientService clientService, ClientAssembler clientAssembler, ObjectMapper objectMapper) {
@@ -47,12 +47,22 @@ public class ClientController {
     }
 
     @PutMapping("client/update")
-    public ResponseEntity<?> updateClient(@Valid @RequestBody List<ClientDto> clientDtos, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
+    public ResponseEntity<?> updateClientStatus(@Valid @RequestBody List<ClientDto> clientDtos, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
         LOGGER.info("Client Update {} ", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clientDtos));
         List<Client> clients = clientAssembler.convertToEntity(clientDtos);
         List<Client> clientSaved = clientService.updateClient(clients, ClientStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
     }
+
+    @PutMapping("client/update/{id}")
+    public ResponseEntity<?> updateClient(@RequestBody ClientDto clientDto, @PathVariable("id") Long clientId) throws ParseException, JsonProcessingException {
+        LOGGER.info("Client Update input {} ", objectMapper.writeValueAsString(clientDto));
+        Client client = clientAssembler.convertToEntity(clientDto, clientService.getClientById(clientId));
+//        LOGGER.info("Client Update after conversion {} ", objectMapper.writeValueAsString(client));
+        Client clientSaved = clientService.updateClient(client);
+        return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
+    }
+
 
     @GetMapping("client/get")
     public ResponseEntity<?> getAllClientByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {

@@ -19,13 +19,13 @@ import java.util.List;
 @ToString
 public class FocusArea extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String code;
     @Column(nullable = false, unique = true)
     private String name;
 
     @JsonIgnoreProperties({"focusAreas"})
     @JsonIgnore
-    @ManyToMany(mappedBy = "focusAreas")
+    @ManyToMany(mappedBy = "focusAreas", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
     private List<Client> clients = new ArrayList<>();
 }

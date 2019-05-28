@@ -36,8 +36,16 @@ public class TaskController {
     }
 
     @PutMapping("task/update")
-    public ResponseEntity<?> updateTask(@Valid @RequestBody TaskDto taskDto) throws ParseException {
-        Task task = taskAssembler.convertToEntity(taskDto);
+    public ResponseEntity<?> updateTaskStatus(@Valid @RequestBody List<TaskDto> taskDtos, @RequestParam(value = "status") String status) throws ParseException {
+        List<Task> taskList = taskAssembler.convertToEntity(taskDtos);
+        List<Task> taskSaved = taskService.updateTask(taskList, TaskStatus.get(status.toUpperCase()));
+
+        return new ResponseEntity<>(taskAssembler.convertToDto(taskSaved), HttpStatus.OK);
+    }
+
+    @PutMapping("task/update/{id}")
+    public ResponseEntity<?> updateTask(@PathVariable("id") Long taskId, @RequestBody TaskDto taskDto) throws ParseException {
+        Task task = taskAssembler.convertToEntity(taskDto, taskService.getTaskById(taskId));
         Task taskSaved = taskService.updateTask(task);
         return new ResponseEntity<>(taskAssembler.convertToDto(taskSaved), HttpStatus.OK);
     }
@@ -59,7 +67,7 @@ public class TaskController {
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {
             Page<Task> taskPage = taskService.getAllTaskByPagination(page, limits, orderBy, fields);
-            return new ResponseEntity<>(taskAssembler.convertToPagedDto1(taskPage), HttpStatus.OK);
+            return new ResponseEntity<>(taskAssembler.convertToPagedDto(taskPage), HttpStatus.OK);
         }
 
     }

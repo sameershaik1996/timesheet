@@ -27,20 +27,20 @@ public class Client extends BaseEntity implements Serializable {
     private String name;
 
     @JsonIgnoreProperties(value = "client")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
     private List<Poc> pocs;
 
     @Enumerated(EnumType.STRING)
     private ClientStatus status;
     private String url;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
     @JoinColumn(name = "industry_id", nullable = false)
     private Industry industry;
 
 
     @JsonIgnoreProperties(value = "clients")
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToMany
     @JoinTable(name = "pss_clients_focus_area",
             joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "focus_area_id"))

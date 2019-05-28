@@ -11,6 +11,8 @@ public interface ITaskService {
 
     Task saveTask(Task task);
 
+    List<Task> updateTask(List<Task> tasks, TaskStatus status);
+
     Task updateTask(Task task);
 
     void updateTaskHours(Long taskId, BigDecimal usedHour);

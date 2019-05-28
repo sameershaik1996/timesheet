@@ -21,11 +21,18 @@ public class ClientAssembler {
 
     public ClientAssembler(ModelMapper mapper) {
         this.mapper = mapper;
+//        this.mapper.typeMap(Poc.class, Poc.class).setPropertyCondition(Conditions.isNotNull());
+
     }
 
 
     public Client convertToEntity(ClientDto clientDto) throws ParseException {
         return mapper.map(clientDto, Client.class);
+    }
+
+    public Client convertToEntity(ClientDto clientDto, Client client) throws ParseException {
+        mapper.map(clientDto, client);
+        return client;
     }
 
     public ClientDto convertToDto(Client client) throws ParseException {

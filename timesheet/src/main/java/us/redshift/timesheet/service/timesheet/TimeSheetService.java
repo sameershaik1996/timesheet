@@ -125,11 +125,15 @@ public class TimeSheetService implements ITimeSheetService {
         TimeSheet timeSheet = new TimeSheet();
         if (weekNumber != 0 && year != 0) {
             timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, year, weekNumber);
-            if (timeSheet == null && weekNumber == currentWeekNumber && year == currentYear) {
+            if (timeSheet != null) {
+                return timeSheet;
+            } else if (timeSheet == null && weekNumber == currentWeekNumber && year == currentYear) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
                 timeSheet = timeSheetRepository.save(newTimeSheet);
-            } else
+            } else {
+                System.out.println("No Entry Found");
                 throw new ValidationException("No Entry Found");
+            }
         } else if (weekNumber == 0) {
             timeSheet = timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateDesc(employeeId, TimeSheetStatus.PENDING);
             if (timeSheet == null) {

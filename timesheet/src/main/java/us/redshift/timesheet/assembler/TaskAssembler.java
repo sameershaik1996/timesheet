@@ -18,7 +18,7 @@ import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectTaskListDto;
 import us.redshift.timesheet.dto.task.TaskDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
-import us.redshift.timesheet.feignclient.EmployeeFeign;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 public class TaskAssembler {
 
     private final ModelMapper mapper;
-    private final EmployeeFeign employeeFeign;
+    private final EmployeeFeignClient employeeFeignClient;
 
-    public TaskAssembler(ModelMapper mapper, EmployeeFeign employeeFeign) {
+    public TaskAssembler(ModelMapper mapper, EmployeeFeignClient employeeFeignClient) {
         this.mapper = mapper;
-        this.employeeFeign = employeeFeign;
+        this.employeeFeignClient = employeeFeignClient;
 
 
 //      EmployeeListDto to Long list
@@ -77,7 +77,7 @@ public class TaskAssembler {
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
                 //          Feign Client Call to get EmployeeDto
-                List<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+                List<EmployeeDto> employees = this.employeeFeignClient.getAllEmployeeByIds(source).getBody();
                 Type targetType = new TypeToken<List<EmployeeListDto>>() {
                 }.getType();
                 //System.out.println("Task Assembler employee list");
@@ -95,7 +95,7 @@ public class TaskAssembler {
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
 //          Feign Client Call to get SkillDto
-                List<SkillDto> dest = this.employeeFeign.getAllSkillsByIds(source, null).getBody();
+                List<SkillDto> dest = this.employeeFeignClient.getAllSkillsByIds(source, null).getBody();
 
                 return dest;
             }
@@ -149,6 +149,18 @@ public class TaskAssembler {
 
     public Task convertToEntity(TaskDto taskDto) throws ParseException {
         return mapper.map(taskDto, Task.class);
+    }
+
+    public Task convertToEntity(TaskDto taskDto, Task task) throws ParseException {
+        mapper.map(taskDto, task);
+        return task;
+    }
+
+    public List<Task> convertToEntity(List<TaskDto> taskDtos) throws ParseException {
+        Type targetListType = new TypeToken<List<Task>>() {
+        }.getType();
+        List<Task> list = mapper.map(taskDtos, targetListType);
+        return list;
     }
 
     public TaskDto convertToDto(Task task) throws ParseException {

@@ -53,7 +53,7 @@ public class TimeSheetController {
 
 
     @GetMapping({"timesheet/get"})
-    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) int year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") int weekNumber, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) Integer year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") Integer weekNumber, @RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "limits", defaultValue = "0") Integer limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (projectId != 0) {
             Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByProjectId(projectId, page, limits, orderBy, fields);
             return new ResponseEntity<>(timeSheetAssembler.convertToPagedDto(timeSheetPage), HttpStatus.OK);
@@ -78,6 +78,9 @@ public class TimeSheetController {
         TimesheetCloneDto timesheetCloneDto = timeSheetCloneAssembler.convertToCloneDto(previousTimeSheet);
         timesheetCloneDto.setId(timeSheetDto.getId());
         timesheetCloneDto.setWeekNumber(timeSheetDto.getWeekNumber());
+        timesheetCloneDto.setFromDate(timeSheetDto.getFromDate());
+        timesheetCloneDto.setToDate(timeSheetDto.getToDate());
+        timesheetCloneDto.setStatus(timeSheetDto.getStatus());
         TimeSheet timeSheet = timeSheetCloneAssembler.convertCloneToEntity(timesheetCloneDto);
 
         return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetService.cloneTimeSheet(timeSheet)), HttpStatus.OK);

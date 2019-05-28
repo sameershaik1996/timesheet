@@ -1,5 +1,9 @@
 package us.redshift.timesheet.controller.project;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +28,15 @@ public class ProjectController {
     private final IProjectService projectService;
 
     private final ProjectAssembler projectAssembler;
+    private final ObjectMapper objectMapper;
 
+    private final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
-    public ProjectController(IProjectService projectService, ProjectAssembler projectAssembler) {
+    public ProjectController(IProjectService projectService, ProjectAssembler projectAssembler, ObjectMapper objectMapper) {
         this.projectService = projectService;
         this.projectAssembler = projectAssembler;
 
+        this.objectMapper = objectMapper;
     }
 
 
@@ -41,10 +48,18 @@ public class ProjectController {
     }
 
     @PutMapping("project/update")
-    public ResponseEntity<?> updateProject(@Valid @RequestBody List<ProjectDto> projectDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
+    public ResponseEntity<?> updateProjectStatus(@Valid @RequestBody List<ProjectDto> projectDtos, @RequestParam(value = "status", required = false) String status) throws ParseException {
         List<Project> projectList = projectAssembler.convertToEntity(projectDtos);
         List<Project> projectSaved = projectService.updateProject(projectList, ProjectStatus.get(status.toUpperCase()));
+
         return new ResponseEntity<>(projectAssembler.convertToDto(projectSaved), HttpStatus.OK);
+    }
+
+    @PutMapping("project/update/{id}")
+    public ResponseEntity<?> updateProject(@PathVariable("id") Long projectId, @RequestBody ProjectDto projectDto, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
+        LOGGER.info("Project Update input {} ", objectMapper.writeValueAsString(projectDto));
+        Project project = projectAssembler.convertToEntity(projectDto, projectService.getProjectById(projectId));
+        return new ResponseEntity<>(projectAssembler.convertToDto(projectService.updateProject(project)), HttpStatus.OK);
     }
 
     @GetMapping("project/get/{id}")

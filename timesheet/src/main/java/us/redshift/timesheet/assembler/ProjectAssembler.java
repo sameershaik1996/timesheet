@@ -14,7 +14,7 @@ import us.redshift.timesheet.dto.common.EmployeeListDto;
 import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectDto;
 import us.redshift.timesheet.dto.project.ProjectListDto;
-import us.redshift.timesheet.feignclient.EmployeeFeign;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
@@ -28,11 +28,12 @@ public class ProjectAssembler {
 
     private final ModelMapper mapper;
 
-    private final EmployeeFeign employeeFeign;
+    private final EmployeeFeignClient employeeFeignClient;
 
-    public ProjectAssembler(ModelMapper mapper, EmployeeFeign employeeFeign) {
+    public ProjectAssembler(ModelMapper mapper, EmployeeFeignClient employeeFeignClient) {
         this.mapper = mapper;
-        this.employeeFeign = employeeFeign;
+        this.employeeFeignClient = employeeFeignClient;
+
 
 //      EmployeeListDto to Long set
         Converter<List<EmployeeListDto>, List<Long>> EmployeeToLongList = mappingContext -> {
@@ -58,7 +59,7 @@ public class ProjectAssembler {
 //                //System.out.println(source);
 
 //          Feign Client Call to get EmployeeDto
-                List<EmployeeDto> employees = this.employeeFeign.getAllEmployeeByIds(source).getBody();
+                List<EmployeeDto> employees = this.employeeFeignClient.getAllEmployeeByIds(source).getBody();
 
 
                 Type targetType = new TypeToken<List<EmployeeListDto>>() {
@@ -80,7 +81,7 @@ public class ProjectAssembler {
                 source = mappingContext.getSource();
                 //System.out.println("project Assembler");
 
-                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                EmployeeDto employee = this.employeeFeignClient.getEmployeeById(source).getBody();
                 EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
 
                 return dest;
@@ -112,6 +113,11 @@ public class ProjectAssembler {
 
     public Project convertToEntity(ProjectDto projectDto) throws ParseException {
         return mapper.map(projectDto, Project.class);
+    }
+
+    public Project convertToEntity(ProjectDto projectDto, Project project) throws ParseException {
+        mapper.map(projectDto, project);
+        return project;
     }
 
     public List<Project> convertToEntity(List<ProjectDto> projectDtos) throws ParseException {
@@ -150,7 +156,7 @@ public class ProjectAssembler {
 
     public List<EmployeeListDto> convertToEmployeeDto(List<Long> ids) {
 
-        List<EmployeeDto> dtos = employeeFeign.getAllEmployeeByIds(ids).getBody();
+        List<EmployeeDto> dtos = employeeFeignClient.getAllEmployeeByIds(ids).getBody();
         Type targetType = new TypeToken<List<EmployeeListDto>>() {
         }.getType();
         return mapper.map(dtos, targetType);
@@ -158,7 +164,7 @@ public class ProjectAssembler {
 
     public List<SkillDto> convertToSkillDto(List<Long> ids) {
 
-        List<SkillDto> dtos = employeeFeign.getAllSkillsByIds(null, ids).getBody();
+        List<SkillDto> dtos = employeeFeignClient.getAllSkillsByIds(null, ids).getBody();
         return dtos;
     }
 

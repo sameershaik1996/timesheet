@@ -1,5 +1,6 @@
 package us.redshift.timesheet.assembler;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -13,15 +14,15 @@ import us.redshift.timesheet.dto.ratecard.RateCardDetailDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetBasicListDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetListDto;
-import us.redshift.timesheet.feignclient.EmployeeFeign;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 
 @Configuration
 public class ModelMapperConfig {
 
-    private final EmployeeFeign employeeFeign;
+    private final EmployeeFeignClient employeeFeignClient;
 
-    public ModelMapperConfig(EmployeeFeign employeeFeign) {
-        this.employeeFeign = employeeFeign;
+    public ModelMapperConfig(EmployeeFeignClient employeeFeignClient) {
+        this.employeeFeignClient = employeeFeignClient;
     }
 
 
@@ -29,13 +30,15 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
 
+        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+
         //      Long to EmployeeListDto
         Converter<Long, EmployeeListDto> LongToEmployee = mappingContext -> {
             Long source;
             if (mappingContext.getSource() != null) {
                 source = mappingContext.getSource();
                 //System.out.println("TimeSheet Assembler employee");
-                EmployeeDto employee = this.employeeFeign.getEmployeeById(source).getBody();
+                EmployeeDto employee = this.employeeFeignClient.getEmployeeById(source).getBody();
                 EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
                 return dest;
             }

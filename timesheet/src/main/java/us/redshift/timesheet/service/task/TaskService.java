@@ -15,6 +15,7 @@ import us.redshift.timesheet.reposistory.task.TaskRepository;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,6 +39,19 @@ public class TaskService implements ITaskService {
         Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
         taskValidate(project, task);
         return taskRepository.save(task);
+    }
+
+    @Override
+    public List<Task> updateTask(List<Task> tasks, TaskStatus status) {
+        List<Task> taskList = new ArrayList<>();
+        tasks.forEach(task -> {
+            if (status != null) {
+                Task getTask = taskRepository.findById(task.getId()).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", task.getId()));
+                getTask.setStatus(status);
+                taskList.add(getTask);
+            }
+        });
+        return taskRepository.saveAll(taskList);
     }
 
     @Override

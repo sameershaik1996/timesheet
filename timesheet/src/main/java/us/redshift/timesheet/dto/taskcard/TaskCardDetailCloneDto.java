@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class TaskCardDetailCloneDto {
 
+    private Long _index;
     @NonNull
     private Date date;
     @NonNull

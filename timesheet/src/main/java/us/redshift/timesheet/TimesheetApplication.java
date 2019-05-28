@@ -15,6 +15,7 @@ import java.util.Calendar;
 @EnableJpaAuditing
 @EnableFeignClients
 @EnableDiscoveryClient
+//@EnableCaching
 public class TimesheetApplication {
 
     public static void main(String[] args) {
@@ -31,6 +32,18 @@ public class TimesheetApplication {
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
+
+//    @Bean
+//    public CacheManager cacheManager() {
+//        SimpleCacheManager cacheManager = new SimpleCacheManager();
+//        Cache employeesCache = new ConcurrentMapCache("employees");
+//        Cache designationsCache = new ConcurrentMapCache("designations");
+//        Cache skillsCache = new ConcurrentMapCache("skills");
+//        cacheManager.setCaches(Arrays.asList(employeesCache));
+//        cacheManager.setCaches(Arrays.asList(designationsCache));
+//        cacheManager.setCaches(Arrays.asList(skillsCache));
+//        return cacheManager;
+//    }
 
 
 }

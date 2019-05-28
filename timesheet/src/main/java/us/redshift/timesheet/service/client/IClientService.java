@@ -13,6 +13,8 @@ public interface IClientService {
 
     List<Client> updateClient(List<Client> clients, ClientStatus status);
 
+    Client updateClient(Client client);
+
     Client getClientById(Long id);
 
     Page<Client> getAllClientByPagination(int page, int limits, String orderBy, String... fields);

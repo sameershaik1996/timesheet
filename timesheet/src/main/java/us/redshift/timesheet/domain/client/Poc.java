@@ -24,7 +24,7 @@ public class Poc extends BaseEntity implements Serializable {
     private String email;
 
     @JsonIgnore
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     @JsonIgnoreProperties(value = {"pocs"}, allowSetters = true)
     private Client client;
