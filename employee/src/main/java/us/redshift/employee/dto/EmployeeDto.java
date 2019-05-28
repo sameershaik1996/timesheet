@@ -1,12 +1,17 @@
 package us.redshift.employee.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import us.redshift.employee.domain.Designation;
+import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.Skill;
 import us.redshift.employee.domain.common.Address;
 import us.redshift.employee.domain.common.Gender;
 import us.redshift.employee.domain.common.MaritalStatus;
+import us.redshift.filter.model.Role;
+
 
 import java.io.Serializable;
 import java.util.Date;
@@ -27,7 +32,7 @@ public class EmployeeDto extends BaseDto implements Serializable {
 
 
     private String lastName;
-
+    @JsonProperty("employeeCode")
     private String employeeId;
 
     private Date dob;
@@ -47,7 +52,9 @@ public class EmployeeDto extends BaseDto implements Serializable {
 
     private Designation designation;
 
-    private Long reportingManager;
+
+    @JsonIgnoreProperties(value = {"designation","skills","address"})
+    private Employee reportingManager;
 
 
 
@@ -60,9 +67,10 @@ public class EmployeeDto extends BaseDto implements Serializable {
 
     private Boolean status=Boolean.TRUE;
 
+    @JsonIgnoreProperties(value="employees")
     private Set<Skill> skills = new HashSet<>();
 
-    private Long roleId;
+    private Role role;
 
     private Address address;
 

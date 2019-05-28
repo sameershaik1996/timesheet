@@ -1,4 +1,4 @@
-package us.redshift.employee.exception;
+package us.redshift.auth.exception;
 
 import org.hibernate.JDBCException;
 import org.springframework.core.Ordered;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -90,6 +91,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    protected ResponseEntity<Object> handleBadCredentialsException(
+            BadCredentialsException ex) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage("Bad Credentials");
+
+        return buildResponseEntity(apiError);
+    }
+
+
     /**
      * Handles EntityNotFoundException. Created to encapsulate errors with more detail than javax.persistence.EntityNotFoundException.
      *
@@ -135,29 +146,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    @ExceptionHandler(value
-            = {DataIntegrityViolationException.class, SQLIntegrityConstraintViolationException.class})
-    protected ResponseEntity<?> handleConflict(RuntimeException ex, WebRequest request) {
-
-
-        return buildResponseEntity(new ApiError(HttpStatus.CONFLICT,ex.getCause().getCause().getLocalizedMessage(), ex));
-    }
 
     /**
      * Handle DataIntegrityViolationException, inspects the cause for different DB causes.
      */
-    /*@ExceptionHandler(DataIntegrityViolationException.class)
-    protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex,
-                                                                  WebRequest request) {
-        if (ex.getCause() instanceof ConstraintViolationException) {
-            return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
-        }
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,ex.getCause().getLocalizedMessage(), ex));
-    }*/
+    @ExceptionHandler(value
+            = {DataIntegrityViolationException.class, SQLIntegrityConstraintViolationException.class})
+    protected ResponseEntity<?> handleConflict(RuntimeException ex, WebRequest request) {
+        ApiError apiError=new ApiError(HttpStatus.CONFLICT,ex.getCause().getCause().getLocalizedMessage(), ex);
+
+
+        return buildResponseEntity(apiError);
+    }
 
     @ExceptionHandler(HttpClientErrorException.class)
     protected ResponseEntity<Object> handleHttpClientErrorException(HttpClientErrorException ex,
-                                                         WebRequest request) {
+                                                                    WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setMessage("Invalid token or you don't have permission to access this resource");
         apiError.setDebugMessage(ex.getMessage());
@@ -166,11 +170,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(JDBCException.class)
     protected ResponseEntity<Object> handleJDBCException(JDBCException ex,
-                                                                  WebRequest request) {
+                                                         WebRequest request) {
         if (ex.getCause() instanceof ConstraintViolationException) {
             return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
         }
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,"Value Already Exists", ex));
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Value Already Exists", ex));
     }
 
     /**
@@ -200,7 +204,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public  ResponseEntity<Object> handleEmptyDataException(HttpServletRequest request, Exception exception) {
+    public ResponseEntity<Object> handleEmptyDataException(HttpServletRequest request, Exception exception) {
 
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage("Resource Not found");

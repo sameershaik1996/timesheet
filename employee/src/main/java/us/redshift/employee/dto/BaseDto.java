@@ -19,10 +19,10 @@ public class BaseDto implements Serializable {
 
     private String updatedTimeStamp;
 
-    private Long createdBy;
+    private String createdBy;
 
 
 
-    private Long updatedBy;
+    private String updatedBy;
 
 }

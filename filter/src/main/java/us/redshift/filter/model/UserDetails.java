@@ -27,6 +27,7 @@ public class UserDetails implements Serializable {
 
     private String roleName;
 
+    private Role role;
     @Override
     public String toString() {
         return "UserDetails{" +

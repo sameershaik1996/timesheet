@@ -74,8 +74,10 @@ public class Employee extends BaseEntity implements Serializable {
     private Designation designation;
 
 
-    @Column(name="reporting_Manager",nullable=true)
-    private Long reportingManager;
+    @ManyToOne
+    @JoinColumn(name="reporting_manager_id")
+    @JsonIgnoreProperties(value = {"designation","skills","address"})
+    private Employee reportingManager;
 
 
 

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.client.HttpClientErrorException;
+import us.redshift.employee.assembler.EmployeeAssembler;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.Skill;
 import us.redshift.employee.dto.EmployeeDto;
@@ -24,6 +26,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,7 +38,7 @@ public class EmployeeController {
     @Autowired
     ModelMapper mapper;
     @Autowired
-    EmployeeRespository employeeRespository;
+    EmployeeAssembler employeeAssembler;
 
     @Autowired
     IDTOHelper dtoHelper;
@@ -49,10 +52,11 @@ public class EmployeeController {
     @PostMapping("/save")
     public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeeDto employee)throws ConstraintViolationException,DataIntegrityViolationException {
 
-        Employee newEmp = mapper.map(employee,Employee.class);
-        Employee emp = employeeService.createEmployee(newEmp);
-        userClient.createUser(generateUserDto(emp),employee.getRoleId());
-        return new ResponseEntity<>(emp, HttpStatus.CREATED);//send mail
+
+        Employee emp = employeeService.createEmployee( mapper.map(employee,Employee.class));
+        UserDetails ud=userClient.createUser(generateUserDto(emp),employee.getRole().getId());
+        EmployeeDto empDto=employeeAssembler.convertToDto(emp);
+        return new ResponseEntity<>(empDto, HttpStatus.CREATED);//send mail
 
 
     }
@@ -68,7 +72,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateEmployee(@Valid @RequestBody Employee employee){
+    public ResponseEntity<?> updateEmployee(@Valid @RequestBody EmployeeDto employee){
 
         if(employee.getId()==null){
             return new ResponseEntity<>(new BadRequestException("id cannot be null"),HttpStatus.BAD_REQUEST);
@@ -78,23 +82,30 @@ public class EmployeeController {
 
         mapper.map(employee,currentEmployee);
 
-        return new ResponseEntity<>(employeeService.updateEmployee(currentEmployee), HttpStatus.CREATED);
+        userClient.updateUser(employee.getId(),employee.getRole());
+
+        return new ResponseEntity<>(employeeAssembler.convertToDto(employeeService.updateEmployee(currentEmployee)), HttpStatus.CREATED);
 
     }
 
 
 
     @GetMapping("get/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable Long id,HttpServletRequest req)throws NoSuchElementException, EntityNotFoundException
+    public ResponseEntity<?> getEmployeeById(@PathVariable Long id)throws NoSuchElementException, EntityNotFoundException, HttpClientErrorException
     {
-        System.out.println("details:"+req.getHeader("userDetails"));
 
-        return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
+        EmployeeDto empDto=employeeAssembler.convertToDto(employeeService.getEmployeeById(id));
+        return new ResponseEntity<>(empDto, HttpStatus.OK);
 
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getAllEmployee(@RequestParam(value="id",required = false) List<Long> id,@RequestParam(value="roleName",required = false)String roleName)
+    public ResponseEntity<?> getAllEmployee(@RequestParam(value="id",required = false) List<Long> id,
+                                            @RequestParam(value="roleName",required = false)String roleName,
+                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                            @RequestParam(value = "limits", defaultValue = "0") int limits,
+                                            @RequestParam(value = "orderBy", required = false) String orderBy,
+                                            @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException
     {
         if(id!=null)
             return new ResponseEntity<>(employeeService.getEmployeeByIds(id), HttpStatus.OK);
@@ -112,7 +123,7 @@ public class EmployeeController {
 
 
         else
-            return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
+            return new ResponseEntity<>(employeeService.getAllEmployee(page, limits, orderBy, fields), HttpStatus.OK);
 
 
     }

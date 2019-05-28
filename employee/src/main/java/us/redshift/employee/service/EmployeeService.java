@@ -3,9 +3,12 @@ package us.redshift.employee.service;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import us.redshift.employee.Reusable;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.repository.EmployeeRespository;
@@ -28,17 +31,11 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public Employee createEmployee(Employee employee)  throws ConstraintViolationException,DataIntegrityViolationException {
-        try {
+
             Employee emp = employeeRespository.findTopByOrderByIdDesc();
             employee.setEmployeeId(generateEmployeeId(emp));
             return employeeRespository.save(employee);
-        }
-        catch (ConstraintViolationException e){
-            throw e;
-        }
-        catch (DataIntegrityViolationException e){
-            throw new DataIntegrityViolationException("Value Already Exists",e);
-        }
+
     }
 
 
@@ -49,6 +46,9 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public Employee getEmployeeById(Long id)throws NoSuchElementException, EntityNotFoundException {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        System.out.println(request.getHeader("Authorization"));
         try{
             Employee employee= employeeRespository.findById(id).get();
             return employee;
@@ -60,8 +60,10 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public List<Employee> getAllEmployee() {
-        return employeeRespository.findAll();
+    public Page<Employee> getAllEmployee(int page, int limits, String orderBy, String... fields) {
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+        Page<Employee> employees = employeeRespository.findAll(pageable);
+        return employees;
     }
 
     @Override

@@ -2,7 +2,6 @@ package us.redshift.auth.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,26 +10,17 @@ import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import us.redshift.auth.security.CustomUserDetailsService;
 import us.redshift.auth.security.JwtAuthenticationEntryPoint;
 import us.redshift.auth.security.JwtAuthenticationFilter;
 import us.redshift.auth.security.JwtGrantFilter;
-
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -109,6 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/webjars/**")
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers("/auth/v1/api/permission/get").permitAll()
 
                 .antMatchers("/auth/v1/api/role/assignpermission").permitAll()
                 .antMatchers("/auth/v1/api/user/login")

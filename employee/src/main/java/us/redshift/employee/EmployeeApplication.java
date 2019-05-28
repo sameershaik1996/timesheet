@@ -16,6 +16,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import us.redshift.employee.domain.Employee;
+import us.redshift.employee.dto.EmployeeDto;
 
 
 import javax.annotation.PostConstruct;
@@ -46,7 +47,9 @@ public class EmployeeApplication {
 	@Bean("mapper")
 	public ModelMapper modelMapper() {
 		ModelMapper mapper=new ModelMapper();
+		mapper.typeMap(EmployeeDto.class,Employee.class).setPropertyCondition(Conditions.isNotNull());
 		mapper.typeMap(Employee.class,Employee.class).setPropertyCondition(Conditions.isNotNull());
+
 		return mapper;
 	}
 

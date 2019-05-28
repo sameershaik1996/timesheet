@@ -1,5 +1,6 @@
 package us.redshift.employee.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import us.redshift.employee.domain.Employee;
 
@@ -15,7 +16,7 @@ public interface IEmployeeService {
 
     Employee getEmployeeById(Long id);
 
-    List<Employee> getAllEmployee();
+    Page<Employee> getAllEmployee(int page, int limits, String orderBy, String... fields);
 
     Boolean checkIfEmployeeExists(Long id);
 
