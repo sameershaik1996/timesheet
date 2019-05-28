@@ -18,6 +18,7 @@ import us.redshift.timesheet.service.task.TaskService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -124,6 +125,11 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     @Override
     public int setStatusForTaskCardDetail(String toString, List<Long> taskCardDetailsId) {
         return taskCardDetailRepository.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString(), taskCardDetailsId);
+    }
+
+    @Override
+    public List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate) {
+        return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(projectId,fromDate,toDate,TimeSheetStatus.INVOICE_RAISED,TaskType.BILLABLE);
     }
 
     @Override

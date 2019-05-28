@@ -2,6 +2,7 @@ package us.redshift.timesheet.controller.taskcard;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import us.redshift.timesheet.util.Reusable;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -43,9 +45,25 @@ public class TaskCardDetailController {
     }
 
     @GetMapping({"taskcarddetail/get"})
-    public ResponseEntity<?> getTaskCardTaskCardDetailsByPagination(@RequestParam(value = "taskCardId", required = false, defaultValue = "0") Long taskCardId, @RequestParam(value = "timeSheetId", defaultValue = "0", required = false) Long timeSheetId, @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId, @RequestParam(value = "status", defaultValue = "PENDING", required = false) String status, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getTaskCardTaskCardDetailsByPagination(@RequestParam(value = "taskCardId", required = false, defaultValue = "0") Long taskCardId,
+                                                                    @RequestParam(value = "timeSheetId", defaultValue = "0", required = false) Long timeSheetId,
+                                                                    @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId,
+                                                                    @RequestParam(value = "status", defaultValue = "PENDING", required = false) String status,
+                                                                    @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                    @RequestParam(value = "limits", defaultValue = "0") int limits,
+                                                                    @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                                    @RequestParam(value="fromDate",required = false)@DateTimeFormat(pattern="yyyy-MM-dd")Date fromDate,
+                                                                    @RequestParam(value="toDate",required = false)@DateTimeFormat(pattern="yyyy-MM-dd")Date toDate,
+                                                                    @RequestParam(value = "projectIds", required = false)List<Long> projectIds,
+                                                                    @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException
+    {
         Page<TaskCardDetail> taskCardDetails;
-        if (taskCardId != 0) {
+        System.out.println((fromDate)+" "+toDate+" "+projectId);
+        if(fromDate!=null&&toDate!=null&&projectIds!=null){
+
+            return new ResponseEntity<>(taskCardDetailAssembler.convertToDto(taskCardDetailService.getTaskCardDetailBetweenDateAndByProject(projectIds,fromDate,toDate)), HttpStatus.OK);
+        }
+        else if (taskCardId != 0) {
             taskCardDetails = taskCardDetailService.getTaskCardTaskCardDetailsByPagination(taskCardId, page, limits, orderBy, fields);
             return new ResponseEntity<>(taskCardDetailAssembler.convertToPagedDto(taskCardDetails), HttpStatus.OK);
         } else if (timeSheetId != 0 && projectId != 0) {

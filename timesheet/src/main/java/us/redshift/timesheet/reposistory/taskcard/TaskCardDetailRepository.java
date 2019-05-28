@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
+import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -37,6 +39,8 @@ public interface TaskCardDetailRepository extends JpaRepository<TaskCardDetail, 
     Page<TaskCardDetail> findAllByTaskCard_TimeSheet_IdAndTaskCard_Project_IdAndStatusNotLikeOrderByDate(Long timeSheetId, Long projectId, TimeSheetStatus status, Pageable pageable);
 
     List<TaskCardDetail> findTaskCardDetailsByTaskCard_Id(Long taskCardId);
+
+    List<TaskCardDetail> findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(List<Long> projectId, Date fromDate, Date toDate, TimeSheetStatus status, TaskType type);
 
 
 }
