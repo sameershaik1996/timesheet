@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ITaskCardDetailService {
@@ -20,4 +21,6 @@ public interface ITaskCardDetailService {
     void deleteTaskCardDetailById(Long id);
 
     int setStatusForTaskCardDetail(String toString, List<Long> taskCardDetailsId);
+
+    List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate);
 }
