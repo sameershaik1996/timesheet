@@ -1,210 +1,244 @@
 package us.redshift.timesheet.assembler;
 
-import org.modelmapper.Converter;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import us.redshift.timesheet.domain.client.Client;
-import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.task.Task;
-import us.redshift.timesheet.dto.common.CommonDto;
-import us.redshift.timesheet.dto.common.EmployeeDto;
-import us.redshift.timesheet.dto.common.EmployeeListDto;
-import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectTaskListDto;
 import us.redshift.timesheet.dto.task.TaskDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
-import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Component
 public class TaskAssembler {
 
     private final ModelMapper mapper;
-    private final EmployeeFeignClient employeeFeignClient;
 
-    public TaskAssembler(ModelMapper mapper, EmployeeFeignClient employeeFeignClient) {
+
+    public TaskAssembler(ModelMapper mapper) {
         this.mapper = mapper;
-        this.employeeFeignClient = employeeFeignClient;
-
-
-//      EmployeeListDto to Long list
-        Converter<List<EmployeeListDto>, List<Long>> EmployeeToLongList = mappingContext -> {
-
-            List<EmployeeListDto> source;
-            if (mappingContext.getSource() != null) {
-                source = mappingContext.getSource();
-                //System.out.println("Task Assembler employee long list");
-                List<Long> dest = source.stream().map(employeeListDto -> employeeListDto.getId()).collect(Collectors.toList());
-                return dest;
-            }
-            return null;
-        };
-
-//      SkillDto to Long list
-        Converter<List<SkillDto>, List<Long>> SkillToLongList = mappingContext -> {
-
-            List<SkillDto> source;
-            if (mappingContext.getSource() != null) {
-                source = mappingContext.getSource();
-                //System.out.println("Task Assembler skill long list");
-                List<Long> dest = source.stream().map(skillDto -> skillDto.getId()).collect(Collectors.toList());
-                return dest;
-            }
-            return null;
-        };
-
-//      adding EmployeeListDto to long list conversion property
-        this.mapper.addMappings(new PropertyMap<TaskDto, Task>() {
-            protected void configure() {
-                using(EmployeeToLongList).map(source.getEmployees()).setEmployeeId(null);
-                using(SkillToLongList).map(source.getSkills()).setSkillId(null);
-            }
-        });
-
-//      Long to EmployeeListDto list
-        Converter<List<Long>, List<EmployeeListDto>> LongToEmployeeList = mappingContext -> {
-            List<Long> source;
-            if (mappingContext.getSource() != null) {
-                source = mappingContext.getSource();
-                //          Feign Client Call to get EmployeeDto
-                List<EmployeeDto> employees = this.employeeFeignClient.getAllEmployeeByIds(source).getBody();
-                Type targetType = new TypeToken<List<EmployeeListDto>>() {
-                }.getType();
-                //System.out.println("Task Assembler employee list");
-//          Convert EmployeeDto to EmployeeListDto
-                List<EmployeeListDto> dest = mapper.map(employees, targetType);
-                return dest;
-            }
-
-            return null;
-        };
-
-//      Long to SkillDto list
-        Converter<List<Long>, List<SkillDto>> LongToSkillList = mappingContext -> {
-            List<Long> source;
-            if (mappingContext.getSource() != null) {
-                source = mappingContext.getSource();
-//          Feign Client Call to get SkillDto
-                List<SkillDto> dest = this.employeeFeignClient.getAllSkillsByIds(source, null).getBody();
-
-                return dest;
-            }
-            return null;
-        };
-
-//      adding long to EmployeeListDto list conversion property
-        this.mapper.addMappings(new PropertyMap<Task, TaskDto>() {
-            protected void configure() {
-
-                using(LongToEmployeeList).map(source.getEmployeeId()).setEmployees(null);
-                using(LongToSkillList).map(source.getSkillId()).setSkills(null);
-            }
-        });
-//      adding long to EmployeeListDto list conversion property
-        this.mapper.addMappings(new PropertyMap<Task, TaskListDto>() {
-            protected void configure() {
-                using(LongToSkillList).map(source.getSkillId()).setSkills(null);
-            }
-        });
-
-//      Project to CommonDto
-        Converter<Project, CommonDto> projectToCommon =
-                mappingContext -> {
-                    Project source = new Project();
-                    if (mappingContext.getSource() != null)
-                        source = mappingContext.getSource();
-                    return new CommonDto(source.getId(), source.getName(), source.getProjectCode(), source.getStatus().name());
-                };
-
-//      Client to CommonDto
-        Converter<Client, CommonDto> clientToCommon =
-                mappingContext -> {
-                    Client source = new Client();
-                    if (mappingContext.getSource() != null)
-                        source = mappingContext.getSource();
-                    return new CommonDto(source.getId(), source.getName(), source.getClientCode(), source.getStatus().name());
-                };
-
-//      adding to Common Property
-        this.mapper.addMappings(new PropertyMap<Task, ProjectTaskListDto>() {
-            protected void configure() {
-                using(projectToCommon).map(source.getProject()).setProject(null);
-                using(clientToCommon).map(source.getProject().getClient()).setClient(null);
-            }
-        });
-
-
     }
 
 
-    public Task convertToEntity(TaskDto taskDto) throws ParseException {
+    public Task convertToEntity(TaskDto taskDto) {
         return mapper.map(taskDto, Task.class);
     }
 
-    public Task convertToEntity(TaskDto taskDto, Task task) throws ParseException {
+    public Task convertToEntity(TaskDto taskDto, Task task) {
         mapper.map(taskDto, task);
         return task;
     }
 
-    public List<Task> convertToEntity(List<TaskDto> taskDtos) throws ParseException {
+    public List<Task> convertToEntity(List<TaskDto> taskDtos) {
         Type targetListType = new TypeToken<List<Task>>() {
         }.getType();
-        List<Task> list = mapper.map(taskDtos, targetListType);
-        return list;
+        return mapper.map(taskDtos, targetListType);
     }
 
-    public TaskDto convertToDto(Task task) throws ParseException {
+    public TaskDto convertToDto(Task task) {
         return mapper.map(task, TaskDto.class);
     }
 
-    public List<TaskListDto> convertToDto(List<Task> tasks) throws ParseException {
+    public List<TaskListDto> convertToDto(List<Task> tasks) {
         Type targetListType = new TypeToken<List<TaskListDto>>() {
         }.getType();
-        List<TaskListDto> list = mapper.map(tasks, targetListType);
-        return list;
+        return mapper.map(tasks, targetListType);
     }
 
-    public List<ProjectTaskListDto> convertToDto1(List<Task> tasks) throws ParseException {
-
-        List<ProjectTaskListDto> list = tasks.stream().map(task -> {
-            return mapper.map(task, ProjectTaskListDto.class);
-        }).collect(Collectors.toCollection(ArrayList::new));
-
-        return list;
+    public List<ProjectTaskListDto> convertToProjectTaskDto(List<Task> tasks) {
+        Type targetListType = new TypeToken<List<ProjectTaskListDto>>() {
+        }.getType();
+        return mapper.map(tasks, targetListType);
     }
 
-    public Page<ProjectTaskListDto> convertToPagedDto(Page<Task> taskPage) {
+    public Page<ProjectTaskListDto> convertToProjectTaskPagedDto(Page<Task> taskPage) {
 
         Type targetListType = new TypeToken<List<ProjectTaskListDto>>() {
         }.getType();
         List<ProjectTaskListDto> dtos = mapper.map(taskPage.getContent(), targetListType);
 
-        Page<ProjectTaskListDto> page = new PageImpl<>(dtos,
-                new PageRequest(taskPage.getPageable().getPageNumber(), taskPage.getPageable().getPageSize(), taskPage.getPageable().getSort()),
-                dtos.size());
+        Page<ProjectTaskListDto> page = new Page<ProjectTaskListDto>() {
+            @Override
+            public int getTotalPages() {
+                return taskPage.getTotalPages();
+            }
+
+            @Override
+            public long getTotalElements() {
+                return taskPage.getTotalElements();
+            }
+
+            @Override
+            public <U> Page<U> map(Function<? super ProjectTaskListDto, ? extends U> converter) {
+                return null;
+            }
+
+            @Override
+            public int getNumber() {
+                return taskPage.getNumber();
+            }
+
+            @Override
+            public int getSize() {
+                return taskPage.getSize();
+            }
+
+            @Override
+            public int getNumberOfElements() {
+                return taskPage.getNumberOfElements();
+            }
+
+            @Override
+            public List<ProjectTaskListDto> getContent() {
+                return dtos;
+            }
+
+            @Override
+            public boolean hasContent() {
+                return taskPage.hasContent();
+            }
+
+            @Override
+            public Sort getSort() {
+                return taskPage.getSort();
+            }
+
+            @Override
+            public boolean isFirst() {
+                return taskPage.isFirst();
+            }
+
+            @Override
+            public boolean isLast() {
+                return taskPage.isLast();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return taskPage.hasNext();
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return taskPage.hasPrevious();
+            }
+
+            @Override
+            public Pageable nextPageable() {
+                return taskPage.nextPageable();
+            }
+
+            @Override
+            public Pageable previousPageable() {
+                return taskPage.previousPageable();
+            }
+
+            @NotNull
+            @Override
+            public Iterator<ProjectTaskListDto> iterator() {
+                return dtos.iterator();
+            }
+        };
 
         return page;
     }
 
-    public Page<TaskListDto> convertToPagedDto1(Page<Task> taskPage) {
+    public Page<TaskListDto> convertToPagedDto(Page<Task> taskPage) {
 
         Type targetListType = new TypeToken<List<TaskListDto>>() {
         }.getType();
         List<TaskListDto> dtos = mapper.map(taskPage.getContent(), targetListType);
 
-        Page<TaskListDto> page = new PageImpl<>(dtos,
-                new PageRequest(taskPage.getPageable().getPageNumber(), taskPage.getPageable().getPageSize(), taskPage.getPageable().getSort()),
-                dtos.size());
+        Page<TaskListDto> page = new Page<TaskListDto>() {
+            @Override
+            public int getTotalPages() {
+                return taskPage.getTotalPages();
+            }
+
+            @Override
+            public long getTotalElements() {
+                return taskPage.getTotalElements();
+            }
+
+            @Override
+            public <U> Page<U> map(Function<? super TaskListDto, ? extends U> converter) {
+                return null;
+            }
+
+            @Override
+            public int getNumber() {
+                return taskPage.getNumber();
+            }
+
+            @Override
+            public int getSize() {
+                return taskPage.getSize();
+            }
+
+            @Override
+            public int getNumberOfElements() {
+                return taskPage.getNumberOfElements();
+            }
+
+            @Override
+            public List<TaskListDto> getContent() {
+                return dtos;
+            }
+
+            @Override
+            public boolean hasContent() {
+                return taskPage.hasContent();
+            }
+
+            @Override
+            public Sort getSort() {
+                return taskPage.getSort();
+            }
+
+            @Override
+            public boolean isFirst() {
+                return taskPage.isFirst();
+            }
+
+            @Override
+            public boolean isLast() {
+                return taskPage.isLast();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return taskPage.hasNext();
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return taskPage.hasPrevious();
+            }
+
+            @Override
+            public Pageable nextPageable() {
+                return taskPage.nextPageable();
+            }
+
+            @Override
+            public Pageable previousPageable() {
+                return taskPage.previousPageable();
+            }
+
+            @NotNull
+            @Override
+            public Iterator<TaskListDto> iterator() {
+                return dtos.iterator();
+            }
+        };
 
         return page;
     }

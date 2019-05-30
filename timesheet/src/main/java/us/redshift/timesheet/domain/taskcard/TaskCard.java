@@ -26,7 +26,7 @@ import java.util.List;
 public class TaskCard extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private TimeSheetStatus status;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
     private TaskType type;
@@ -72,14 +72,6 @@ public class TaskCard extends BaseEntity {
         taskCardDetail.setTaskCard(this);
     }
 
-    public void setStatus(TimeSheetStatus status) {
-
-        this.status = status == null ? TimeSheetStatus.PENDING : status;
-    }
-
-    public void setType(TaskType type) {
-        this.type = type == null ? TaskType.BILLABLE : type;
-    }
 
     public void setComment(String comment) {
         this.comment = comment == null ? "" : comment;

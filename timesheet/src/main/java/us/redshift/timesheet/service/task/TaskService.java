@@ -2,6 +2,7 @@ package us.redshift.timesheet.service.task;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,8 +11,8 @@ import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.exception.ValidationException;
-import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.reposistory.task.TaskRepository;
+import us.redshift.timesheet.service.project.IProjectService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
@@ -24,19 +25,20 @@ public class TaskService implements ITaskService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
 
     private final TaskRepository taskRepository;
-    private final ProjectRepository projectRepository;
+    private final IProjectService projectService;
 
 
-    public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository) {
+    public TaskService(TaskRepository taskRepository,
+                       @Lazy IProjectService projectService) {
         this.taskRepository = taskRepository;
-        this.projectRepository = projectRepository;
+        this.projectService = projectService;
 
     }
 
 
     @Override
     public Task saveTask(Task task) {
-        Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
+        Project project = projectService.getProjectById(task.getProject().getId());
         taskValidate(project, task);
         return taskRepository.save(task);
     }
@@ -58,7 +60,7 @@ public class TaskService implements ITaskService {
     public Task updateTask(Task task) {
         if (!taskRepository.existsById(task.getId()))
             throw new ResourceNotFoundException("Task", "Id", task.getId());
-        Project project = projectRepository.findById(task.getProject().getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", task.getProject().getId()));
+        Project project = projectService.getProjectById(task.getProject().getId());
         taskValidate(project, task);
         return taskRepository.save(task);
     }
@@ -98,7 +100,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> getProjectTasksByPagination(Long projectId, int page, int limits, String orderBy, String... fields) {
-        if (!projectRepository.existsById(projectId))
+        if (!projectService.existsById(projectId))
             throw new ResourceNotFoundException("Project", "Id", projectId);
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
 //        List<Task> taskList = taskRepository.findTaskByProject_Id(projectId, pageable).getContent();

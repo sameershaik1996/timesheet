@@ -30,5 +30,9 @@ public interface IProjectService {
 
     List<Project> findAllByStatus(ProjectStatus status);
 
+    Boolean existsById(Long projectId);
+
+    List<Project> getAllProjectByManagerId(Long managerId);
+
 
 }

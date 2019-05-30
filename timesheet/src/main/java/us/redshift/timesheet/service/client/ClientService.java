@@ -90,4 +90,9 @@ public class ClientService implements IClientService {
     public List<Client> findAllByStatus(ClientStatus status) {
         return clientRepository.findAllByStatusOrderByIdAsc(status);
     }
+
+    @Override
+    public Boolean existsById(Long ClientId) {
+        return clientRepository.existsById(ClientId);
+    }
 }

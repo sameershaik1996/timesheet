@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 import us.redshift.timesheet.domain.project.ProjectType;
 import us.redshift.timesheet.dto.common.BaseDto;
@@ -18,6 +19,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ProjectListDto extends BaseDto {
 
+    @NonNull
     private Long id;
     private String projectCode;
     private String name;

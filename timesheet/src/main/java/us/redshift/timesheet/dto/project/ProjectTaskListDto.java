@@ -1,9 +1,6 @@
 package us.redshift.timesheet.dto.project;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.dto.common.BaseDto;
@@ -18,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ProjectTaskListDto extends BaseDto {
 
+    @NonNull
     private Long id;
     private String taskCode;
     private String name;

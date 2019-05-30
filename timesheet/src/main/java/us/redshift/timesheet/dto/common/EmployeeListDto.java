@@ -9,13 +9,13 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class EmployeeListDto extends BaseDto {
+public class EmployeeListDto {
 
     private Long id;
     private String employeeCode;
     private String firstName;
     private String lastName;
-    private String name;
     private DesignationDto designation;
     private Set<SkillDto> skills;
+    private EmployeeListDto reportingManager;
 }

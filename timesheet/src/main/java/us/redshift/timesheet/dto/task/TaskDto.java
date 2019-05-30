@@ -27,7 +27,6 @@ public class TaskDto extends BaseDto {
     private String description;
     @NonNull
     private TaskType type;
-    @NonNull
     private TaskStatus status;
     private Date startDate;
     private Date endDate;

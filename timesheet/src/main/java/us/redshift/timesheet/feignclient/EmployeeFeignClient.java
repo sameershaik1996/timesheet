@@ -12,28 +12,32 @@ import us.redshift.timesheet.dto.common.SkillDto;
 
 import java.util.List;
 
-@FeignClient(url = "${zuul.employee.url}", value = "Employee-Service", fallback = EmployeeFeignClientFallback.class)
+@FeignClient(url = "${zuul.employee.url}", value = "employeeFeignClient", fallback = EmployeeFeignClientFallback.class)
 public interface EmployeeFeignClient {
 
-    @Cacheable(value = "employees", key = "#id")
+    @Cacheable(cacheNames = "employees", key = "#id")
     @GetMapping("/employee/v1/api/employee/get/{id}")
     ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Long id);
 
-    @Cacheable(value = "employees")
+    @Cacheable(cacheNames = "employees", key = "#ids")
     @GetMapping("/employee/v1/api/employee/get")
     ResponseEntity<List<EmployeeDto>> getAllEmployeeByIds(@RequestParam("id") List<Long> ids);
 
-    @Cacheable(value = "skills", key = "#id")
+    @Cacheable(cacheNames = "skills", key = "#id")
     @GetMapping("/employee/v1/api/skill/get/{id}")
     ResponseEntity<SkillDto> getSkillById(@PathVariable("id") Long id);
 
-    @Cacheable(value = "designations", key = "#id")
+    @Cacheable(cacheNames = "designations", key = "#id")
     @GetMapping("/employee/v1/api/designation/get/{id}")
     ResponseEntity<DesignationDto> getDesignationById(@PathVariable("id") Long id);
 
-    @Cacheable(value = "skills")
+    @Cacheable(cacheNames = "skills", key = "#skillIds")
     @GetMapping("/employee/v1/api/skill/get")
-    ResponseEntity<List<SkillDto>> getAllSkillsByIds(@RequestParam("id") List<Long> skillIds, @RequestParam("empId") List<Long> empIds);
+    ResponseEntity<List<SkillDto>> getAllSkillsByIds(@RequestParam("id") List<Long> skillIds);
+
+    @Cacheable(cacheNames = "skills", key = "#employeeIds")
+    @GetMapping("/employee/v1/api/skill/get")
+    ResponseEntity<List<SkillDto>> getAllSkillsByEmployeeIds(@RequestParam("empId") List<Long> employeeIds);
 
 }
 

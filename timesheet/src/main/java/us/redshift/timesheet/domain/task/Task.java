@@ -35,7 +35,7 @@ public class Task extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.ACTIVE;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -50,11 +50,11 @@ public class Task extends BaseEntity {
     private Date endedOn;
 
 
-    private BigDecimal billableHour;
+    private BigDecimal billableHour = BigDecimal.valueOf(0);
 
-    private BigDecimal nonBillableHour;
+    private BigDecimal nonBillableHour = BigDecimal.valueOf(0);
 
-    private BigDecimal usedHour;
+    private BigDecimal usedHour = BigDecimal.valueOf(0);
 
     @ElementCollection(targetClass = Long.class)
     @JoinTable(name = "pss_task_skills")
@@ -70,24 +70,4 @@ public class Task extends BaseEntity {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-
-    public void setStatus(TaskStatus status) {
-        this.status = status == null ? TaskStatus.ACTIVE : status;
-    }
-
-    public void setType(TaskType type) {
-        this.type = type == null ? TaskType.BILLABLE : type;
-    }
-
-    public void setUsedHour(BigDecimal usedHour) {
-        this.usedHour = usedHour == null ? BigDecimal.valueOf(0) : usedHour;
-    }
-
-    public void setBillableHour(BigDecimal billableHour) {
-        this.billableHour = billableHour == null ? BigDecimal.valueOf(0) : billableHour;
-    }
-
-    public void setNonBillableHour(BigDecimal nonBillableHour) {
-        this.nonBillableHour = nonBillableHour == null ? BigDecimal.valueOf(0) : nonBillableHour;
-    }
 }

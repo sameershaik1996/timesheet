@@ -1,6 +1,10 @@
 package us.redshift.timesheet.controller.task;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +27,20 @@ public class TaskController {
 
     private final TaskAssembler taskAssembler;
 
-    public TaskController(ITaskService taskService, TaskAssembler taskAssembler) {
+    private final ObjectMapper objectMapper;
+
+
+    private final Logger LOGGER = LoggerFactory.getLogger(TaskController.class);
+
+    public TaskController(ITaskService taskService, TaskAssembler taskAssembler, ObjectMapper objectMapper) {
         this.taskService = taskService;
         this.taskAssembler = taskAssembler;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("task/save")
-    public ResponseEntity<?> saveTask(@Valid @RequestBody TaskDto taskDto) throws ParseException {
+    public ResponseEntity<?> saveTask(@Valid @RequestBody TaskDto taskDto) throws ParseException, JsonProcessingException {
+        LOGGER.info("Task Insert {} ", objectMapper.writeValueAsString(taskDto));
         Task task = taskAssembler.convertToEntity(taskDto);
         Task taskSaved = taskService.saveTask(task);
         return new ResponseEntity<>(taskAssembler.convertToDto(taskSaved), HttpStatus.CREATED);
@@ -44,7 +55,8 @@ public class TaskController {
     }
 
     @PutMapping("task/update/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable("id") Long taskId, @RequestBody TaskDto taskDto) throws ParseException {
+    public ResponseEntity<?> updateTask(@PathVariable("id") Long taskId, @RequestBody TaskDto taskDto) throws ParseException, JsonProcessingException {
+        LOGGER.info("Task  {} ", objectMapper.writeValueAsString(taskDto));
         Task task = taskAssembler.convertToEntity(taskDto, taskService.getTaskById(taskId));
         Task taskSaved = taskService.updateTask(task);
         return new ResponseEntity<>(taskAssembler.convertToDto(taskSaved), HttpStatus.OK);
@@ -57,17 +69,23 @@ public class TaskController {
     }
 
     @GetMapping({"task/get"})
-    public ResponseEntity<?> getAllTaskByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId, @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllTaskByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status,
+                                                    @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId,
+                                                    @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId,
+                                                    @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                    @RequestParam(value = "limits", defaultValue = "0") Integer limits,
+                                                    @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                    @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
         if (projectId != 0 && employeeId == 0) {
             Page<Task> taskPage = taskService.getProjectTasksByPagination(projectId, page, limits, orderBy, fields);
-            return new ResponseEntity<>(taskAssembler.convertToPagedDto1(taskPage), HttpStatus.OK);
+            return new ResponseEntity<>(taskAssembler.convertToPagedDto(taskPage), HttpStatus.OK);
         } else if (projectId != 0 && employeeId != 0 && !("ALL".equalsIgnoreCase(status))) {
             List<Task> tasks = taskService.findAllByProjectIdAndEmployeeId(projectId, employeeId, TaskStatus.get(status.toUpperCase()));
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {
             Page<Task> taskPage = taskService.getAllTaskByPagination(page, limits, orderBy, fields);
-            return new ResponseEntity<>(taskAssembler.convertToPagedDto(taskPage), HttpStatus.OK);
+            return new ResponseEntity<>(taskAssembler.convertToProjectTaskPagedDto(taskPage), HttpStatus.OK);
         }
 
     }

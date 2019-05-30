@@ -1,9 +1,6 @@
 package us.redshift.timesheet.dto.timesheet;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
@@ -16,6 +13,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeSheetBasicListDto extends BaseDto {
+
+    @NonNull
     private Long id;
     private String name;
     private String comment;

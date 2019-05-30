@@ -13,6 +13,6 @@ import us.redshift.timesheet.dto.common.BaseDto;
 @AllArgsConstructor
 public class IndustryDto extends BaseDto {
 
-    private Long id;
+    private int id;
     private String name;
 }

@@ -22,13 +22,13 @@ public interface TaskCardDetailRepository extends JpaRepository<TaskCardDetail, 
     @Transactional
     @Modifying
     @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE task_card_id = ?2", nativeQuery = true)
-    int setStatusForTaskCardDetail(String status, Long taskCardId);
+    int setStatusForTaskCardDetailByTaskCardId(String status, Long taskCardId);
 
 
     @Transactional
     @Modifying
     @Query(value = "UPDATE pss_task_card_details SET status=?1 WHERE id in (?2)", nativeQuery = true)
-    int setStatusForTaskCardDetail(String status, List<Long> id);
+    int setStatusForTaskCardDetailByTaskCardId(String status, List<Long> id);
 
     @Transactional
     @Modifying

@@ -1,18 +1,20 @@
 package us.redshift.timesheet.assembler;
 
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.dto.client.ClientDto;
 import us.redshift.timesheet.dto.client.ClientListDto;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 @Component
 public class ClientAssembler {
@@ -21,37 +23,32 @@ public class ClientAssembler {
 
     public ClientAssembler(ModelMapper mapper) {
         this.mapper = mapper;
-//        this.mapper.typeMap(Poc.class, Poc.class).setPropertyCondition(Conditions.isNotNull());
-
     }
 
 
-    public Client convertToEntity(ClientDto clientDto) throws ParseException {
+    public Client convertToEntity(ClientDto clientDto) {
         return mapper.map(clientDto, Client.class);
     }
 
-    public Client convertToEntity(ClientDto clientDto, Client client) throws ParseException {
+    public Client convertToEntity(ClientDto clientDto, Client client) {
         mapper.map(clientDto, client);
         return client;
     }
 
-    public ClientDto convertToDto(Client client) throws ParseException {
+    public List<Client> convertToEntity(List<ClientDto> clientDtos) {
+        Type targetListType = new TypeToken<List<Client>>() {
+        }.getType();
+        return mapper.map(clientDtos, targetListType);
+    }
+
+    public ClientDto convertToDto(Client client) {
         return mapper.map(client, ClientDto.class);
     }
 
-    public List<Client> convertToEntity(List<ClientDto> clientDtos) throws ParseException {
-        Type targetListType = new TypeToken<List<Client>>() {
-        }.getType();
-        List<Client> clientList = mapper.map(clientDtos, targetListType);
-        return clientList;
-    }
-
-
-    public List<ClientListDto> convertToDto(List<Client> clients) throws ParseException {
+    public List<ClientListDto> convertToDto(List<Client> clients) {
         Type targetListType = new TypeToken<List<ClientListDto>>() {
         }.getType();
-        List<ClientListDto> clientList = mapper.map(clients, targetListType);
-        return clientList;
+        return mapper.map(clients, targetListType);
     }
 
     public Page<ClientListDto> convertToPagedDto(Page<Client> clientPage) {
@@ -60,9 +57,88 @@ public class ClientAssembler {
         }.getType();
         List<ClientListDto> dtos = mapper.map(clientPage.getContent(), targetListType);
 
-        Page<ClientListDto> page = new PageImpl<>(dtos,
-                new PageRequest(clientPage.getPageable().getPageNumber(), clientPage.getPageable().getPageSize(), clientPage.getPageable().getSort()),
-                dtos.size());
+        Page<ClientListDto> page = new Page<ClientListDto>() {
+            @Override
+            public int getTotalPages() {
+                return clientPage.getTotalPages();
+            }
+
+            @Override
+            public long getTotalElements() {
+                return clientPage.getTotalElements();
+            }
+
+            @Override
+            public <U> Page<U> map(Function<? super ClientListDto, ? extends U> converter) {
+                return null;
+            }
+
+            @Override
+            public int getNumber() {
+                return clientPage.getNumber();
+            }
+
+            @Override
+            public int getSize() {
+                return clientPage.getSize();
+            }
+
+            @Override
+            public int getNumberOfElements() {
+                return clientPage.getNumberOfElements();
+            }
+
+            @Override
+            public List<ClientListDto> getContent() {
+                return dtos;
+            }
+
+            @Override
+            public boolean hasContent() {
+                return clientPage.hasContent();
+            }
+
+            @Override
+            public Sort getSort() {
+                return clientPage.getSort();
+            }
+
+            @Override
+            public boolean isFirst() {
+                return clientPage.isFirst();
+            }
+
+            @Override
+            public boolean isLast() {
+                return clientPage.isLast();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return clientPage.hasNext();
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return clientPage.hasPrevious();
+            }
+
+            @Override
+            public Pageable nextPageable() {
+                return clientPage.nextPageable();
+            }
+
+            @Override
+            public Pageable previousPageable() {
+                return clientPage.previousPageable();
+            }
+
+            @NotNull
+            @Override
+            public Iterator<ClientListDto> iterator() {
+                return dtos.iterator();
+            }
+        };
 
         return page;
     }

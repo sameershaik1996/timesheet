@@ -23,4 +23,6 @@ public interface ITimeSheetService {
 
 
     TimeSheet cloneTimeSheet(TimeSheet timeSheet);
+
+    Integer setStatusForTimeSheet(String status, Long timeSheetId);
 }
