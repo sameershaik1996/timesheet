@@ -31,7 +31,11 @@ public class ClientService implements IClientService {
     public Client saveClient(Client client) {
 
         Set<Poc> pocs = new HashSet<>(client.getPocs());
+
+        System.out.println(pocs.size());
+
         pocs.forEach(poc -> {
+            System.out.println(poc.getName());
             client.addPoc(poc);
         });
         return clientRepository.save(client);

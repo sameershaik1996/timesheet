@@ -51,6 +51,10 @@ public class TaskCardDetailService implements ITaskCardDetailService {
             if (!taskCardDetailRepository.existsById(taskCardDetail.getId()))
                 throw new ResourceNotFoundException("TaskCardDetail", "ID", taskCardDetail.getId());
             LOGGER.info("UpdateTaskCardDetails  status Update {}", taskCardDetail.getId());
+            TaskCardDetail taskCardDetail1 = taskCardDetailRepository.findById(taskCardDetail.getId()).get();
+            taskCardDetail.set_index(taskCardDetail1.get_index());
+            System.out.println(taskCardDetail1.get_index() + "index");
+
             taskCardDetail.setStatus(status);
 //            taskCardDetailRepository.save(taskCardDetail);
             taskCardDetailList.add(taskCardDetail);

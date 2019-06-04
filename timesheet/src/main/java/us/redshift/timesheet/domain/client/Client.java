@@ -8,7 +8,9 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -27,8 +29,8 @@ public class Client extends BaseEntity implements Serializable {
     private String name;
 
     @JsonIgnoreProperties(value = "client")
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
-    private List<Poc> pocs = new ArrayList<>();
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
+    private Set<Poc> pocs = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private ClientStatus status = ClientStatus.ACTIVE;

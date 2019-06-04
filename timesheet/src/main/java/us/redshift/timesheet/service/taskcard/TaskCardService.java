@@ -137,6 +137,11 @@ public class TaskCardService implements ITaskCardService {
     @Override
     public TaskCard calculateAmount(TaskCard card) {
 
+
+        if (card.getProject() != null) {
+            System.out.println(card.getProject().getType());
+        }
+
 //      Get rateCardId
         Task task = taskService.getTaskById(card
                 .getTask().getId());

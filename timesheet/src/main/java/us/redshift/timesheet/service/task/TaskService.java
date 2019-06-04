@@ -16,6 +16,8 @@ import us.redshift.timesheet.service.project.IProjectService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class TaskService implements ITaskService {
 
 
     @Override
-    public Task saveTask(Task task) {
+    public Task saveTask(Task task) throws ParseException {
         Project project = projectService.getProjectById(task.getProject().getId());
         taskValidate(project, task);
         return taskRepository.save(task);
@@ -57,7 +59,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task) throws ParseException {
         if (!taskRepository.existsById(task.getId()))
             throw new ResourceNotFoundException("Task", "Id", task.getId());
         Project project = projectService.getProjectById(task.getProject().getId());
@@ -123,17 +125,25 @@ public class TaskService implements ITaskService {
         return taskRepository.findAllByProjectIdAndEmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
     }
 
-    private void taskValidate(Project project, Task task) {
+    private void taskValidate(Project project, Task task) throws ParseException {
+
+
+        String pattern = "yyyy-MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         if (project.getStartDate() != null && project.getEndDate() != null && task.getStartDate() != null && task.getEndDate() != null) {
-            if (project.getStartDate().compareTo(task.getStartDate()) > 0) {
-                throw new ValidationException("The Task Start Date should  be greater then or equal the Project Start Date");
+
+            if (project.getStartDate().compareTo(simpleDateFormat.parse(simpleDateFormat.format(task.getStartDate()))) > 0) {
+                LOGGER.error("The Task Start Date ( " + task.getStartDate() + " ) should  be greater then or equal the Project Start Date ( " + project.getStartDate() + " )");
+                throw new ValidationException("The Task Start Date ( " + task.getStartDate() + " ) should  be greater then or equal the Project Start Date ( " + project.getStartDate() + " )");
             }
-            if (project.getEndDate().compareTo(task.getStartDate()) < 0 || project.getEndDate().compareTo(task.getEndDate()) < 0) {
-                throw new ValidationException("The Task Start Date / End Date should not be greater then the Project End Date");
+            if (project.getEndDate().compareTo(simpleDateFormat.parse(simpleDateFormat.format(task.getStartDate()))) < 0 || project.getEndDate().compareTo(simpleDateFormat.parse(simpleDateFormat.format(task.getEndDate()))) < 0) {
+                LOGGER.error("The Task Start Date  ( " + task.getStartDate() + " ) / End Date ( " + task.getEndDate() + " ) should not be greater then the Project End Date ( " + project.getEndDate() + " )");
+                throw new ValidationException("The Task Start Date  ( " + task.getStartDate() + " ) / End Date ( " + task.getEndDate() + " ) should not be greater then the Project End Date ( " + project.getEndDate() + " )");
             }
-            if (task.getStartDate().compareTo(task.getEndDate()) > 0) {
-                throw new ValidationException("The Task Start Date should not be greater then the Task End Date");
+            if (task.getStartDate().compareTo(simpleDateFormat.parse(simpleDateFormat.format(task.getEndDate()))) > 0) {
+                LOGGER.error("The Task Start Date ( " + task.getStartDate() + " ) should not be greater then the Task End Date ( " + task.getEndDate() + " )");
+                throw new ValidationException("The Task Start Date ( " + task.getStartDate() + " ) should not be greater then the Task End Date ( " + task.getEndDate() + " )");
             }
         }
     }

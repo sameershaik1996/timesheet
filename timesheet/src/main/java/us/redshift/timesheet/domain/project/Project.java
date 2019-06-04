@@ -27,7 +27,7 @@ public class Project extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+
     private String description;
 
     @Column(nullable = false)
@@ -71,7 +71,6 @@ public class Project extends BaseEntity implements Serializable {
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "rate_card_id")
     private RateCard rateCard;
-
 
 
 }

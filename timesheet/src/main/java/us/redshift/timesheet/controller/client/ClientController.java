@@ -39,6 +39,7 @@ public class ClientController {
     public ResponseEntity<?> saveClient(@Valid @RequestBody ClientDto clientDto) throws ParseException, JsonProcessingException {
         LOGGER.info("Client Insert {} ", objectMapper.writeValueAsString(clientDto));
         Client client = clientAssembler.convertToEntity(clientDto);
+        LOGGER.info("Client After Assembler {} ", objectMapper.writeValueAsString(client));
         Client clientSaved = clientService.saveClient(client);
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.CREATED);
     }

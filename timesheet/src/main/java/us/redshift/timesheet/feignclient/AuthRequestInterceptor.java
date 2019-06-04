@@ -23,8 +23,8 @@ public class AuthRequestInterceptor implements RequestInterceptor {
         if (request == null) {
             return;
         }
-        String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzc2FtZWVyMUByZWQtc2hpZnQudXMiLCJlbXBsb3llZUlkIjozLCJpYXQiOjE1NTkyMjA2MDYsImV4cCI6MTU1OTgyNTQwNn0.AAQav8RAY-2yxuDtokkkF705HowyOT9G1q0fxyahjglclPTUuiCo_lIP8r6wJ1VzEXgGZ7hn4-UzPO_ytchlsQ";
-//        String token = request.getHeader(AUTHORIZATION_HEADER);
+//        String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzc2FtZWVyMUByZWQtc2hpZnQudXMiLCJlbXBsb3llZUlkIjozLCJpYXQiOjE1NTkyMjA2MDYsImV4cCI6MTU1OTgyNTQwNn0.AAQav8RAY-2yxuDtokkkF705HowyOT9G1q0fxyahjglclPTUuiCo_lIP8r6wJ1VzEXgGZ7hn4-UzPO_ytchlsQ";
+        String token = request.getHeader(AUTHORIZATION_HEADER);
         if (token == null) {
             return;
         }
