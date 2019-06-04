@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import us.redshift.auth.domain.User;
 import us.redshift.auth.dto.ClaimsDto;
+import us.redshift.auth.exception.CustomException;
 import us.redshift.auth.service.UserService;
 
 import java.util.Date;
@@ -70,21 +71,26 @@ public class JwtTokenProvider {
 
     }
 
-    public boolean validateToken(String authToken) {
+    public boolean validateToken(String authToken) throws CustomException{
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature");
+
+            throw new CustomException("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            logger.error("Invalid JWT token");
+
+            throw new CustomException("Invalid JWT Token");
         } catch (ExpiredJwtException ex) {
-            logger.error("Expired JWT token");
+            throw new CustomException("Expired JWT Token");
         } catch (UnsupportedJwtException ex) {
-            logger.error("Unsupported JWT token");
+            throw new CustomException("Unsupported JWT Token");
+
         } catch (IllegalArgumentException ex) {
-            logger.error("JWT claims string is empty.");
+
+            throw new CustomException("JWT claims string is empty.");
+
         }
-        return false;
+
     }
 }

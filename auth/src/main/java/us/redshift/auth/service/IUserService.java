@@ -20,4 +20,9 @@ public interface IUserService {
     List<User> findAllUsers();
 
 
+    int checkIfUserIsActive(String userNameOrEmail);
+
+    int updateUserStatus(List<Long> empIds, Boolean status);
+
+    User updateUserStatusAndRole(User currentUser);
 }

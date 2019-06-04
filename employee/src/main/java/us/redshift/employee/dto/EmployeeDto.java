@@ -8,6 +8,7 @@ import us.redshift.employee.domain.Designation;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.Skill;
 import us.redshift.employee.domain.common.Address;
+import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.domain.common.Gender;
 import us.redshift.employee.domain.common.MaritalStatus;
 import us.redshift.filter.model.Role;
@@ -65,7 +66,8 @@ public class EmployeeDto extends BaseDto implements Serializable {
     private Date resignationDate;
 
 
-    private Boolean status=Boolean.TRUE;
+    private EmployeeStatus status=EmployeeStatus.ACTIVE;
+
 
     @JsonIgnoreProperties(value="employees")
     private Set<Skill> skills = new HashSet<>();

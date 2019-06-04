@@ -1,7 +1,9 @@
 package us.redshift.employee.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,12 +17,11 @@ public class BaseDto implements Serializable {
 
     private Long id;
 
-    private String createdTimeStamp;
+    private Instant createdTimeStamp;
 
-    private String updatedTimeStamp;
+    private Instant updatedTimeStamp;
 
     private String createdBy;
-
 
 
     private String updatedBy;

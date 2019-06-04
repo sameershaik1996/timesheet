@@ -10,6 +10,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import us.redshift.employee.Reusable;
 import us.redshift.employee.domain.Employee;
+import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.repository.EmployeeRespository;
 import us.redshift.employee.util.DTO;
@@ -74,6 +75,11 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public List<Employee> getEmployeeByIds(List<Long> id) {
         return employeeRespository.findByIdIn(id);
+    }
+
+    @Override
+    public int setStatusForEmployee(EmployeeStatus status, List<Long> empIds) {
+        return employeeRespository.setStatusForEmployee(status.toString(),empIds);
     }
 
     private String generateEmployeeId(Employee emp) {

@@ -2,6 +2,7 @@ package us.redshift.employee.controller;
 
 
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import us.redshift.employee.assembler.EmployeeAssembler;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.Skill;
+import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.dto.SignUpDto;
 import us.redshift.employee.exception.BadRequestException;
@@ -54,7 +56,8 @@ public class EmployeeController {
 
 
         Employee emp = employeeService.createEmployee( mapper.map(employee,Employee.class));
-        UserDetails ud=userClient.createUser(generateUserDto(emp),employee.getRole().getId());
+        Boolean status=emp.getStatus().equals(EmployeeStatus.ACTIVE)?true:false;
+        userClient.createUser(generateUserDto(emp),employee.getRole().getId(),status);
         EmployeeDto empDto=employeeAssembler.convertToDto(emp);
         return new ResponseEntity<>(empDto, HttpStatus.CREATED);//send mail
 
@@ -72,7 +75,21 @@ public class EmployeeController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateEmployee(@Valid @RequestBody EmployeeDto employee){
+    public ResponseEntity<?> updateEmployee(@Valid @RequestBody EmployeeDto employee,
+                                            @RequestParam(value = "empId",required = false)List<Long> empIds,
+                                            @RequestParam(value = "status",required = false)EmployeeStatus status
+                                            )
+    {
+
+        Boolean empStatus=true;
+        if(empIds!=null&&status!=null){
+            empStatus=status.equals(EmployeeStatus.ACTIVE)?true:false;
+            System.out.println(status);
+            employeeService.setStatusForEmployee(status,empIds);
+            userClient.updateUser(empIds,empStatus);
+            return new ResponseEntity<>(employeeService.getEmployeeByIds(empIds),HttpStatus.OK);
+        }
+
 
         if(employee.getId()==null){
             return new ResponseEntity<>(new BadRequestException("id cannot be null"),HttpStatus.BAD_REQUEST);
@@ -82,11 +99,15 @@ public class EmployeeController {
 
         mapper.map(employee,currentEmployee);
 
-        userClient.updateUser(employee.getId(),employee.getRole());
+        EmployeeDto empDto=employeeAssembler.convertToDto(employeeService.updateEmployee(currentEmployee));
+        empStatus=empDto.getStatus().equals(EmployeeStatus.ACTIVE)?true:false;
+        userClient.updateUser(empDto.getId(),empStatus,employee.getRole());
 
-        return new ResponseEntity<>(employeeAssembler.convertToDto(employeeService.updateEmployee(currentEmployee)), HttpStatus.CREATED);
+        return new ResponseEntity<>(empDto, HttpStatus.CREATED);
 
     }
+
+
 
 
 

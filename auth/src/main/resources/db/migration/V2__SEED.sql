@@ -6,7 +6,7 @@ insert into auth_roles(name) values('MANAGER');
 insert into auth_roles(name) values('PM');
 
 
-INSERT INTO auth_users VALUES (1,0,'2019-05-07 23:15:53',0,'2019-05-07 23:15:53','admin@red-shift.us',0,'$2a$10$hA8gjchkjcHayuWk2fqzC.rMQXyx6yzxRArG7aBmUVMj2H6InE1vW','admin',2);
+INSERT INTO auth_users VALUES (1,0,'2019-05-07 23:15:53',0,'2019-05-07 23:15:53','admin@red-shift.us',0,'$2a$10$hA8gjchkjcHayuWk2fqzC.rMQXyx6yzxRArG7aBmUVMj2H6InE1vW',1,'admin',2);
 
 insert into auth_permissions(name) values('designation_crud');
 insert into auth_permissions(name) values('designation_get');

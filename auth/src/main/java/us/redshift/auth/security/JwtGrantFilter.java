@@ -1,10 +1,13 @@
 package us.redshift.auth.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 import us.redshift.auth.domain.Permission;
 import us.redshift.auth.domain.User;
+import us.redshift.auth.exception.AuthException;
+import us.redshift.auth.exception.CustomException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,17 +43,18 @@ public class JwtGrantFilter extends OncePerRequestFilter {
             System.out.println(permissionFromUri);
             System.out.println(authorities);
             if (!authorities.contains(permissionFromUri)) {
-                httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"you don't have enough permissions to access this resource");
-                throw new Exception("you don't have enough permissions to access this resource");
+
+                throw new CustomException("you don't have enough permissions to access this resource");
             }
 
         }
-    }
-    catch (Exception ex){
+    }catch (CustomException ex){
         ex.printStackTrace();
-        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"you don't have enough permissions to access this resource");
-
+        //httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(),"Error");
+        entryPoint.commence(httpServletRequest,httpServletResponse,  new AuthException(ex.getMessage()));
+        throw new CustomException("you don't have enough permissions to access this resource");
     }
+
         filterChain.doFilter(httpServletRequest, httpServletResponse);
 
     }
@@ -58,19 +62,18 @@ public class JwtGrantFilter extends OncePerRequestFilter {
     private String getPermission(String api,String role) {
         String[] split=api.split("/");
         StringBuilder permission=new StringBuilder();
-        if(split[1].equals("save")||split[1].equals("update")||split[1].equals("delete")){
-            permission.append(split[0]+"_"+"crud");
-        }
-        else if(split[1].equals("get")&&!role.equals("EMPLOYEE"))
-        {
-            permission.append(split[0]+"_"+"crud");
-        }
-        else if(split[1].equals("get")&&role.equals("EMPLOYEE")){
-            permission.append(split[0]+"_"+"get");
-        }
-        else
-        {
-            permission.append(split[0]+"_"+"common");
+        try {
+            if (split[1].equals("save") || split[1].equals("update") || split[1].equals("delete")) {
+                permission.append(split[0] + "_" + "crud");
+            } else if (split[1].equals("get") && !role.equals("EMPLOYEE")) {
+                permission.append(split[0] + "_" + "crud");
+            } else if (split[1].equals("get") && role.equals("EMPLOYEE")) {
+                permission.append(split[0] + "_" + "get");
+            } else {
+                permission.append(split[0] + "_" + "common");
+            }
+        }catch (Exception e){
+
         }
         return permission.toString();
 

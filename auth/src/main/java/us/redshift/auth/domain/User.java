@@ -43,6 +43,7 @@ public class User extends BaseEntity implements Serializable {
         @NotNull
         @JsonProperty("employee_id")
         @Column(unique = true)
+        @NaturalId
         private Long employeeId;
 
         @NotBlank
@@ -53,6 +54,8 @@ public class User extends BaseEntity implements Serializable {
         @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn(name="role_id")
         private Role role;
+
+        private Boolean status=Boolean.TRUE;
 
         @Override
         public String toString() {
