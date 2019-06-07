@@ -1,43 +1,27 @@
 package us.redshift.timesheet.controller.invoice;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import us.redshift.timesheet.domain.invoice.Invoice;
-import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
-import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.service.invoice.IInvoiceService;
-import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("timesheet/v1/api/invoice")
 public class InvoiceController {
 
-    @Autowired
-    IInvoiceService invoiceService;
+    private final IInvoiceService invoiceService;
 
-    @Autowired
-    ITaskCardDetailService taskCardDetailService;
+    public InvoiceController(IInvoiceService invoiceService) {
+        this.invoiceService = invoiceService;
+    }
 
-    @Autowired
-    TaskCardDetailRepository taskCardDetailRepository;
 
     @PostMapping("save")
-    public ResponseEntity<?> createInvoice(@RequestBody Invoice invoice,@RequestParam(value = "fromDate",required = false)String fromDate) {
-        Invoice savedInvoice = invoiceService.createInvoice(invoice);
-        List<Long> taskCardDetailsId = new ArrayList<>();
-        invoice.getTaskCardDetails().forEach(taskCardDetail ->
-                taskCardDetailsId.add(taskCardDetail.getId())
-        );
-        int d = taskCardDetailService.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString(), taskCardDetailsId);
-
-        return new ResponseEntity<>(savedInvoice, HttpStatus.CREATED);
+    public ResponseEntity<?> createInvoice(@RequestBody Invoice invoice, @RequestParam(value = "fromDate", required = false) String fromDate) {
+        return new ResponseEntity<>(invoiceService.createInvoice(invoice), HttpStatus.CREATED);
     }
 
     @PutMapping("update")
@@ -48,8 +32,17 @@ public class InvoiceController {
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getInvoice() {
-        return new ResponseEntity<>(invoiceService.getAllInvoice(), HttpStatus.OK);
+    public ResponseEntity<?> getInvoice(
+            @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "limits", defaultValue = "0") Integer limits,
+            @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+            @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) {
+        if (projectId != 0) {
+            return new ResponseEntity<>(invoiceService.getAllInvoiceByProjectId(projectId, page, limits, orderBy, fields), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(invoiceService.getAllInvoiceByPagination(page, limits, orderBy, fields), HttpStatus.OK);
+        }
     }
 
     @GetMapping("get/{id}")

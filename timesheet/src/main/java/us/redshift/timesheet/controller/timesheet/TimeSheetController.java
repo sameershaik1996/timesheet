@@ -1,5 +1,8 @@
 package us.redshift.timesheet.controller.timesheet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +17,6 @@ import us.redshift.timesheet.service.timesheet.ITimeSheetService;
 
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.Calendar;
 
 @RestController
 @RequestMapping("timesheet/v1/api/")
@@ -23,21 +25,24 @@ public class TimeSheetController {
     private final ITimeSheetService timeSheetService;
     private final TimeSheetAssembler timeSheetAssembler;
     private final TimeSheetCloneAssembler timeSheetCloneAssembler;
-    private final Calendar calendar;
+    private final ObjectMapper objectMapper;
+
+
+    private final Logger LOGGER = LoggerFactory.getLogger(TimeSheetController.class);
 
     public TimeSheetController(ITimeSheetService timeSheetService,
                                TimeSheetAssembler timeSheetAssembler,
-                               Calendar calendar,
-                               TimeSheetCloneAssembler timeSheetCloneAssembler) {
+                               TimeSheetCloneAssembler timeSheetCloneAssembler, ObjectMapper objectMapper) {
         this.timeSheetService = timeSheetService;
         this.timeSheetAssembler = timeSheetAssembler;
-        this.calendar = calendar;
         this.timeSheetCloneAssembler = timeSheetCloneAssembler;
+        this.objectMapper = objectMapper;
     }
 
 
     @PutMapping("timesheet/update")
-    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody TimeSheetDto timeSheetDto, @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
+    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody TimeSheetDto timeSheetDto,
+                                             @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
         TimeSheet timeSheet = timeSheetAssembler.convertToEntity(timeSheetDto);
         TimeSheet savedTimeSheet = timeSheetService.updateTimeSheet(timeSheet, TimeSheetStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(timeSheetAssembler.convertToDto(savedTimeSheet), HttpStatus.OK);
@@ -53,7 +58,14 @@ public class TimeSheetController {
 
 
     @GetMapping({"timesheet/get"})
-    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId, @RequestParam(value = "employeeId", required = false) Long employeeId, @RequestParam(value = "year", defaultValue = "0", required = false) Integer year, @RequestParam(value = "weekNumber", required = false, defaultValue = "0") Integer weekNumber, @RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "limits", defaultValue = "0") Integer limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId,
+                                                      @RequestParam(value = "employeeId", required = false) Long employeeId,
+                                                      @RequestParam(value = "year", defaultValue = "0", required = false) Integer year,
+                                                      @RequestParam(value = "weekNumber", required = false, defaultValue = "0") Integer weekNumber,
+                                                      @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                      @RequestParam(value = "limits", defaultValue = "0") Integer limits,
+                                                      @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                      @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         if (projectId != 0) {
             Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByProjectId(projectId, page, limits, orderBy, fields);
             return new ResponseEntity<>(timeSheetAssembler.convertToPagedDto(timeSheetPage), HttpStatus.OK);
@@ -67,7 +79,7 @@ public class TimeSheetController {
     }
 
     @PutMapping("timesheet/clone")
-    public ResponseEntity<?> cloneTimesheet(@Valid @RequestBody TimeSheetDto timeSheetDto, @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
+    public ResponseEntity<?> cloneTimeSheet(@Valid @RequestBody TimeSheetDto timeSheetDto) throws ParseException {
 
 
         if (timeSheetDto.getTaskCards().size() > 0) {

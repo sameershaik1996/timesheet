@@ -5,15 +5,16 @@ import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.task.TaskStatus;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.List;
 
 public interface ITaskService {
 
-    Task saveTask(Task task);
+    Task saveTask(Task task) throws ParseException;
 
     List<Task> updateTask(List<Task> tasks, TaskStatus status);
 
-    Task updateTask(Task task);
+    Task updateTask(Task task) throws ParseException;
 
     void updateTaskHours(Long taskId, BigDecimal usedHour);
 

@@ -23,4 +23,6 @@ public interface IClientService {
 
     List<Client> findAllByStatus(ClientStatus status);
 
+    Boolean existsById(Long ClientId);
+
 }

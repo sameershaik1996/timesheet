@@ -14,17 +14,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class TaskCardListDto extends BaseDto {
 
+    @NonNull
     private Long id;
     private TimeSheetStatus status;
     private EmployeeListDto approvedBy;
-    @NonNull
     private TaskType type;
-    @NonNull
     private EmployeeListDto employee;
-    @NonNull
     private SkillDto skill;
     private DesignationDto designation;
-    @NonNull
     private LocationDto location;
     private TaskListDto task;
     private BigDecimal ratePerHour;

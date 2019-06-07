@@ -2,12 +2,12 @@ package us.redshift.timesheet.service.timesheet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import us.redshift.timesheet.assembler.TimeSheetCloneAssembler;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
@@ -16,11 +16,10 @@ import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.exception.ValidationException;
-import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
-import us.redshift.timesheet.reposistory.taskcard.TaskCardRepository;
 import us.redshift.timesheet.reposistory.timesheet.TimeSheetRepository;
-import us.redshift.timesheet.service.task.TaskService;
-import us.redshift.timesheet.service.taskcard.TaskCardService;
+import us.redshift.timesheet.service.task.ITaskService;
+import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
+import us.redshift.timesheet.service.taskcard.ITaskCardService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.time.LocalDate;
@@ -39,27 +38,21 @@ public class TimeSheetService implements ITimeSheetService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeSheetService.class);
 
     private final TimeSheetRepository timeSheetRepository;
-    private final TaskCardService taskCardService;
-    private final TaskCardDetailRepository taskCardDetailRepository;
-    private final TaskCardRepository taskCardRepository;
-    private final TaskService taskService;
-    private final TimeSheetCloneAssembler timeSheetCloneAssembler;
+    private final ITaskCardService taskCardService;
+    private final ITaskCardDetailService taskCardDetailService;
+    private final ITaskService taskService;
     private final Calendar calendar;
 
     public TimeSheetService(TimeSheetRepository timeSheetRepository,
-                            TaskCardService taskCardService,
-                            TaskCardDetailRepository taskCardDetailRepository,
-                            TaskCardRepository taskCardRepository,
-                            TaskService taskService,
-                            Calendar calendar,
-                            TimeSheetCloneAssembler timeSheetCloneAssembler) {
+                            @Lazy ITaskCardService taskCardService,
+                            @Lazy ITaskCardDetailService taskCardDetailService,
+                            @Lazy ITaskService taskService,
+                            Calendar calendar) {
         this.timeSheetRepository = timeSheetRepository;
         this.taskCardService = taskCardService;
-        this.taskCardDetailRepository = taskCardDetailRepository;
-        this.taskCardRepository = taskCardRepository;
+        this.taskCardDetailService = taskCardDetailService;
         this.taskService = taskService;
         this.calendar = calendar;
-        this.timeSheetCloneAssembler = timeSheetCloneAssembler;
     }
 
 
@@ -94,7 +87,7 @@ public class TimeSheetService implements ITimeSheetService {
         timeSheet.setStatus(status);
         TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
         timeSheet.getTaskCards().forEach(taskCard -> {
-            LOGGER.info("UpdateTimeSheet TaskCardDetails Status Updated {}", taskCardDetailRepository.setStatusForTaskCardDetail(status.name(), taskCard.getId()));
+            LOGGER.info("UpdateTimeSheet TaskCardDetails Status Updated {}", taskCardDetailService.setStatusForTaskCardDetailByTaskCardId(status.name(), taskCard.getId()));
         });
 
         return SaveTimeSheet;
@@ -173,6 +166,11 @@ public class TimeSheetService implements ITimeSheetService {
         timeSheet.setTaskCards(taskCards);
 
         return timeSheetRepository.save(timeSheet);
+    }
+
+    @Override
+    public Integer setStatusForTimeSheet(String status, Long timeSheetId) {
+        return timeSheetRepository.setStatusForTimeSheet(status, timeSheetId);
     }
 
     @Override

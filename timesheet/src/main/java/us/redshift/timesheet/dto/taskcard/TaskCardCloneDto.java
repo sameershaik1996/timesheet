@@ -7,7 +7,6 @@ import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
 import us.redshift.timesheet.dto.common.LocationDto;
 import us.redshift.timesheet.dto.common.SkillDto;
-import us.redshift.timesheet.dto.project.ProjectListDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
 
 import java.math.BigDecimal;
@@ -37,7 +36,7 @@ public class TaskCardCloneDto {
     @NonNull
     private TaskListDto task;
     @NonNull
-    private ProjectListDto project;
+    private TaskListDto project;
     @NonNull
     @JsonIgnoreProperties("taskCard")
     private Set<TaskCardDetailCloneDto> taskCardDetails;

@@ -27,7 +27,7 @@ public class Project extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+
     private String description;
 
     @Column(nullable = false)
@@ -38,7 +38,7 @@ public class Project extends BaseEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectStatus status;
+    private ProjectStatus status = ProjectStatus.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -64,35 +64,13 @@ public class Project extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Long managerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "rate_card_id")
     private RateCard rateCard;
-
-    public void setStatus(ProjectStatus status) {
-        this.status = status == null ? ProjectStatus.ACTIVE : status;
-    }
-
-    public void setType(ProjectType type) {
-        this.type = type == null ? ProjectType.FIXED_BID : type;
-    }
-
-
-    //    @JsonIgnoreProperties("project")
-//    @OneToMany(mappedBy = "project",
-//            cascade = CascadeType.ALL)
-//    private List<Task> tasks = new ArrayList<>();
-
-
-//    public void add(Task task) {
-//        if (tasks == null)
-//            tasks = new ArrayList<>();
-//        task.setProject(this);
-//        tasks.add(task);
-//    }
 
 
 }

@@ -1,0 +1,19 @@
+
+version: "3.2"
+
+networks:
+  frontend:
+  backend:
+
+services:
+  eureka-server:
+    build:
+      context: eureka
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    environment:
+      - spring.application.name = pss_eureka
+      - eureka.client.register-with-eureka = false
+      - eureka.client.fetch-registry = false
+      - server.port = 8761

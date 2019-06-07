@@ -1,5 +1,6 @@
 package us.redshift.timesheet.dto.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,6 @@ public class EmployeeDto extends BaseDto {
     private Long id;
     private String firstName;
     private String lastName;
-    private String name;
     private String employeeCode;
     private Date dob;
     private String emailId;
@@ -26,19 +26,20 @@ public class EmployeeDto extends BaseDto {
     private String gender;
     private String maritalStatus;
     private DesignationDto designation;
-    private Long reportingManager;
+    @JsonIgnoreProperties("reportingManager")
+    private EmployeeListDto reportingManager;
     private Date joiningDate;
+    private Date anniversaryDate;
     private Date resignationDate;
-    private Boolean status = Boolean.TRUE;
+    private String status;
     private Set<SkillDto> skills;
     private Address address;
 
 
-    public EmployeeDto(Long id, String firstName, String lastName, String employeeCode, String name) {
+    public EmployeeDto(Long id, String firstName, String lastName, String employeeCode) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.employeeCode = employeeCode;
-        this.name = name;
     }
 }

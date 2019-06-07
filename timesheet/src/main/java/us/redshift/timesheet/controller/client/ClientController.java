@@ -25,10 +25,7 @@ public class ClientController {
 
     private final IClientService clientService;
     private final ClientAssembler clientAssembler;
-
     private final ObjectMapper objectMapper;
-
-
     private final Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
 
 
@@ -40,15 +37,17 @@ public class ClientController {
 
     @PostMapping("client/save")
     public ResponseEntity<?> saveClient(@Valid @RequestBody ClientDto clientDto) throws ParseException, JsonProcessingException {
-        LOGGER.info("Client Insert {} ", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clientDto));
+        LOGGER.info("Client Insert {} ", objectMapper.writeValueAsString(clientDto));
         Client client = clientAssembler.convertToEntity(clientDto);
+        LOGGER.info("Client After Assembler {} ", objectMapper.writeValueAsString(client));
         Client clientSaved = clientService.saveClient(client);
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.CREATED);
     }
 
     @PutMapping("client/update")
-    public ResponseEntity<?> updateClientStatus(@Valid @RequestBody List<ClientDto> clientDtos, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
-        LOGGER.info("Client Update {} ", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clientDtos));
+    public ResponseEntity<?> updateClientStatus(@Valid @RequestBody List<ClientDto> clientDtos,
+                                                @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
+        LOGGER.info("Client Update {} ", objectMapper.writeValueAsString(clientDtos));
         List<Client> clients = clientAssembler.convertToEntity(clientDtos);
         List<Client> clientSaved = clientService.updateClient(clients, ClientStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
@@ -58,18 +57,21 @@ public class ClientController {
     public ResponseEntity<?> updateClient(@RequestBody ClientDto clientDto, @PathVariable("id") Long clientId) throws ParseException, JsonProcessingException {
         LOGGER.info("Client Update input {} ", objectMapper.writeValueAsString(clientDto));
         Client client = clientAssembler.convertToEntity(clientDto, clientService.getClientById(clientId));
-//        LOGGER.info("Client Update after conversion {} ", objectMapper.writeValueAsString(client));
+        LOGGER.info("Client Update after conversion {} ", objectMapper.writeValueAsString(client));
         Client clientSaved = clientService.updateClient(client);
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
     }
 
 
     @GetMapping("client/get")
-    public ResponseEntity<?> getAllClientByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "limits", defaultValue = "0") int limits, @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy, @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
+    public ResponseEntity<?> getAllClientByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status,
+                                                      @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                      @RequestParam(value = "limits", defaultValue = "0") Integer limits,
+                                                      @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                      @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
         if ("ALL".equalsIgnoreCase(status)) {
             Page<Client> clients = clientService.getAllClientByPagination(page, limits, orderBy, fields);
-//            List<ClientListDto> list = clientAssembler.convertToDto(clients.getContent());
             return new ResponseEntity<>(clientAssembler.convertToPagedDto(clients), HttpStatus.OK);
         } else {
             List<Client> clients = clientService.findAllByStatus(ClientStatus.get(status.toUpperCase()));

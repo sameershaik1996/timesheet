@@ -17,4 +17,6 @@ public interface RateCardDetailRepository extends JpaRepository<RateCardDetail, 
 
     RateCardDetail findByLocationIdAndSkillIdAndDesignationId(Long locationId, Long skillId, Long designationId);
 
+    RateCardDetail findByRateCard_ProjectTypeAndLocationIdAndSkillIdAndDesignationId(ProjectType type, Long locationId, Long skillId, Long designationId);
+
 }

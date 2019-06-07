@@ -27,7 +27,7 @@ public class TaskCardDetail extends BaseEntity {
     private BigDecimal hours;
 
     @Enumerated(EnumType.STRING)
-    private TimeSheetStatus status;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
     private String comment = "";
 
@@ -39,10 +39,6 @@ public class TaskCardDetail extends BaseEntity {
     @JsonIgnore
     private TaskCard taskCard;
 
-
-    public void setStatus(TimeSheetStatus status) {
-        this.status = status == null ? TimeSheetStatus.PENDING : status;
-    }
 
     public void setComment(String comment) {
         this.comment = comment == null ? "" : comment;

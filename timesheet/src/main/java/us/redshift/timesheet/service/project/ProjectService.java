@@ -1,5 +1,6 @@
 package us.redshift.timesheet.service.project;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,8 +8,8 @@ import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
-import us.redshift.timesheet.reposistory.client.ClientRepository;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
+import us.redshift.timesheet.service.client.IClientService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.util.ArrayList;
@@ -20,12 +21,13 @@ import java.util.Set;
 public class ProjectService implements IProjectService {
 
     private final ProjectRepository projectRepository;
-    private final ClientRepository clientRepository;
+    private final IClientService clientService;
 
 
-    public ProjectService(ProjectRepository projectRepository, ClientRepository clientRepository) {
+    public ProjectService(ProjectRepository projectRepository,
+                          @Lazy IClientService clientService) {
         this.projectRepository = projectRepository;
-        this.clientRepository = clientRepository;
+        this.clientService = clientService;
     }
 
     @Override
@@ -76,7 +78,7 @@ public class ProjectService implements IProjectService {
 
     @Override
     public Page<Project> getClientProjectsByPagination(Long clientId, int page, int limits, String orderBy, String... fields) {
-        if (!clientRepository.existsById(clientId))
+        if (!clientService.existsById(clientId))
             throw new ResourceNotFoundException("Project", "ClientId", clientId);
         Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
 //        List<Project> projectList = projectRepository.findProjectsByClient_Id(clientId, pageable).getContent();
@@ -109,6 +111,15 @@ public class ProjectService implements IProjectService {
         return projectRepository.findAllByStatusOrderByIdAsc(status);
     }
 
+    @Override
+    public Boolean existsById(Long projectId) {
+        return projectRepository.existsById(projectId);
+    }
+
+    @Override
+    public List<Project> getAllProjectByManagerId(Long managerId) {
+        return projectRepository.findAllByManagerId(managerId);
+    }
 
     private Project setRateCardDetail(Project project) {
         Set<RateCardDetail> rateCardDetails = new HashSet<>();

@@ -16,11 +16,15 @@ public interface ITaskCardDetailService {
 
     TaskCardDetail getTaskCardDetail(Long id);
 
+    Page<TaskCardDetail> getAllTaskCardDetails(int page, int limits, String orderBy, String... fields);
+
     Page<TaskCardDetail> getTaskCardDetailsByTimeSheetId_ProjectId_statusNotLike(Long timeSheetId, Long projectId, TimeSheetStatus status, int page, int limits, String orderBy, String... fields);
 
     void deleteTaskCardDetailById(Long id);
 
     int setStatusForTaskCardDetail(String toString, List<Long> taskCardDetailsId);
+
+    Integer setStatusForTaskCardDetailByTaskCardId(String status, Long taskCardId);
 
     List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate);
 }

@@ -8,7 +8,9 @@ import us.redshift.timesheet.domain.common.BaseEntity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -27,15 +29,16 @@ public class Client extends BaseEntity implements Serializable {
     private String name;
 
     @JsonIgnoreProperties(value = "client")
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
-    private List<Poc> pocs;
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
+    private Set<Poc> pocs = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
-    private ClientStatus status;
+    private ClientStatus status = ClientStatus.ACTIVE;
     private String url;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
-    @JoinColumn(name = "industry_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "industry_id")
+    @JsonIgnoreProperties(value = "clients")
     private Industry industry;
 
 
@@ -61,29 +64,5 @@ public class Client extends BaseEntity implements Serializable {
         pocs.add(poc);
     }
 
-    public void setStatus(ClientStatus status) {
-        this.status = status == null ? ClientStatus.ACTIVE : status;
-    }
-
-    public void setFocusAreas(List<FocusArea> focusAreas) {
-        this.focusAreas = focusAreas == null ? new ArrayList<>() : focusAreas;
-    }
-
-    public void setPocs(List<Poc> pocs) {
-        this.pocs = pocs == null ? new ArrayList<>() : pocs;
-    }
-
-    //    //    @JsonManagedReference
-//    @JsonIgnoreProperties(value = "client")
-//    @OneToMany(mappedBy = "client",
-//            cascade = CascadeType.ALL)
-//    private List<Project> projects = new ArrayList<>();
-//
-//    public void add(Project project) {
-//        if (project == null)
-//            projects = new ArrayList<>();
-//        project.setClient(this);
-//        projects.add(project);
-//    }
 
 }

@@ -1,8 +1,7 @@
 package us.redshift.timesheet.service.invoice;
 
+import org.springframework.data.domain.Page;
 import us.redshift.timesheet.domain.invoice.Invoice;
-
-import java.util.List;
 
 public interface IInvoiceService {
 
@@ -13,5 +12,8 @@ public interface IInvoiceService {
 
     Invoice getInvoiceById(Long id);
 
-    List<Invoice> getAllInvoice();
+    Page<Invoice> getAllInvoiceByPagination(int page, int limits, String orderBy, String... fields);
+
+    Page<Invoice> getAllInvoiceByProjectId(Long projectId, int page, int limits, String orderBy, String... fields);
+
 }

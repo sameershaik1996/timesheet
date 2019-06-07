@@ -14,17 +14,13 @@ public class TimeSheetCloneAssembler {
 
     public TimeSheetCloneAssembler(ModelMapper mapper) {
         this.mapper = mapper;
-
-
     }
 
     public TimesheetCloneDto convertToCloneDto(TimeSheet timeSheet) throws ParseException {
-
         return mapper.map(timeSheet, TimesheetCloneDto.class);
     }
 
     public TimeSheet convertCloneToEntity(TimesheetCloneDto timesheetCloneDto) throws ParseException {
-
         return mapper.map(timesheetCloneDto, TimeSheet.class);
     }
 

@@ -22,7 +22,7 @@ public class EmployeeFeignClientFallback implements EmployeeFeignClient {
     public ResponseEntity<EmployeeDto> getEmployeeById(Long id) {
 
         LOGGER.info("error-getAllEmployeeById");
-        EmployeeDto dto = new EmployeeDto(id, "NAN", "NAN", "NAN", "NAN");
+        EmployeeDto dto = new EmployeeDto(id, "NAN", "NAN", "NAN");
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
@@ -31,7 +31,7 @@ public class EmployeeFeignClientFallback implements EmployeeFeignClient {
 
 
         LOGGER.info("error-getAllEmployeeByIds");
-        List<EmployeeDto> dtos = ids.stream().map(id -> new EmployeeDto(id, "NAN", "NAN", "NAN", "NAN")).collect(Collectors.toList());
+        List<EmployeeDto> dtos = ids.stream().map(id -> new EmployeeDto(id, "NAN", "NAN", "NAN")).collect(Collectors.toList());
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
@@ -45,6 +45,7 @@ public class EmployeeFeignClientFallback implements EmployeeFeignClient {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
+
     @Override
     public ResponseEntity<DesignationDto> getDesignationById(Long id) {
 
@@ -55,15 +56,19 @@ public class EmployeeFeignClientFallback implements EmployeeFeignClient {
     }
 
     @Override
-    public ResponseEntity<List<SkillDto>> getAllSkillsByIds(List<Long> skillIds, List<Long> empIds) {
-
+    public ResponseEntity<List<SkillDto>> getAllSkillsByIds(List<Long> skillIds) {
         LOGGER.info("error-getAllSkillsByIds");
-        List<SkillDto> dtos;
-        if (!skillIds.isEmpty())
-            dtos = skillIds.stream().map(id -> new SkillDto(id, "NAN")).collect(Collectors.toList());
-        else
-            dtos = empIds.stream().map(id -> new SkillDto(id, "NAN")).collect(Collectors.toList());
+        List<SkillDto> dtos = dtos = skillIds.stream().map(id -> new SkillDto(id, "NAN")).collect(Collectors.toList());
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
+
+
+    @Override
+    public ResponseEntity<List<SkillDto>> getAllSkillsByEmployeeIds(List<Long> employeeIds) {
+        LOGGER.info("error-getAllSkillsByEmployeeIds");
+        List<SkillDto> dtos = employeeIds.stream().map(id -> new SkillDto(id, "NAN")).collect(Collectors.toList());
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+
 
 }
