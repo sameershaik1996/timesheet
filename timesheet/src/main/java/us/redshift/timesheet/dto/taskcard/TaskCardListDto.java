@@ -1,6 +1,7 @@
 package us.redshift.timesheet.dto.taskcard;
 
 import lombok.*;
+import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.common.*;
@@ -19,7 +20,7 @@ public class TaskCardListDto extends BaseDto {
     private TimeSheetStatus status;
     private EmployeeListDto approvedBy;
     private TaskType type;
-    private EmployeeListDto employee;
+    private Employee employee;
     private SkillDto skill;
     private DesignationDto designation;
     private LocationDto location;

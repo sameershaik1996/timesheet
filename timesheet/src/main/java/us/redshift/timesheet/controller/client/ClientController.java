@@ -2,6 +2,7 @@ package us.redshift.timesheet.controller.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -26,13 +27,15 @@ public class ClientController {
     private final IClientService clientService;
     private final ClientAssembler clientAssembler;
     private final ObjectMapper objectMapper;
+    private final ModelMapper mapper;
     private final Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
 
 
-    public ClientController(IClientService clientService, ClientAssembler clientAssembler, ObjectMapper objectMapper) {
+    public ClientController(IClientService clientService, ClientAssembler clientAssembler, ObjectMapper objectMapper, ModelMapper mapper) {
         this.clientService = clientService;
         this.clientAssembler = clientAssembler;
         this.objectMapper = objectMapper;
+        this.mapper = mapper;
     }
 
     @PostMapping("client/save")
@@ -56,9 +59,12 @@ public class ClientController {
     @PutMapping("client/update/{id}")
     public ResponseEntity<?> updateClient(@RequestBody ClientDto clientDto, @PathVariable("id") Long clientId) throws ParseException, JsonProcessingException {
         LOGGER.info("Client Update input {} ", objectMapper.writeValueAsString(clientDto));
-        Client client = clientAssembler.convertToEntity(clientDto, clientService.getClientById(clientId));
-        LOGGER.info("Client Update after conversion {} ", objectMapper.writeValueAsString(client));
-        Client clientSaved = clientService.updateClient(client);
+        Client currentClient = clientService.getClientById(clientId);
+        // Client client = clientAssembler.convertToEntity(clientDto, currentClient);
+        mapper.map(clientDto, currentClient);
+        LOGGER.info("Client Update after conversion {} ", objectMapper.writeValueAsString(currentClient));
+
+        Client clientSaved = clientService.updateClient(currentClient);
         return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
     }
 

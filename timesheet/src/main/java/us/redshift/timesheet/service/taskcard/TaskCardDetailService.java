@@ -12,6 +12,7 @@ import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.exception.ValidationException;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardDetailRepository;
 import us.redshift.timesheet.service.task.ITaskService;
 import us.redshift.timesheet.service.timesheet.ITimeSheetService;
@@ -50,6 +51,8 @@ public class TaskCardDetailService implements ITaskCardDetailService {
         taskCardDetails.forEach(taskCardDetail -> {
             if (!taskCardDetailRepository.existsById(taskCardDetail.getId()))
                 throw new ResourceNotFoundException("TaskCardDetail", "ID", taskCardDetail.getId());
+            if (taskCardDetailRepository.existsByIdAndStatus(taskCardDetail.getId(), taskCardDetail.getStatus()))
+                throw new ValidationException("It's Already in Approved Status " + taskCardDetail.getId());
             LOGGER.info("UpdateTaskCardDetails  status Update {}", taskCardDetail.getId());
             TaskCardDetail taskCardDetail1 = taskCardDetailRepository.findById(taskCardDetail.getId()).get();
             taskCardDetail.set_index(taskCardDetail1.get_index());
@@ -146,6 +149,11 @@ public class TaskCardDetailService implements ITaskCardDetailService {
     @Override
     public List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate) {
         return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(projectId, fromDate, toDate, TimeSheetStatus.INVOICE_RAISED, TaskType.BILLABLE);
+    }
+
+    @Override
+    public Boolean existsByIdAndStatus(Long id, TimeSheetStatus status) {
+        return taskCardDetailRepository.existsByIdAndStatus(id, status);
     }
 
     @Override

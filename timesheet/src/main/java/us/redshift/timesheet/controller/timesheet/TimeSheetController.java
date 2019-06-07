@@ -58,7 +58,7 @@ public class TimeSheetController {
 
 
     @GetMapping({"timesheet/get"})
-    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false, defaultValue = "0") Long projectId,
+    public ResponseEntity<?> getTimeSheetByWeekNumber(@RequestParam(value = "projectId", required = false) Long projectId,
                                                       @RequestParam(value = "employeeId", required = false) Long employeeId,
                                                       @RequestParam(value = "year", defaultValue = "0", required = false) Integer year,
                                                       @RequestParam(value = "weekNumber", required = false, defaultValue = "0") Integer weekNumber,
@@ -66,7 +66,7 @@ public class TimeSheetController {
                                                       @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                       @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
                                                       @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-        if (projectId != 0) {
+        if (projectId != null) {
             Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByProjectId(projectId, page, limits, orderBy, fields);
             return new ResponseEntity<>(timeSheetAssembler.convertToPagedDto(timeSheetPage), HttpStatus.OK);
         } else if (employeeId != null) {

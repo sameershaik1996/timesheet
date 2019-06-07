@@ -1,43 +1,21 @@
 package us.redshift.timesheet.domain;
 
-import java.util.HashMap;
-import java.util.Map;
+import lombok.*;
+import us.redshift.timesheet.domain.common.BaseEntity;
 
-public enum EmployeeRole {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-    DEVELOPER("DEVELOPER"), TESTER("TESTER"), ARCHITECT("ARCHITECT"), PROJECT_MANAGEMENT("PROJECT_MANAGEMENT"), CONSULTANT("CONSULTANT");
+@Entity
+@Table(name = "pss_employee_roles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class EmployeeRole extends BaseEntity {
 
-    //Lookup table
-    private static final Map<String, EmployeeRole> lookup = new HashMap<>();
-
-    //Populate the lookup table on loading time
-    static {
-        for (EmployeeRole role : EmployeeRole.values()) {
-            lookup.put(role.getStatus(), role);
-        }
-    }
-
+    @Column(nullable = false, unique = true)
     private String role;
-
-
-    //****** Reverse Lookup Implementation************//
-
-    EmployeeRole(String role) {
-        this.role = role;
-    }
-
-    //This method can be used for reverse lookup purpose
-    public static EmployeeRole get(String role) {
-        return lookup.get(role);
-    }
-
-    public static Map<String, EmployeeRole> getLookup() {
-        return lookup;
-    }
-
-    public String getStatus() {
-        return role;
-    }
-
-
 }

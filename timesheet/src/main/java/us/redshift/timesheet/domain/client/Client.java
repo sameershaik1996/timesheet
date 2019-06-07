@@ -59,6 +59,8 @@ public class Client extends BaseEntity implements Serializable {
     @JoinColumn(name = "billing_address_id")
     private Address billingAddress;
 
+    private String notes;
+
     public void addPoc(Poc poc) {
         poc.setClient(this);
         pocs.add(poc);

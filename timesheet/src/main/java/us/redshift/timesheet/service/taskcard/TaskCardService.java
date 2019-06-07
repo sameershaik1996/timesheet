@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.domain.task.Task;
@@ -62,7 +63,10 @@ public class TaskCardService implements ITaskCardService {
                 throw new ResourceNotFoundException("TaskCard", "ID", taskCard.getId());
             taskCard.setStatus(status);
             TimeSheet timeSheet = timeSheetService.getTimeSheet(taskCard.getTimeSheet().getId());
-            TaskCard savedTaskCard = taskCardRepository.save(calculateAmount(taskCard));
+//          calculateAmount()
+            if (status.equals(TimeSheetStatus.APPROVED))
+                taskCard = calculateAmount(taskCard);
+            TaskCard savedTaskCard = taskCardRepository.save(taskCard);
             taskCardList.add(savedTaskCard);
             if (status.equals(TimeSheetStatus.APPROVED)) {
                 taskCardDetailService.setStatusForTaskCardDetailByTaskCardId(TimeSheetStatus.APPROVED.name(), taskCard.getId());
@@ -138,16 +142,13 @@ public class TaskCardService implements ITaskCardService {
     public TaskCard calculateAmount(TaskCard card) {
 
 
-        if (card.getProject() != null) {
-            System.out.println(card.getProject().getType());
-        }
-
 //      Get rateCardId
         Task task = taskService.getTaskById(card
                 .getTask().getId());
 
 
         Long rateCardId = new Long(0);
+        Employee employee = task.getEmployees().stream().filter(employee1 -> employee1.getEmployeeId() == card.getEmployee().getEmployeeId()).findFirst().orElse(null);
         BigDecimal ratePerHour = new BigDecimal(0);
 
         if (TaskType.BILLABLE.equals(task.getType())) {
@@ -156,7 +157,7 @@ public class TaskCardService implements ITaskCardService {
 
 
 //      Assign ratePerHour
-            if (card.getLocation().getId() != null && card.getSkillId() != null && card.getEmployeeId() != null && card.getDesignationId() != null) {
+            if (card.getLocation().getId() != null && employee != null && rateCardId != null) {
 /*
 //      Get Employee Designation
                 Long designationId = Long.valueOf(1);
@@ -165,8 +166,9 @@ public class TaskCardService implements ITaskCardService {
                     designationId = employeeDto.getDesignation().getId();
 */
 //       TODo Add RateCard Id
-                RateCardDetail rateCardDetail = rateCardDetailService.findByLocationIdAndSkillIdAndDesignationId
-                        (card.getLocation().getId(), card.getSkillId(), card.getDesignationId());
+                RateCardDetail rateCardDetail = rateCardDetailService.findByRateCard_IdAndLocation_IdAndEmployeeRole_Id(rateCardId, employee.getEmployeeId(), card.getLocation().getId());
+//                rateCardDetailService.findByLocationIdAndSkillIdAndDesignationId
+//                        (card.getLocation().getId(), card.getSkillId(), card.getDesignationId());
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
                 LOGGER.info(" UpdateTaskCard Calculate Amount RatePerHour {}", ratePerHour);

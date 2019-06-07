@@ -32,6 +32,7 @@ public class ClientDto extends BaseDto {
     private Boolean addressFlag;
     private AddressDto address;
     private AddressDto billingAddress;
+    private String notes;
 
 
 }

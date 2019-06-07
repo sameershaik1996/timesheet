@@ -1,7 +1,6 @@
 package us.redshift.timesheet.service.ratecard;
 
 import org.springframework.stereotype.Service;
-import us.redshift.timesheet.domain.project.ProjectType;
 import us.redshift.timesheet.domain.ratecard.RateCard;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
@@ -45,9 +44,14 @@ public class RateCardService implements IRateCardService {
     }
 
     @Override
-    public RateCard getRateCardByProjectTypeAndIsDefault(ProjectType type, Boolean isDefault) {
-        return rateCardRepository.findByProjectTypeAndIsDefault(type, isDefault);
+    public RateCard getRateCardByIsDefault(Boolean isDefault) {
+        return rateCardRepository.findByIsDefault(isDefault);
     }
+
+//    @Override
+//    public RateCard getRateCardByProjectTypeAndIsDefault(ProjectType type, Boolean isDefault) {
+//        return rateCardRepository.findByProjectTypeAndIsDefault(type, isDefault);
+//    }
 
     @Override
     public RateCard getRateCard(Long id) {

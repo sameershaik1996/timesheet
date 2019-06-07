@@ -14,8 +14,10 @@ import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeOff;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
+import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.exception.ValidationException;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 import us.redshift.timesheet.reposistory.timesheet.TimeSheetRepository;
 import us.redshift.timesheet.service.task.ITaskService;
 import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
@@ -42,17 +44,19 @@ public class TimeSheetService implements ITimeSheetService {
     private final ITaskCardDetailService taskCardDetailService;
     private final ITaskService taskService;
     private final Calendar calendar;
+    private final EmployeeFeignClient employeeFeignClient;
 
     public TimeSheetService(TimeSheetRepository timeSheetRepository,
                             @Lazy ITaskCardService taskCardService,
                             @Lazy ITaskCardDetailService taskCardDetailService,
                             @Lazy ITaskService taskService,
-                            Calendar calendar) {
+                            Calendar calendar, EmployeeFeignClient employeeFeignClient) {
         this.timeSheetRepository = timeSheetRepository;
         this.taskCardService = taskCardService;
         this.taskCardDetailService = taskCardDetailService;
         this.taskService = taskService;
         this.calendar = calendar;
+        this.employeeFeignClient = employeeFeignClient;
     }
 
 
@@ -109,8 +113,21 @@ public class TimeSheetService implements ITimeSheetService {
     @Override
     public TimeSheet getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber) {
 
-
+        EmployeeDto employeeDto = employeeFeignClient.getEmployeeById(employeeId).getBody();
+        ZoneId defaultZoneId = ZoneId.of("UTC");
         WeekFields weekFields = WeekFields.of(Locale.ENGLISH);
+
+        LocalDate dateOfJoining = LocalDate.parse("2019-03-14");
+        int joiningWeekNumber = dateOfJoining.get(weekFields.weekOfWeekBasedYear());
+        int joiningYear = dateOfJoining.getYear();
+
+        if (employeeDto.getJoiningDate() != null) {
+            dateOfJoining = employeeDto.getJoiningDate().toInstant().atZone(defaultZoneId).toLocalDate();
+            joiningWeekNumber = dateOfJoining.get(weekFields.weekOfWeekBasedYear());
+            joiningYear = dateOfJoining.getYear();
+        }
+
+
         LocalDate today = LocalDate.now();
         int currentWeekNumber = today.get(weekFields.weekOfWeekBasedYear());
         int currentYear = today.getYear();
@@ -122,6 +139,9 @@ public class TimeSheetService implements ITimeSheetService {
                 return timeSheet;
             } else if (timeSheet == null && weekNumber == currentWeekNumber && year == currentYear) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, today);
+                timeSheet = timeSheetRepository.save(newTimeSheet);
+            } else if (timeSheet == null && weekNumber >= joiningWeekNumber && year >= joiningYear) {
+                TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
                 timeSheet = timeSheetRepository.save(newTimeSheet);
             } else {
                 System.out.println("No Entry Found");
@@ -203,16 +223,24 @@ public class TimeSheetService implements ITimeSheetService {
     }
 
 
-    private TimeSheet newTimeSheet(Long employeeId, int currentWeekNumber, int currentYear, LocalDate today) {
+    private TimeSheet newTimeSheet(Long employeeId, int weekNumber, int year, LocalDate date) {
+
         ZoneId defaultZoneId = ZoneId.of("UTC");
-        LocalDate monday = today.with(previousOrSame(MONDAY));
-        LocalDate sunday = today.with(nextOrSame(SUNDAY));
+        if (date == null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setWeekDate(year, weekNumber, 2);
+            date = calendar.getTime().toInstant().atZone(defaultZoneId).toLocalDate();
+        }
+
+
+        LocalDate monday = date.with(previousOrSame(MONDAY));
+        LocalDate sunday = date.with(nextOrSame(SUNDAY));
         TimeSheet newTimeSheet = new TimeSheet();
         newTimeSheet.setFromDate(Date.from(monday.atStartOfDay(defaultZoneId).toInstant()));
         newTimeSheet.setToDate(Date.from(sunday.atStartOfDay(defaultZoneId).toInstant()));
-        newTimeSheet.setWeekNumber(currentWeekNumber);
+        newTimeSheet.setWeekNumber(weekNumber);
         newTimeSheet.setEmployeeId(employeeId);
-        newTimeSheet.setYear(currentYear);
+        newTimeSheet.setYear(year);
         return newTimeSheet;
     }
 

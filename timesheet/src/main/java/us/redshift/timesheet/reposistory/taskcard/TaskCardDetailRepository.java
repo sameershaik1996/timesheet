@@ -42,5 +42,6 @@ public interface TaskCardDetailRepository extends JpaRepository<TaskCardDetail, 
 
     List<TaskCardDetail> findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(List<Long> projectId, Date fromDate, Date toDate, TimeSheetStatus status, TaskType type);
 
+    Boolean existsByIdAndStatus(Long id, TimeSheetStatus status);
 
 }

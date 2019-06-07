@@ -70,17 +70,17 @@ public class TaskController {
 
     @GetMapping({"task/get"})
     public ResponseEntity<?> getAllTaskByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status,
-                                                    @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId,
-                                                    @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId,
+                                                    @RequestParam(value = "projectId", required = false) Long projectId,
+                                                    @RequestParam(value = "employeeId", required = false) Long employeeId,
                                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                     @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                     @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
                                                     @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
-        if (projectId != 0 && employeeId == 0) {
+        if (projectId != null && employeeId == null) {
             Page<Task> taskPage = taskService.getProjectTasksByPagination(projectId, page, limits, orderBy, fields);
             return new ResponseEntity<>(taskAssembler.convertToPagedDto(taskPage), HttpStatus.OK);
-        } else if (projectId != 0 && employeeId != 0 && !("ALL".equalsIgnoreCase(status))) {
+        } else if (projectId != null && employeeId != null && !("ALL".equalsIgnoreCase(status))) {
             List<Task> tasks = taskService.findAllByProjectIdAndEmployeeId(projectId, employeeId, TaskStatus.get(status.toUpperCase()));
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {

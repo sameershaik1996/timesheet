@@ -30,14 +30,17 @@ public class ClientService implements IClientService {
     @Override
     public Client saveClient(Client client) {
 
-        Set<Poc> pocs = new HashSet<>(client.getPocs());
+//        Set<Poc> pocs = new HashSet<>(client.getPocs());
+//
+//        System.out.println(pocs.size());
+//
+//        pocs.forEach(poc -> {
+//            System.out.println(poc.getName());
+//            client.addPoc(poc);
+//        });
 
-        System.out.println(pocs.size());
+        client.getPocs().stream().forEach(poc -> client.addPoc(poc));
 
-        pocs.forEach(poc -> {
-            System.out.println(poc.getName());
-            client.addPoc(poc);
-        });
         return clientRepository.save(client);
     }
 

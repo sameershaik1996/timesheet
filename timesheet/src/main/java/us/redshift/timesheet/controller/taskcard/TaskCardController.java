@@ -47,16 +47,16 @@ public class TaskCardController {
     }
 
     @GetMapping({"taskcard/get"})
-    public ResponseEntity<?> getAllTaskCardByPagination(@RequestParam(value = "managerId", defaultValue = "0") Long managerId,
-                                                        @RequestParam(value = "projectId", defaultValue = "0") Long projectId,
+    public ResponseEntity<?> getAllTaskCardByPagination(@RequestParam(value = "managerId") Long managerId,
+                                                        @RequestParam(value = "projectId") Long projectId,
                                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                         @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                         @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
                                                         @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-        if (!managerId.equals(Long.valueOf(0))) {
+        if (managerId != null) {
             List<TaskCard> taskCardList = taskCardService.getAllTaskCardByMangerId(managerId);
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCardList), HttpStatus.OK);
-        } else if (!projectId.equals(Long.valueOf(0))) {
+        } else if (projectId != null) {
             List<TaskCard> taskCards = taskCardService.getAllTaskCardByProject(projectId);
             System.out.println(taskCards.size());
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCards), HttpStatus.OK);
