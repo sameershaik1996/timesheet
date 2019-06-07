@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import us.redshift.timesheet.domain.EmployeeRole;
 import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.task.Task;
 
@@ -26,10 +27,9 @@ public class InvoiceDetails extends BaseEntity implements Serializable {
     @JoinColumn(name = "task_id")
     private Task task;
 
-
-    private String skill;
-
-    private String designation;
+    @ManyToOne
+    @JoinColumn(name="employee_role_id")
+    private EmployeeRole employeeRole;
 
     private String location;
 

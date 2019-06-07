@@ -170,7 +170,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         if (ex.getCause() instanceof ConstraintViolationException) {
             return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
         }
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,"Value Already Exists", ex));
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,ex.getCause().getCause().getLocalizedMessage(), ex));
     }
 
     /**

@@ -34,7 +34,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice("us.redshift")
+@ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 
@@ -159,6 +159,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<?> handleCustomException(CustomException ex, WebRequest request) {
+        ApiError apiError=new ApiError(HttpStatus.UNAUTHORIZED,ex.getMessage(), ex);
+
+
+        return buildResponseEntity(apiError);
+    }
+    @ExceptionHandler({ Exception.class })
+    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), ex);
+        return buildResponseEntity(apiError);
+    }
     @ExceptionHandler(HttpClientErrorException.class)
     protected ResponseEntity<Object> handleHttpClientErrorException(HttpClientErrorException ex,
                                                                     WebRequest request) {

@@ -16,11 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import us.redshift.auth.security.CustomUserDetailsService;
-import us.redshift.auth.security.JwtAuthenticationEntryPoint;
-import us.redshift.auth.security.JwtAuthenticationFilter;
-import us.redshift.auth.security.JwtGrantFilter;
+import us.redshift.auth.security.*;
 
 @Configuration
 @EnableWebSecurity
@@ -111,7 +109,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(jwtGrantFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(jwtGrantFilter(), JwtAuthenticationFilter.class);
+        //http.addFilterBefore(new ExceptionHandlerFilter(), LogoutFilter.class);
     }
 
 

@@ -148,7 +148,8 @@ public class TaskCardDetailService implements ITaskCardDetailService {
 
     @Override
     public List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate) {
-        return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(projectId, fromDate, toDate, TimeSheetStatus.INVOICE_RAISED, TaskType.BILLABLE);
+        return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(projectId,fromDate,toDate,TimeSheetStatus.APPROVED,TaskType.BILLABLE);
+
     }
 
     @Override

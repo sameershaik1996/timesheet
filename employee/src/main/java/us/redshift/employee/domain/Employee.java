@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import us.redshift.employee.domain.common.Address;
+import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.domain.common.Gender;
 import us.redshift.employee.domain.common.MaritalStatus;
 
@@ -81,7 +82,7 @@ public class Employee extends BaseEntity implements Serializable {
 
 
 
-    @Column(name="joining_date",nullable = false)
+    @Column(name="joining_date")
     @Temporal(TemporalType.DATE)
     private Date joiningDate;
 
@@ -89,16 +90,25 @@ public class Employee extends BaseEntity implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date resignationDate;
 
-    @Column(nullable = false)
-    private Boolean status=Boolean.TRUE;
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Date lastWorkingDate;
 
-    @JsonIgnoreProperties(value="employees")
-    @ManyToMany
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EmployeeStatus status=EmployeeStatus.ACTIVE;
+
+  //  @JsonIgnoreProperties(value="employees")
+    /*@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
     @JoinTable(name = "emp_employees_skill",
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new HashSet<>();
+*/
 
+    @ManyToMany(targetEntity = Skill.class, mappedBy="employees")
+    private Set<Skill> skills = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="address_id")

@@ -16,6 +16,7 @@ import us.redshift.auth.domain.User;
 import us.redshift.auth.dto.JwtAuthenticationResponse;
 import us.redshift.auth.dto.LoginDto;
 import us.redshift.auth.dto.UserDto;
+import us.redshift.auth.exception.ApiError;
 import us.redshift.auth.exception.BadRequestException;
 import us.redshift.auth.repository.RoleRepository;
 import us.redshift.auth.security.CurrentUser;
@@ -48,37 +49,51 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping("save")
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user, @RequestParam(value = "roleId",required = false)Long roleId,HttpServletRequest servletRequest)
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, @RequestParam(value = "roleId",required = false)Long roleId,@RequestParam(required = false)Boolean status)
     {
         if(user.getRole()==null){
             Role role=new Role();
             Long id=new Long(roleId);
             role.setId(id);
             user.setRole(role);
+            user.setStatus(status);
         }
         return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
     }
 
     @PutMapping("update")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody User user, HttpServletRequest servletRequest)
+    public ResponseEntity<?> updateUser(@Valid @RequestBody User user)
     {
 
         return new ResponseEntity<>(userService.updateUser(user), HttpStatus.CREATED);
     }
 
 
+    @PutMapping("update/status")
+    public ResponseEntity<?> updateUserStatus(@RequestParam(value = "empId")List<Long> empIds,
+                                              @RequestParam(value = "status")Boolean status)
+    {
+
+            return new ResponseEntity<>(userService.updateUserStatus(empIds,status), HttpStatus.CREATED);
+
+
+    }
+
     @PutMapping("/update/role/{employeeId}")
-    public ResponseEntity<?> updateUsersRole(@PathVariable Long employeeId,@RequestBody Role role)
+    public ResponseEntity<?> updateUsersRole(@PathVariable Long employeeId,@RequestParam(value = "status")Boolean status,@RequestBody Role role)
     {
         User currentUser=userService.loadUserByEmployeeId(employeeId);
         currentUser.setRole(role);
-        return new ResponseEntity<>(userService.updateUser(currentUser), HttpStatus.CREATED);
+        currentUser.setStatus(status);
+        System.out.println(employeeId+" "+status+" "+currentUser.getPassword());
+        return new ResponseEntity<>(userService.updateUserStatusAndRole(currentUser), HttpStatus.CREATED);
     }
 
     @GetMapping("get/{employeeId}")
     public ResponseEntity<?> getUserByEmpId( @PathVariable Long employeeId)
     {
         UserDto userDto=modelMapper.map(userService.loadUserByEmployeeId(employeeId),UserDto.class);
+        System.out.println(employeeId+" "+" "+userService.loadUserByEmployeeId(employeeId).getPassword());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -106,7 +121,10 @@ public class UserController {
     @PostMapping("login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginDto login)throws BadCredentialsException
     {
-        System.out.println("login");
+        int status=userService.checkIfUserIsActive(login.getUserNameOrEmail());
+        if(status!=1){
+            return new ResponseEntity<>(new ApiError(HttpStatus.BAD_REQUEST,"You are in-active please contact admin for access"),HttpStatus.BAD_REQUEST);
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         login.getUserNameOrEmail(),login.getPassword()

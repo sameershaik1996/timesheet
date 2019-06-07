@@ -2,8 +2,12 @@ package us.redshift.auth.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,7 +26,7 @@ import java.util.Set;
 @Data
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.CUSTOM, property = "error", visible = true)
 @JsonTypeIdResolver(LowerCaseClassNameResolver.class)
-class ApiError {
+public class ApiError {
 
     private HttpStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
@@ -47,20 +51,34 @@ class ApiError {
         this.debugMessage = ex.getLocalizedMessage();
     }
 
-    ApiError(HttpStatus status, String message, Throwable ex) {
+    public ApiError(HttpStatus status, String message, Throwable ex) {
         this();
         this.status = status;
         this.message = message;
         this.debugMessage = ex.getLocalizedMessage();
     }
+   public  ApiError(HttpStatus status, String message) {
+        this();
+        this.status = status;
+        this.message = message;
 
+    }
     private void addSubError(ApiSubError subError) {
         if (subErrors == null) {
             subErrors = new ArrayList<>();
         }
         subErrors.add(subError);
     }
+    public String convertToJson() throws JsonProcessingException {
+        if (this == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+        return mapper.writeValueAsString(this);
+    }
     private void addValidationError(String object, String field, Object rejectedValue, String message) {
         addSubError(new ApiValidationError(object, field, rejectedValue, message));
     }

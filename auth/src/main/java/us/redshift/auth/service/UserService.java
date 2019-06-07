@@ -16,6 +16,7 @@ import us.redshift.auth.security.JwtTokenProvider;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -72,5 +73,24 @@ public class UserService implements IUserService {
     @Override
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public int checkIfUserIsActive(String userNameOrEmail) {
+        Optional<User> user=userRepository.findByUserNameOrEmail(userNameOrEmail,userNameOrEmail);
+        if(user.get().getStatus()==true){
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public int updateUserStatus(List<Long> empIds, Boolean status) {
+        return userRepository.setUserStatus(empIds,status);
+    }
+
+    @Override
+    public User updateUserStatusAndRole(User currentUser) {
+        return userRepository.save(currentUser);
     }
 }
