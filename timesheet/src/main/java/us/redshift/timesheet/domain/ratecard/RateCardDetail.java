@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "pss_rate_card_details", uniqueConstraints =
-@UniqueConstraint(columnNames = {"employee_role_id", "location_id", "rate_card_id"}))
+@UniqueConstraint(columnNames = {"employee_role_id", "location_id", "designation_id", "rate_card_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,7 +28,7 @@ public class RateCardDetail extends BaseEntity {
     @Column(name = "designation_id", nullable = false)
     private Long designationId;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne()
     @JoinColumn(name = "employee_role_id", nullable = false)
     private EmployeeRole employeeRole;
 

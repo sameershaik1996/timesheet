@@ -39,9 +39,16 @@ public class RateCardController {
     @GetMapping({"ratecard/get"})
     public ResponseEntity<?> getAllRateCard(@RequestParam(value = "isDefault", defaultValue = "false", required = false) Boolean isDefault,
                                             @RequestParam(value = "id", required = false) Long id) {
-        if (isDefault != false)
-            return new ResponseEntity<>(rateCardService.getRateCardByIsDefault(isDefault), HttpStatus.OK);
-        else if (id != null)
+        if (isDefault != false) {
+            RateCard rateCard = rateCardService.getRateCardByIsDefault(true);
+            if (rateCard == null) {
+                RateCard newRateCard = new RateCard();
+                newRateCard.setIsDefault(true);
+                rateCard = rateCardService.saveRateCard(newRateCard);
+
+            }
+            return new ResponseEntity<>(rateCard, HttpStatus.OK);
+        } else if (id != null)
             return new ResponseEntity<>(rateCardService.getRateCard(id), HttpStatus.OK);
         else
             return new ResponseEntity<>(rateCardService.getAllRateCard(), HttpStatus.OK);

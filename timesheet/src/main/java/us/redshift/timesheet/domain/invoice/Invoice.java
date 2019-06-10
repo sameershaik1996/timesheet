@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.domain.client.Client;
+import us.redshift.timesheet.domain.common.Address;
 import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
@@ -63,6 +64,10 @@ public class Invoice extends BaseEntity implements Serializable {
             cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "invoice")
     private Set<InvoiceDetails> invoiceDetails = new HashSet<>();
+
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "billing_address_id")
+    private Address billingAddress;
 
 
     public void addInvoiceDetail(InvoiceDetails invoiceDetail) {
