@@ -64,7 +64,7 @@ public class Employee extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private MaritalStatus maritalStatus;
 
-   // @JsonProperty("aadhar_ssn_number")
+    // @JsonProperty("aadhar_ssn_number")
     //@Column(nullable=true,unique = true)
     //private String aadharSsnNumber;
 
@@ -99,16 +99,15 @@ public class Employee extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private EmployeeStatus status=EmployeeStatus.ACTIVE;
 
-  //  @JsonIgnoreProperties(value="employees")
-    /*@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
+    @JsonIgnoreProperties(value = "employees")
+    @ManyToMany()
     @JoinTable(name = "emp_employees_skill",
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new HashSet<>();
-*/
 
-    @ManyToMany(targetEntity = Skill.class, mappedBy="employees")
-    private Set<Skill> skills = new HashSet<>();
+
+
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="address_id")

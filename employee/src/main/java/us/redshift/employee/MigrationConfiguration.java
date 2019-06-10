@@ -25,6 +25,7 @@ public class MigrationConfiguration {
     @Bean
     @DependsOn("entityManagerFactory")
     FlywayMigrationInitializer delayedFlywayInitializer(Flyway flyway) {
+        flyway.setBaselineOnMigrate(true);
         return new FlywayMigrationInitializer(flyway, null);
     }
 

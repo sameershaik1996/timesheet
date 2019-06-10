@@ -38,7 +38,7 @@ public class EmployeeDto extends BaseDto implements Serializable {
 
     private Date dob;
 
-    private Date anniversaryDate;
+    private Date lastWorkingDate;
 
     private String emailId;
 
