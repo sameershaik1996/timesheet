@@ -1,6 +1,6 @@
 
-use employee;
-INSERT INTO `emp_countries` (`id`, `country_code`, `name`, `phone_code`) VALUES
+
+INSERT INTO `pss_countries` (`id`, `country_code`, `name`, `phone_code`) VALUES
 (1, 'AF', 'Afghanistan', 93),
 (2, 'AL', 'Albania', 355),
 (3, 'DZ', 'Algeria', 213),

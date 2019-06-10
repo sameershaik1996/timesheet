@@ -1,6 +1,6 @@
 
 
-INSERT INTO `emp_states` (`id`, `name`, `country_id`) VALUES
+INSERT INTO `pss_states` (`id`, `name`, `country_id`) VALUES
 (1, 'Andaman and Nicobar Islands', 101),
 (2, 'Andhra Pradesh', 101),
 (3, 'Arunachal Pradesh', 101),
@@ -2173,7 +2173,7 @@ INSERT INTO `emp_states` (`id`, `name`, `country_id`) VALUES
 (2179, 'Rivercess', 123),
 (2180, 'Sinoe', 123),
 (2181, 'Ajdabiya', 124);
-INSERT INTO `emp_states` (`id`, `name`, `country_id`) VALUES
+INSERT INTO `pss_states` (`id`, `name`, `country_id`) VALUES
 (2182, 'Fezzan', 124),
 (2183, 'Banghazi', 124),
 (2184, 'Darnah', 124),
@@ -3951,7 +3951,7 @@ INSERT INTO `emp_states` (`id`, `name`, `country_id`) VALUES
 (3976, 'West Virginia', 231),
 (3977, 'Wisconsin', 231),
 (3978, 'Wyoming', 231),
-(3979, 'United emp_states Minor Outlying I', 232),
+(3979, 'United States Minor Outlying I', 232),
 (3980, 'Artigas', 233),
 (3981, 'Canelones', 233),
 (3982, 'Cerro Largo', 233),

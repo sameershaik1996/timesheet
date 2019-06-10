@@ -51,12 +51,17 @@ public class TaskCardDetailService implements ITaskCardDetailService {
         taskCardDetails.forEach(taskCardDetail -> {
             if (!taskCardDetailRepository.existsById(taskCardDetail.getId()))
                 throw new ResourceNotFoundException("TaskCardDetail", "ID", taskCardDetail.getId());
-            if (taskCardDetailRepository.existsByIdAndStatus(taskCardDetail.getId(), taskCardDetail.getStatus()))
-                throw new ValidationException("It's Already in Approved Status " + taskCardDetail.getId());
+//            if (taskCardDetailRepository.existsByIdAndStatus(taskCardDetail.getId(), taskCardDetail.getStatus()))
+//                throw new ValidationException("It's Already in Approved Status " + taskCardDetail.getId());
             LOGGER.info("UpdateTaskCardDetails  status Update {}", taskCardDetail.getId());
             TaskCardDetail taskCardDetail1 = taskCardDetailRepository.findById(taskCardDetail.getId()).get();
             taskCardDetail.set_index(taskCardDetail1.get_index());
             System.out.println(taskCardDetail1.get_index() + "index");
+
+            if (taskCardDetail.getStatus().equals(TimeSheetStatus.APPROVED) && status.equals(TimeSheetStatus.APPROVED))
+                throw new ValidationException("It's Already in Approved Status " + " ( " + taskCardDetail.getId() + " )");
+            if (taskCardDetail.getStatus().equals(TimeSheetStatus.APPROVED) && status.equals(TimeSheetStatus.REJECTED))
+                throw new ValidationException("InProper status update " + " ( " + taskCardDetail.getId() + " )");
 
             taskCardDetail.setStatus(status);
 //            taskCardDetailRepository.save(taskCardDetail);
@@ -148,7 +153,7 @@ public class TaskCardDetailService implements ITaskCardDetailService {
 
     @Override
     public List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate) {
-        return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(projectId,fromDate,toDate,TimeSheetStatus.APPROVED,TaskType.BILLABLE);
+        return taskCardDetailRepository.findTaskCardDetailsByTaskCard_Project_IdInAndDateBetweenAndStatusAndTaskCard_Type(projectId, fromDate, toDate, TimeSheetStatus.APPROVED, TaskType.BILLABLE);
 
     }
 

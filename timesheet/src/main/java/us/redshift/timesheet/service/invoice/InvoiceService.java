@@ -1,5 +1,6 @@
 package us.redshift.timesheet.service.invoice;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import us.redshift.timesheet.domain.invoice.Invoice;
 import us.redshift.timesheet.domain.invoice.InvoiceDetails;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.reposistory.invoice.InvoiceRepository;
+import us.redshift.timesheet.service.client.ClientService;
 import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
 import us.redshift.timesheet.util.Reusable;
 
@@ -23,9 +25,14 @@ public class InvoiceService implements IInvoiceService {
 
     private final ITaskCardDetailService taskCardDetailService;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, ITaskCardDetailService taskCardDetailService) {
+    private final ClientService clientService;
+
+    public InvoiceService(InvoiceRepository invoiceRepository,
+                          @Lazy ITaskCardDetailService taskCardDetailService,
+                          @Lazy ClientService clientService) {
         this.invoiceRepository = invoiceRepository;
         this.taskCardDetailService = taskCardDetailService;
+        this.clientService = clientService;
     }
 
     @Override
