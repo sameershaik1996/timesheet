@@ -11,6 +11,8 @@ import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,12 +34,25 @@ public class InvoiceService implements IInvoiceService {
         invoiceDetails.forEach(invoiceDetail -> {
             invoice.addInvoiceDetail(invoiceDetail);
         });
-        Invoice savedInvoice = invoiceRepository.save(invoice);
+
         List<Long> taskCardDetailsId = new ArrayList<>();
-        invoice.getTaskCardDetails().forEach(taskCardDetail ->
-                taskCardDetailsId.add(taskCardDetail.getId())
+        List<Date> dates = new ArrayList<>();
+        invoice.getTaskCardDetails().forEach(taskCardDetail -> {
+                    taskCardDetailsId.add(taskCardDetail.getId());
+                    dates.add(taskCardDetailService.getTaskCardDetail(taskCardDetail.getId()).getDate());
+                }
         );
+
+        Collections.sort(dates);
+
+        invoice.setFromDate(dates.get(0));
+        invoice.setToDate(dates.get(dates.size() - 1));
+
         int d = taskCardDetailService.setStatusForTaskCardDetail(TimeSheetStatus.INVOICE_RAISED.toString(), taskCardDetailsId);
+
+//        TODO From TO Date
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+
         return savedInvoice;
     }
 

@@ -8,9 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.task.Task;
+import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectTaskListDto;
 import us.redshift.timesheet.dto.task.TaskDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
@@ -22,9 +24,12 @@ public class TaskAssembler {
 
     private final ModelMapper mapper;
 
+    private final EmployeeFeignClient employeeFeignClient;
 
-    public TaskAssembler(ModelMapper mapper) {
+
+    public TaskAssembler(ModelMapper mapper, EmployeeFeignClient employeeFeignClient) {
         this.mapper = mapper;
+        this.employeeFeignClient = employeeFeignClient;
     }
 
 
@@ -33,7 +38,8 @@ public class TaskAssembler {
     }
 
     public Task convertToEntity(TaskDto taskDto, Task task) {
-        mapper.map(taskDto, task);
+        Task convertedTask = convertToEntity(taskDto);
+        mapper.map(convertedTask, task);
         return task;
     }
 
@@ -241,6 +247,11 @@ public class TaskAssembler {
         };
 
         return page;
+    }
+
+    public List<SkillDto> convertToSkillDto(List<Long> employeeIds) {
+        List<SkillDto> dtos = employeeFeignClient.getAllSkillsByEmployeeIds(employeeIds).getBody();
+        return dtos;
     }
 
 }

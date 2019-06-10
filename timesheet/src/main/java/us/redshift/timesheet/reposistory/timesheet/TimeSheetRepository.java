@@ -22,7 +22,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
 
     TimeSheet findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber);
 
-    TimeSheet findFirstByEmployeeIdAndStatusOrderByFromDateDesc(Long employeeId, TimeSheetStatus status);
+    TimeSheet findFirstByEmployeeIdAndStatusOrderByFromDateAsc(Long employeeId, TimeSheetStatus status);
 
     Page<TimeSheet> findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(Set<TaskCard> taskCardSet, TimeSheetStatus status, Pageable pageable);
 

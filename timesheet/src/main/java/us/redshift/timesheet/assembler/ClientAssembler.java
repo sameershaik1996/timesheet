@@ -30,8 +30,13 @@ public class ClientAssembler {
         return mapper.map(clientDto, Client.class);
     }
 
+    public Client convertToEntity(Client client) {
+        return mapper.map(client, Client.class);
+    }
+
     public Client convertToEntity(ClientDto clientDto, Client client) {
-        mapper.map(clientDto, client);
+        Client convertedClient = convertToEntity(clientDto);
+        mapper.map(convertedClient, client);
         return client;
     }
 

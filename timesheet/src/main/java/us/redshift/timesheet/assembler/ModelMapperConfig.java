@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import us.redshift.timesheet.domain.client.Client;
 import us.redshift.timesheet.domain.project.Project;
-import us.redshift.timesheet.domain.ratecard.RateCardDetail;
 import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
@@ -18,7 +17,6 @@ import us.redshift.timesheet.dto.common.*;
 import us.redshift.timesheet.dto.project.ProjectDto;
 import us.redshift.timesheet.dto.project.ProjectListDto;
 import us.redshift.timesheet.dto.project.ProjectTaskListDto;
-import us.redshift.timesheet.dto.ratecard.RateCardDetailDto;
 import us.redshift.timesheet.dto.task.TaskDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
 import us.redshift.timesheet.dto.taskcard.TaskCardDetailDto;
@@ -54,6 +52,7 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+
 
 //      Long to EmployeeListDto
         Converter<Long, EmployeeListDto> LongToEmployeeListDto = mappingContext -> {
@@ -255,7 +254,7 @@ public class ModelMapperConfig {
 //      adding property (Task, TaskDto)
         mapper.addMappings(new PropertyMap<Task, TaskDto>() {
             protected void configure() {
-                using(listLongToEmployeeListDto).map(source.getEmployeeId()).setEmployees(null);
+//                using(listLongToEmployeeListDto).map(source.getEmployeeId()).setEmployees(null);
                 using(listLongToSkill).map(source.getSkillId()).setSkills(null);
             }
         });
@@ -264,7 +263,7 @@ public class ModelMapperConfig {
 //      adding property (TaskDto, Task)
         mapper.addMappings(new PropertyMap<TaskDto, Task>() {
             protected void configure() {
-                using(listEmployeeListDtoToLong).map(source.getEmployees()).setEmployeeId(null);
+//                using(listEmployeeListDtoToLong).map(source.getEmployees()).setEmployeeId(null);
                 using(listSkillToLong).map(source.getSkills()).setSkillId(null);
             }
         });
@@ -357,7 +356,7 @@ public class ModelMapperConfig {
                 using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillDtoToLong).map(source.getSkill()).setSkillId(null);
                 using(taskCardDetailConverter).map(source.getTaskCardDetails()).setTaskCardDetails(null);
-                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
+//                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
             }
         });
 
@@ -397,12 +396,12 @@ public class ModelMapperConfig {
         });
 
         /*------------------------------------------------Mapping for RateCard-------------------------------------------------*/
-//      RateCard
-        mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
-            protected void configure() {
-                map().setLocationId(source.getLocation().getId());
-            }
-        });
+////      RateCard
+//        mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
+//            protected void configure() {
+//                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
+//            }
+//        });
 
 
         return mapper;

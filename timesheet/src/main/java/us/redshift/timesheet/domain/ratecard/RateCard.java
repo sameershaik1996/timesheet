@@ -6,9 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.domain.common.BaseEntity;
-import us.redshift.timesheet.domain.project.ProjectType;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +26,6 @@ public class RateCard extends BaseEntity {
 
     private Boolean isDefault = false;
 
-    @Enumerated(EnumType.STRING)
-    private ProjectType projectType = ProjectType.FIXED_BID;
 
     @JsonIgnoreProperties(value = "rateCard")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "rateCard")
@@ -34,14 +34,6 @@ public class RateCard extends BaseEntity {
 
     public void addRateCardDetail(RateCardDetail rateCardDetail) {
         rateCardDetail.setRateCard(this);
-//        rateCardDetails.add(rateCardDetail);
     }
 
-    public void setDefault(Boolean isDefault) {
-        this.isDefault = isDefault == null ? false : isDefault;
-    }
-
-    public void setProjectType(ProjectType projectType) {
-        this.projectType = projectType == null ? ProjectType.FIXED_BID : projectType;
-    }
 }

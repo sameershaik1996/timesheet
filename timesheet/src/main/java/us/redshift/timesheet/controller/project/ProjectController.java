@@ -64,8 +64,10 @@ public class ProjectController {
     @PutMapping("project/update/{id}")
     public ResponseEntity<?> updateProject(@PathVariable("id") Long projectId, @RequestBody ProjectDto projectDto, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
         LOGGER.info("Project Update input {} ", objectMapper.writeValueAsString(projectDto));
-        Project project = projectAssembler.convertToEntity(projectDto, projectService.getProjectById(projectId));
-        return new ResponseEntity<>(projectAssembler.convertToDto(projectService.updateProject(project)), HttpStatus.OK);
+        Project currentProject = projectService.getProjectById(projectId);
+        projectAssembler.convertToEntity(projectDto, currentProject);
+        ProjectDto savedProject = projectAssembler.convertToDto(projectService.updateProject(currentProject));
+        return new ResponseEntity<>(savedProject, HttpStatus.OK);
     }
 
     @GetMapping("project/get/{id}")
@@ -75,17 +77,18 @@ public class ProjectController {
     }
 
     @GetMapping({"project/get"})
-    public ResponseEntity<?> getAllProjectByPagination(@RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId,
+    public ResponseEntity<?> getAllProjectByPagination(@RequestParam(value = "projectId", required = false) Long projectId,
                                                        @RequestParam(value = "employees", defaultValue = "false", required = false) Boolean employees,
                                                        @RequestParam(value = "skills", defaultValue = "false", required = false) Boolean skills,
                                                        @RequestParam(value = "status", defaultValue = "ALL", required = false) String status,
-                                                       @RequestParam(value = "clientId", defaultValue = "0", required = false) Long clientId,
-                                                       @RequestParam(value = "employeeId", defaultValue = "0", required = false) Long employeeId,
+                                                       @RequestParam(value = "clientId", required = false) Long clientId,
+                                                       @RequestParam(value = "employeeId", required = false) Long employeeId,
                                                        @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                        @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                        @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
                                                        @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-        if (projectId != 0) {
+
+        if (projectId != null) {
             if (skills) {
                 List<Long> ids = projectService.findAllEmployeesByProjectId(projectId);
                 return new ResponseEntity<>(projectAssembler.convertToSkillDto(ids), HttpStatus.OK);
@@ -95,10 +98,11 @@ public class ProjectController {
             } else {
                 return new ResponseEntity<>(projectAssembler.convertToDto(projectService.getProjectById(projectId)), HttpStatus.OK);
             }
-        } else if (clientId != 0 && employeeId == 0) {
+        } else if (clientId != null && employeeId == null) {
             Page<Project> projectPage = projectService.getClientProjectsByPagination(clientId, page, limits, orderBy, fields);
             return new ResponseEntity<>(projectAssembler.convertToPagedDto(projectPage), HttpStatus.OK);
-        } else if (employeeId != 0 && !("ALL".equalsIgnoreCase(status))) {
+        } else if (employeeId != null && !("ALL".equalsIgnoreCase(status))) {
+            System.out.println("testing...");
             List<Project> projectList = projectService.findAllByEmployeeId(employeeId, ProjectStatus.get(status.toUpperCase()));
             return new ResponseEntity<>(projectAssembler.convertToDto(projectList), HttpStatus.OK);
         } else {

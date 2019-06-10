@@ -33,7 +33,7 @@ public class Project extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Long estimatedDays;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal estimatedCost;
 
     @Enumerated(EnumType.STRING)

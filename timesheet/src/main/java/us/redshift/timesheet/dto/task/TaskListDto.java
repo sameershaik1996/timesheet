@@ -1,6 +1,7 @@
 package us.redshift.timesheet.dto.task;
 
 import lombok.*;
+import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.dto.common.BaseDto;
@@ -29,4 +30,5 @@ public class TaskListDto extends BaseDto {
     private BigDecimal nonBillableHour;
     private BigDecimal usedHour;
     private List<SkillDto> skills;
+    private List<Employee> employees;
 }

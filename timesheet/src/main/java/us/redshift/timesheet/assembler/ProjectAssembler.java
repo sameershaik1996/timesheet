@@ -39,7 +39,8 @@ public class ProjectAssembler {
     }
 
     public Project convertToEntity(ProjectDto projectDto, Project project) {
-        mapper.map(projectDto, project);
+        Project convertedProject = convertToEntity(projectDto);
+        mapper.map(convertedProject, project);
         return project;
     }
 

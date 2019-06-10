@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.math.BigDecimal;
 
 
 @Entity
@@ -23,15 +22,18 @@ import java.math.BigDecimal;
 public class Employee extends BaseEntity {
 
     private Long employeeId;
+
     private String firstName;
 
     private String lastName;
 
     private String employeeCode;
 
-    private EmployeeRole role;
+    private Long designationId;
 
-    private BigDecimal rate;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private EmployeeRole role;
 
     @JsonIgnore
     @ManyToOne

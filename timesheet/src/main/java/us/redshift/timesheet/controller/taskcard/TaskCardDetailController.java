@@ -42,16 +42,17 @@ public class TaskCardDetailController {
 
 
     @PutMapping("taskcarddetail/update")
-    public ResponseEntity<?> updateTaskCardDetail(@Valid @RequestBody List<TaskCardDetailDto> taskCardDetailDtos, @RequestParam(value = "status", defaultValue = "SUBMITTED") String status) throws ParseException {
+    public ResponseEntity<?> updateTaskCardDetail(@Valid @RequestBody List<TaskCardDetailDto> taskCardDetailDtos,
+                                                  @RequestParam(value = "status", defaultValue = "SUBMITTED") String status) throws ParseException {
         List<TaskCardDetail> taskCardDetails = taskCardDetailAssembler.convertToEntity(taskCardDetailDtos);
         List<TaskCardDetail> dtos = taskCardDetailService.updateTaskCardDetail(taskCardDetails, TimeSheetStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(taskCardDetailAssembler.convertToDto(dtos), HttpStatus.OK);
     }
 
     @GetMapping({"taskcarddetail/get"})
-    public ResponseEntity<?> getTaskCardTaskCardDetailsByPagination(@RequestParam(value = "taskCardId", required = false, defaultValue = "0") Long taskCardId,
-                                                                    @RequestParam(value = "timeSheetId", defaultValue = "0", required = false) Long timeSheetId,
-                                                                    @RequestParam(value = "projectId", defaultValue = "0", required = false) Long projectId,
+    public ResponseEntity<?> getTaskCardTaskCardDetailsByPagination(@RequestParam(value = "taskCardId", required = false) Long taskCardId,
+                                                                    @RequestParam(value = "timeSheetId", required = false) Long timeSheetId,
+                                                                    @RequestParam(value = "projectId", required = false) Long projectId,
                                                                     @RequestParam(value = "status", defaultValue = "PENDING", required = false) String status,
                                                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                     @RequestParam(value = "limits", defaultValue = "0") Integer limits,
@@ -65,10 +66,10 @@ public class TaskCardDetailController {
         if (fromDate != null && toDate != null && projectIds != null) {
             System.out.println((fromDate) + " " + toDate + " " + projectId);
             return new ResponseEntity<>(taskCardDetailAssembler.convertToDto(taskCardDetailService.getTaskCardDetailBetweenDateAndByProject(projectIds, fromDate, toDate)), HttpStatus.OK);
-        } else if (taskCardId != 0) {
+        } else if (taskCardId != null) {
             taskCardDetails = taskCardDetailService.getTaskCardTaskCardDetailsByPagination(taskCardId, page, limits, orderBy, fields);
             return new ResponseEntity<>(taskCardDetailAssembler.convertToPagedDto(taskCardDetails), HttpStatus.OK);
-        } else if (timeSheetId != 0 && projectId != 0) {
+        } else if (timeSheetId != null && projectId != null) {
             taskCardDetails = taskCardDetailService.getTaskCardDetailsByTimeSheetId_ProjectId_statusNotLike(timeSheetId, projectId, TimeSheetStatus.get(status.toUpperCase()), page, limits, orderBy, fields);
             return new ResponseEntity<>(taskCardDetailAssembler.convertToPagedDto(taskCardDetails), HttpStatus.OK);
         } else {

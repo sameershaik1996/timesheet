@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.task.TaskStatus;
@@ -18,8 +19,7 @@ import us.redshift.timesheet.util.Reusable;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TaskService implements ITaskService {
@@ -64,6 +64,7 @@ public class TaskService implements ITaskService {
             throw new ResourceNotFoundException("Task", "Id", task.getId());
         Project project = projectService.getProjectById(task.getProject().getId());
         taskValidate(project, task);
+
         return taskRepository.save(task);
     }
 
@@ -122,11 +123,29 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status) {
-        return taskRepository.findAllByProjectIdAndEmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
+        return taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
+    }
+
+    @Override
+    public List<Long> findAllSkillsByProjectId(Long taskId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
+        return task.getSkillId();
+    }
+
+    @Override
+    public List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(Long projectId, Long employeeId, Date today) {
+        return taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(projectId, employeeId, today);
     }
 
     private void taskValidate(Project project, Task task) throws ParseException {
 
+//      set employee
+        Set<Employee> employees = new HashSet<>(task.getEmployees());
+        System.out.println(employees.size());
+        employees.forEach(employee -> {
+            System.out.println(employee.getEmployeeId());
+            task.addEmployee(employee);
+        });
 
         String pattern = "yyyy-MM-dd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);

@@ -27,4 +27,7 @@ public interface ITaskCardDetailService {
     Integer setStatusForTaskCardDetailByTaskCardId(String status, Long taskCardId);
 
     List<TaskCardDetail> getTaskCardDetailBetweenDateAndByProject(List<Long> projectId, Date fromDate, Date toDate);
+
+    Boolean existsByIdAndStatus(Long id, TimeSheetStatus status);
+
 }

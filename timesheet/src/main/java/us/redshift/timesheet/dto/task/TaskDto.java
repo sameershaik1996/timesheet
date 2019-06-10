@@ -1,11 +1,11 @@
 package us.redshift.timesheet.dto.task;
 
 import lombok.*;
+import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.CommonDto;
-import us.redshift.timesheet.dto.common.EmployeeListDto;
 import us.redshift.timesheet.dto.common.SkillDto;
 
 import java.math.BigDecimal;
@@ -39,7 +39,7 @@ public class TaskDto extends BaseDto {
     @NonNull
     private List<SkillDto> skills;
     @NonNull
-    private List<EmployeeListDto> employees;
+    private List<Employee> employees;
     @NonNull
     private CommonDto project;
 
