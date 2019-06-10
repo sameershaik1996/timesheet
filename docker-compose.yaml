@@ -1,0 +1,89 @@
+version: '3.6'
+services:
+  database:
+    image: mysql:latest
+    container_name: database
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'   
+      MYSQL_USER: 'user'  
+      MYSQL_PASSWORD: 'password'   
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - '3306:3306'
+    
+    volumes:
+      - my-db:/var/lib/mysql
+  
+  employeeService:
+    image: pss_employee:latest
+    container_name: employeeService
+    restart: always
+    ports:
+      - '9090:9090'
+    links:
+      - 'pss_zuul:zuul'
+    environment:
+      - JAVA_OPTS=
+        -DEUREKA_SERVER=http://serviceDiscovery:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://serviceDiscovery:8761/eureka
+      - zuul_auth_path=http://apiGateway:9094/auth/auth
+    depends_on: 
+      - database
+      - apiGateway
+      - serviceDiscovery
+    links:
+      - apiGateway:apiGateway
+      - serviceDiscovery:serviceDiscovery
+      - database:database
+    
+
+  serviceDiscovery:
+    image: pss_eureka:latest
+    container_name: serviceDiscovery
+    restart: always
+    ports: 
+      - '8761:8761'
+   
+
+  apiGateway:
+    image: pss_zuul:latest
+    container_name: apiGateway
+    restart: always
+    ports:
+      - '9094:9094'
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://serviceDiscovery:8761/eureka
+    depends_on:
+      - serviceDiscovery
+    links:
+      - serviceDiscovery:serviceDiscovery
+    
+    
+  authService:
+    image: pss_auth:latest
+    container_name: authService
+    restart: always
+    ports:
+      - '9092:9092'
+    environment:
+      - JAVA_OPTS=
+        -DEUREKA_SERVER=http://serviceDiscovery:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://serviceDiscovery:8761/eureka
+    depends_on: 
+      - database
+      - serviceDiscovery
+      - apiGateway
+    links:
+      - serviceDiscovery:serviceDiscovery
+      - database:database
+
+   
+
+
+
+# Names our volume
+volumes:
+  my-db:

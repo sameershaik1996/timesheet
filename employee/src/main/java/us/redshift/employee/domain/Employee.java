@@ -105,8 +105,10 @@ public class Employee extends BaseEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new HashSet<>();
 
+
 //    @ManyToMany(targetEntity = Skill.class, mappedBy = "employees")
 //    private Set<Skill> skills = new HashSet<>();
+
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
