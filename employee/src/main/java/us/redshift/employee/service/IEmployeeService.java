@@ -23,5 +23,7 @@ public interface IEmployeeService {
 
     List<Employee> getEmployeeByIds(List<Long> id);
 
+    List<Employee> findByIdNotLike(Long id);
+
     int setStatusForEmployee(EmployeeStatus status, List<Long> empIds);
 }

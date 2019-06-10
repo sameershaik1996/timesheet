@@ -21,17 +21,17 @@ public class Skill extends BaseEntity{
     @Column(name="skill",nullable = false,unique = true)
     private String skill;
 
-   /* @JsonIgnoreProperties(value="skills")
+    @JsonIgnoreProperties(value="skills")
     @JsonIgnore
     @ManyToMany(mappedBy="skills",cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
-    private Set<Employee> employees=new HashSet<>();*/
+    private Set<Employee> employees=new HashSet<>();
 
-
+   /* @JsonIgnore
     @ManyToMany(targetEntity = Employee.class)
     @JoinTable(name = "emp_employees_skill",
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
-   private Set<Employee> employees=new HashSet<>();
+   private Set<Employee> employees=new HashSet<>();*/
 
 
 

@@ -12,6 +12,7 @@ import us.redshift.employee.Reusable;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.dto.EmployeeDto;
+import us.redshift.employee.exception.CustomException;
 import us.redshift.employee.repository.EmployeeRespository;
 import us.redshift.employee.util.DTO;
 
@@ -31,32 +32,37 @@ public class EmployeeService implements IEmployeeService {
     EmployeeRespository employeeRespository;
 
     @Override
-    public Employee createEmployee(Employee employee)  throws ConstraintViolationException,DataIntegrityViolationException {
+    public Employee createEmployee(Employee employee) throws ConstraintViolationException, DataIntegrityViolationException {
 
-            Employee emp = employeeRespository.findTopByOrderByIdDesc();
-            employee.setEmployeeId(generateEmployeeId(emp));
-            return employeeRespository.save(employee);
+        Employee emp = employeeRespository.findTopByOrderByIdDesc();
+        employee.setEmployeeId(generateEmployeeId(emp));
+        return employeeRespository.save(employee);
 
     }
 
 
     @Override
     public Employee updateEmployee(Employee employee) {
+        if (employee.getReportingManager() != null) {
+            if (employee.getId() == employee.getReportingManager().getId()) {
+                throw new CustomException("Same Employee couldn't assigned as Reporting Manager");
+            }
+        }
+
         return employeeRespository.save(employee);
     }
 
     @Override
-    public Employee getEmployeeById(Long id)throws NoSuchElementException, EntityNotFoundException {
+    public Employee getEmployeeById(Long id) throws NoSuchElementException, EntityNotFoundException {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
         System.out.println(request.getHeader("Authorization"));
-        try{
-            Employee employee= employeeRespository.findById(id).get();
+        try {
+            Employee employee = employeeRespository.findById(id).get();
             return employee;
-        }
-        catch (NoSuchElementException ex){
+        } catch (NoSuchElementException ex) {
 
-            throw new NoSuchElementException( "Employee not found");
+            throw new NoSuchElementException("Employee not found");
         }
     }
 
@@ -78,20 +84,24 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
+    public List<Employee> findByIdNotLike(Long id) {
+        return employeeRespository.findByIdNotLike(id);
+    }
+
+    @Override
     public int setStatusForEmployee(EmployeeStatus status, List<Long> empIds) {
-        return employeeRespository.setStatusForEmployee(status.toString(),empIds);
+        return employeeRespository.setStatusForEmployee(status.toString(), empIds);
     }
 
     private String generateEmployeeId(Employee emp) {
 
-        String s ;
-        if(emp==null)
-            s=String.format("RS_%04d", 1);
-        else
-        {
-            int i=Integer.parseInt(emp.getEmployeeId().substring(3));
+        String s;
+        if (emp == null)
+            s = String.format("RS_%04d", 1);
+        else {
+            int i = Integer.parseInt(emp.getEmployeeId().substring(3));
             i++;
-            s=String.format("RS_%04d",i);
+            s = String.format("RS_%04d", i);
         }
         return s;
 

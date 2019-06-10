@@ -27,6 +27,7 @@ public interface EmployeeRespository extends JpaRepository<Employee, Long> {
     Employee findTopByOrderByIdDesc();
 
 
+    List<Employee> findByIdNotLike(Long id);
 
 
 }
