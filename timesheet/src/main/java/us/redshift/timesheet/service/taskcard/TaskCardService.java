@@ -157,9 +157,9 @@ public class TaskCardService implements ITaskCardService {
         EmployeeDto employeeDto = employeeFeignClient.getEmployeeById(card.getEmployeeId()).getBody();
 
 
-//      Set Designation Id
+/*//      Set Designation Id
         if (card.getDesignationId() == null)
-            card.setDesignationId(employeeDto.getDesignation().getId());
+            card.setDesignationId(employeeDto.getDesignation().getId());*/
 
 
         Long rateCardId = new Long(0);

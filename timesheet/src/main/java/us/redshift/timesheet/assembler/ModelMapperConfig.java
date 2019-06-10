@@ -356,7 +356,7 @@ public class ModelMapperConfig {
                 using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillDtoToLong).map(source.getSkill()).setSkillId(null);
                 using(taskCardDetailConverter).map(source.getTaskCardDetails()).setTaskCardDetails(null);
-//                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
+                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
             }
         });
 
