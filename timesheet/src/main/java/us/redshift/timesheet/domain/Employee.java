@@ -29,6 +29,8 @@ public class Employee extends BaseEntity {
 
     private String employeeCode;
 
+    private Long designationId;
+
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private EmployeeRole role;

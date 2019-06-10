@@ -24,11 +24,11 @@ public class RateCardDetail extends BaseEntity {
     private BigDecimal value;
 
     /*@Column(name = "skill_id", nullable = false)
-    private Long skillId;
+    private Long skillId;*/
     @Column(name = "designation_id", nullable = false)
-    private Long designationId;*/
+    private Long designationId;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "employee_role_id", nullable = false)
     private EmployeeRole employeeRole;
 

@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import us.redshift.timesheet.domain.Employee;
+import us.redshift.timesheet.domain.EmployeeRole;
 import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.common.Location;
 import us.redshift.timesheet.domain.project.Project;
@@ -34,12 +34,15 @@ public class TaskCard extends BaseEntity {
 
     private Long approverId;
 
+
+    private Long employeeId;
+
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    @JoinColumn(name = "employee_role_id")
+    private EmployeeRole role;
 
     private Long skillId;
-//    private Long designationId;
+    private Long designationId;
 
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)

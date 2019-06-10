@@ -64,8 +64,10 @@ public class ProjectController {
     @PutMapping("project/update/{id}")
     public ResponseEntity<?> updateProject(@PathVariable("id") Long projectId, @RequestBody ProjectDto projectDto, @RequestParam(value = "status", required = false) String status) throws ParseException, JsonProcessingException {
         LOGGER.info("Project Update input {} ", objectMapper.writeValueAsString(projectDto));
-        Project project = projectAssembler.convertToEntity(projectDto, projectService.getProjectById(projectId));
-        return new ResponseEntity<>(projectAssembler.convertToDto(projectService.updateProject(project)), HttpStatus.OK);
+        Project currentProject = projectService.getProjectById(projectId);
+        projectAssembler.convertToEntity(projectDto, currentProject);
+        ProjectDto savedProject = projectAssembler.convertToDto(projectService.updateProject(currentProject));
+        return new ResponseEntity<>(savedProject, HttpStatus.OK);
     }
 
     @GetMapping("project/get/{id}")

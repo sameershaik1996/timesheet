@@ -1,5 +1,6 @@
 package us.redshift.timesheet.dto.ratecard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,9 +22,12 @@ public class RateCardDetailDto extends BaseDto {
     private long designationId;
     private long locationId;*/
 
+    private Long designationId;
+
     private Location location;
     private EmployeeRole employeeRole;
 
+    @JsonIgnore
     private RateCardDto rateCard;
 
 

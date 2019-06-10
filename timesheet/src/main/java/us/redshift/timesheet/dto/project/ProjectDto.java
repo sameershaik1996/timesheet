@@ -3,10 +3,10 @@ package us.redshift.timesheet.dto.project;
 import lombok.*;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 import us.redshift.timesheet.domain.project.ProjectType;
-import us.redshift.timesheet.domain.ratecard.RateCard;
 import us.redshift.timesheet.dto.client.ClientListDto;
 import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
+import us.redshift.timesheet.dto.ratecard.RateCardDto;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +25,6 @@ public class ProjectDto extends BaseDto {
     private String description;
     @NonNull
     private Long estimatedDays;
-    @NonNull
     private Double estimatedCost;
     @NonNull
     private ProjectStatus status;
@@ -40,6 +39,6 @@ public class ProjectDto extends BaseDto {
     private EmployeeListDto manager;
     @NonNull
     private ClientListDto client;
-    private RateCard rateCard;
+    private RateCardDto rateCard;
 
 }

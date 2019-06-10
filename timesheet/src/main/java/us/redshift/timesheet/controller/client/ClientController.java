@@ -60,12 +60,9 @@ public class ClientController {
     public ResponseEntity<?> updateClient(@RequestBody ClientDto clientDto, @PathVariable("id") Long clientId) throws ParseException, JsonProcessingException {
         LOGGER.info("Client Update input {} ", objectMapper.writeValueAsString(clientDto));
         Client currentClient = clientService.getClientById(clientId);
-        // Client client = clientAssembler.convertToEntity(clientDto, currentClient);
-        mapper.map(clientDto, currentClient);
-        LOGGER.info("Client Update after conversion {} ", objectMapper.writeValueAsString(currentClient));
-
-        Client clientSaved = clientService.updateClient(currentClient);
-        return new ResponseEntity<>(clientAssembler.convertToDto(clientSaved), HttpStatus.OK);
+        clientAssembler.convertToEntity(clientDto, currentClient);
+        ClientDto savedClient = clientAssembler.convertToDto(clientService.updateClient(currentClient));
+        return new ResponseEntity<>(savedClient, HttpStatus.OK);
     }
 
 

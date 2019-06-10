@@ -53,6 +53,7 @@ public class ModelMapperConfig {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
+
 //      Long to EmployeeListDto
         Converter<Long, EmployeeListDto> LongToEmployeeListDto = mappingContext -> {
             Long source;
@@ -307,18 +308,18 @@ public class ModelMapperConfig {
         mapper.addMappings(new PropertyMap<TaskCard, TaskCardDto>() {
             protected void configure() {
 
-//                using(LongToEmployeeListDto).map(source.getEmployeeId()).setEmployee(null);
+                using(LongToEmployeeListDto).map(source.getEmployeeId()).setEmployee(null);
                 using(LongToSkillDto).map(source.getSkillId()).setSkill(null);
-//                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
+                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
             }
         });
 
 //      adding property for (TaskCard, TaskCardListDto)
         mapper.addMappings(new PropertyMap<TaskCard, TaskCardListDto>() {
             protected void configure() {
-//                using(LongToEmployeeListDto).map(source.getEmployeeId()).setEmployee(null);
+                using(LongToEmployeeListDto).map(source.getEmployeeId()).setEmployee(null);
                 using(LongToSkillDto).map(source.getSkillId()).setSkill(null);
-//                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
+                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
 
             }
         });
@@ -352,7 +353,7 @@ public class ModelMapperConfig {
 //      adding property for (TaskCardDto, TaskCard)
         mapper.addMappings(new PropertyMap<TaskCardDto, TaskCard>() {
             protected void configure() {
-//                using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
+                using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillDtoToLong).map(source.getSkill()).setSkillId(null);
                 using(taskCardDetailConverter).map(source.getTaskCardDetails()).setTaskCardDetails(null);
 //                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
@@ -362,7 +363,7 @@ public class ModelMapperConfig {
 //      adding property for (TaskCardListDto, TaskCard)
         mapper.addMappings(new PropertyMap<TaskCardListDto, TaskCard>() {
             protected void configure() {
-//                using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
+                using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillDtoToLong).map(source.getSkill()).setSkillId(null);
 
 
@@ -395,12 +396,12 @@ public class ModelMapperConfig {
         });
 
         /*------------------------------------------------Mapping for RateCard-------------------------------------------------*/
-/*//      RateCard
-        mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
-            protected void configure() {
-                map().setLocationId(source.getLocation().getId());
-            }
-        });*/
+////      RateCard
+//        mapper.addMappings(new PropertyMap<RateCardDetail, RateCardDetailDto>() {
+//            protected void configure() {
+//                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
+//            }
+//        });
 
 
         return mapper;

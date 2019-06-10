@@ -6,7 +6,6 @@ import us.redshift.timesheet.domain.common.Address;
 import us.redshift.timesheet.domain.common.BaseEntity;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Client extends BaseEntity implements Serializable {
+public class Client extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String clientCode;

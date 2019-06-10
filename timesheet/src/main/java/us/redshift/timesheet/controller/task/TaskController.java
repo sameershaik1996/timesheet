@@ -57,9 +57,10 @@ public class TaskController {
     @PutMapping("task/update/{id}")
     public ResponseEntity<?> updateTask(@PathVariable("id") Long taskId, @RequestBody TaskDto taskDto) throws ParseException, JsonProcessingException {
         LOGGER.info("Task  {} ", objectMapper.writeValueAsString(taskDto));
-        Task task = taskAssembler.convertToEntity(taskDto, taskService.getTaskById(taskId));
-        Task taskSaved = taskService.updateTask(task);
-        return new ResponseEntity<>(taskAssembler.convertToDto(taskSaved), HttpStatus.OK);
+        Task currentTask = taskService.getTaskById(taskId);
+        taskAssembler.convertToEntity(taskDto, currentTask);
+        TaskDto savedTask = taskAssembler.convertToDto(taskService.updateTask(currentTask));
+        return new ResponseEntity<>(savedTask, HttpStatus.OK);
     }
 
     @GetMapping("task/get/{id}")
@@ -70,6 +71,8 @@ public class TaskController {
 
     @GetMapping({"task/get"})
     public ResponseEntity<?> getAllTaskByPagination(@RequestParam(value = "status", defaultValue = "ALL", required = false) String status,
+                                                    @RequestParam(value = "skills", required = false) Boolean skills,
+                                                    @RequestParam(value = "taskId", required = false) Long taskId,
                                                     @RequestParam(value = "projectId", required = false) Long projectId,
                                                     @RequestParam(value = "employeeId", required = false) Long employeeId,
                                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -77,11 +80,15 @@ public class TaskController {
                                                     @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
                                                     @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
-        if (projectId != null && employeeId == null) {
+        if (taskId != null && skills) {
+            List<Long> ids = taskService.findAllSkillsByProjectId(taskId);
+            return new ResponseEntity<>(taskAssembler.convertToSkillDto(ids), HttpStatus.OK);
+        } else if (projectId != null && employeeId == null) {
             Page<Task> taskPage = taskService.getProjectTasksByPagination(projectId, page, limits, orderBy, fields);
             return new ResponseEntity<>(taskAssembler.convertToPagedDto(taskPage), HttpStatus.OK);
         } else if (projectId != null && employeeId != null && !("ALL".equalsIgnoreCase(status))) {
             List<Task> tasks = taskService.findAllByProjectIdAndEmployeeId(projectId, employeeId, TaskStatus.get(status.toUpperCase()));
+//            List<Task> tasks = taskService.findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(projectId, employeeId, new Date(LocalDate.now().toString()));
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {
             Page<Task> taskPage = taskService.getAllTaskByPagination(page, limits, orderBy, fields);

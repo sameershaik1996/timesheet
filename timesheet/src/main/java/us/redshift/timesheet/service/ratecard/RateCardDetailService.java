@@ -14,8 +14,8 @@ public class RateCardDetailService implements IRateCardDetailService {
     }
 
     @Override
-    public RateCardDetail findByRateCard_IdAndLocation_IdAndEmployeeRole_Id(Long rateCardId, Long locationId, Long roleId) {
-        return rateCardDetailRepository.findByRateCard_IdAndLocation_IdAndEmployeeRole_Id(rateCardId, locationId, roleId);
+    public RateCardDetail findByRateCard_IdAndLocation_IdAndEmployeeRole_IdAndDesignationId(Long rateCardId, Long locationId, Long roleId, Long designationId) {
+        return rateCardDetailRepository.findByRateCard_IdAndLocation_IdAndEmployeeRole_IdAndDesignationId(rateCardId, locationId, roleId, designationId);
     }
 
 //    @Override

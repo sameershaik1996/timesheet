@@ -29,7 +29,6 @@ public class ClientDto extends BaseDto {
     private Set<FocusAreaDto> focusAreas = new HashSet<>();
     private String futureFocus;
     private String about;
-    private Boolean addressFlag;
     private AddressDto address;
     private AddressDto billingAddress;
     private String notes;

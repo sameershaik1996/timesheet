@@ -19,10 +19,7 @@ import us.redshift.timesheet.util.Reusable;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TaskService implements ITaskService {
@@ -127,6 +124,17 @@ public class TaskService implements ITaskService {
     @Override
     public List<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status) {
         return taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
+    }
+
+    @Override
+    public List<Long> findAllSkillsByProjectId(Long taskId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
+        return task.getSkillId();
+    }
+
+    @Override
+    public List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(Long projectId, Long employeeId, Date today) {
+        return taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(projectId, employeeId, today);
     }
 
     private void taskValidate(Project project, Task task) throws ParseException {
