@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.lang.NonNull;
 import us.redshift.timesheet.domain.client.ClientStatus;
 import us.redshift.timesheet.domain.client.Industry;
+import us.redshift.timesheet.dto.common.AddressDto;
 import us.redshift.timesheet.dto.common.BaseDto;
 
 import java.util.Set;
@@ -25,4 +26,5 @@ public class ClientListDto extends BaseDto {
     private ClientStatus status;
     private Industry industry;
     private Set<FocusAreaDto> focusAreas;
+    private AddressDto billingAddress;
 }

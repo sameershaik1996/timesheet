@@ -226,6 +226,7 @@ public class ModelMapperConfig {
 
         /*------------------------------------------------Mapping for Projects-------------------------------------------------*/
 
+
 //      adding property (Project, ProjectDto)
         mapper.addMappings(new PropertyMap<Project, ProjectDto>() {
             protected void configure() {
@@ -356,7 +357,7 @@ public class ModelMapperConfig {
                 using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillDtoToLong).map(source.getSkill()).setSkillId(null);
                 using(taskCardDetailConverter).map(source.getTaskCardDetails()).setTaskCardDetails(null);
-//                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
+                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
             }
         });
 

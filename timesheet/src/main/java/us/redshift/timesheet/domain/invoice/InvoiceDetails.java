@@ -28,7 +28,7 @@ public class InvoiceDetails extends BaseEntity implements Serializable {
 
     private String role;
 
-    private String designation;
+//    private String designation;
 
     private String location;
 

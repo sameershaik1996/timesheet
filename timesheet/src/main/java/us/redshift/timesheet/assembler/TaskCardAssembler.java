@@ -3,17 +3,13 @@ package us.redshift.timesheet.assembler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.dto.taskcard.TaskCardDto;
+import us.redshift.timesheet.util.Reusable;
 
-import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class TaskCardAssembler {
@@ -51,7 +47,7 @@ public class TaskCardAssembler {
         }.getType();
         List<TaskCardDto> dtos = mapper.map(taskCardPage, targetListType);
 
-
+/*
         Page<TaskCardDto> page = new Page<TaskCardDto>() {
             @Override
             public int getTotalPages() {
@@ -133,9 +129,9 @@ public class TaskCardAssembler {
             public Iterator<TaskCardDto> iterator() {
                 return dtos.iterator();
             }
-        };
+        };*/
 
-        return page;
+        return Reusable.getPaginated(taskCardPage, dtos);
     }
 
 

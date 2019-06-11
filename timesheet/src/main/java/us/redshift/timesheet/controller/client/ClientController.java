@@ -61,6 +61,7 @@ public class ClientController {
         LOGGER.info("Client Update input {} ", objectMapper.writeValueAsString(clientDto));
         Client currentClient = clientService.getClientById(clientId);
         clientAssembler.convertToEntity(clientDto, currentClient);
+        LOGGER.info("Client After Assembler {} ", objectMapper.writeValueAsString(currentClient));
         ClientDto savedClient = clientAssembler.convertToDto(clientService.updateClient(currentClient));
         return new ResponseEntity<>(savedClient, HttpStatus.OK);
     }

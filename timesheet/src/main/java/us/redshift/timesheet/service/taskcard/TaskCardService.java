@@ -157,9 +157,12 @@ public class TaskCardService implements ITaskCardService {
         EmployeeDto employeeDto = employeeFeignClient.getEmployeeById(card.getEmployeeId()).getBody();
 
 
-//      Set Designation Id
+/*//      Set Designation Id
         if (card.getDesignationId() == null)
             card.setDesignationId(employeeDto.getDesignation().getId());
+//       Set ApproverId
+        if(card.getApproverId() == null)
+            card.setApproverId(employeeDto.getReportingManager().getId());*/
 
 
         Long rateCardId = new Long(0);
@@ -180,14 +183,15 @@ public class TaskCardService implements ITaskCardService {
                     designationId = employeeDto.getDesignation().getId();
 */
 //       TODo Add RateCard Id
-                RateCardDetail rateCardDetail = rateCardDetailService.findByRateCard_IdAndLocation_IdAndEmployeeRole_IdAndDesignationId(rateCardId, card.getLocation().getId(), card.getRole().getId(), card.getDesignationId());
+                RateCardDetail rateCardDetail = rateCardDetailService.findByRateCard_IdAndLocation_IdAndEmployeeRole_Id(rateCardId, card.getLocation().getId(), card.getRole().getId());
 //                rateCardDetailService.findByLocationIdAndSkillIdAndDesignationId
 //                        (card.getLocation().getId(), card.getSkillId(), card.getDesignationId());
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
                 LOGGER.info(" UpdateTaskCard Calculate Amount RatePerHour {}", ratePerHour);
-                card.setRatePerHour(ratePerHour);
+
             }
+            card.setRatePerHour(ratePerHour);
         }
 
 //      sum of hours
