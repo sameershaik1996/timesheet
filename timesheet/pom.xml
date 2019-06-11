@@ -134,6 +134,7 @@
                 </dependencies>
             </plugin>
         </plugins>
+        <finalName>timesheet</finalName>
     </build>
 
 

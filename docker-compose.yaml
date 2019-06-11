@@ -1,6 +1,7 @@
 version: '3.6'
 services:
   database:
+
     image: mysql:latest
     container_name: database
     command: --default-authentication-plugin=mysql_native_password
@@ -21,6 +22,10 @@ services:
     image: pss_employee:latest
     container_name: employeeService
     restart: always
+    command: mvn package -Dmaven.test.skip=true
+    build:
+      context: employee/
+      dockerfile: employee/Dockerfile
     ports:
       - '9090:9090'
     links:
@@ -80,6 +85,24 @@ services:
       - serviceDiscovery:serviceDiscovery
       - database:database
 
+  timesheetService:
+    image: pss_timesheet:latest
+    container_name: timesheetService
+    restart: always
+    ports:
+      - '8084:8084'
+    environment:
+      - JAVA_OPTS=
+        -DEUREKA_SERVER=http://serviceDiscovery:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://serviceDiscovery:8761/eureka
+    depends_on: 
+      - database
+      - serviceDiscovery
+      - apiGateway
+    links:
+      - serviceDiscovery:serviceDiscovery
+      - database:database
+      - apiGateway:apiGateway
    
 
 
