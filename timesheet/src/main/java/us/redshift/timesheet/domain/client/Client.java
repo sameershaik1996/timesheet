@@ -28,7 +28,7 @@ public class Client extends BaseEntity {
     private String name;
 
     @JsonIgnoreProperties(value = "client")
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH})
+    @OneToMany(mappedBy = "client", cascade =CascadeType.ALL)
     private Set<Poc> pocs = new HashSet<>();
 
     @Enumerated(EnumType.STRING)

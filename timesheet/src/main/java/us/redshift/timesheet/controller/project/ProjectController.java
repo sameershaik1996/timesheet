@@ -20,7 +20,10 @@ import us.redshift.timesheet.util.Reusable;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 
@@ -118,7 +121,27 @@ public class ProjectController {
 
     @GetMapping("project/get/enddate")
     public ResponseEntity<?> getEndDate(@RequestParam("startDate") String startDate, @RequestParam("estimatedDays") Long estimatedDays) {
-        return new ResponseEntity<>(Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays).toString(), HttpStatus.OK);
+        //return new ResponseEntity<>(Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays).toString(), HttpStatus.OK);
+        Long epo=Long.parseLong(startDate);
+
+        System.out.println(epo);
+
+        LocalDate date =
+                Instant.ofEpochMilli(epo)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+
+        System.out.println(date.toString());
+
+        LocalDate localDate=Reusable.calcEndDate(LocalDate.parse(date.toString()), estimatedDays);
+        System.out.println(localDate);
+
+        LocalDateTime localDateTime=localDate.atStartOfDay();
+
+        Long l1=localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+
+        return new ResponseEntity<>(l1*1000, HttpStatus.OK);
+
     }
 
     @GetMapping("project/get/employee")

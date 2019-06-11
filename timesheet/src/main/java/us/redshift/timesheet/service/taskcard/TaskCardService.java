@@ -186,8 +186,9 @@ public class TaskCardService implements ITaskCardService {
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
                 LOGGER.info(" UpdateTaskCard Calculate Amount RatePerHour {}", ratePerHour);
-                card.setRatePerHour(ratePerHour);
+
             }
+            card.setRatePerHour(ratePerHour);
         }
 
 //      sum of hours
