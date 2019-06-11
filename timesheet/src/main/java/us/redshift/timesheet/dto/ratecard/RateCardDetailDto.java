@@ -22,8 +22,6 @@ public class RateCardDetailDto extends BaseDto {
     private long designationId;
     private long locationId;*/
 
-    private Long designationId;
-
     private Location location;
     private EmployeeRole employeeRole;
 

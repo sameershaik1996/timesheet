@@ -1,11 +1,8 @@
 package us.redshift.timesheet.assembler;
 
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.dto.common.EmployeeDto;
@@ -14,11 +11,10 @@ import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectDto;
 import us.redshift.timesheet.dto.project.ProjectListDto;
 import us.redshift.timesheet.feignclient.EmployeeFeignClient;
+import us.redshift.timesheet.util.Reusable;
 
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class ProjectAssembler {
@@ -66,7 +62,7 @@ public class ProjectAssembler {
         }.getType();
         List<ProjectListDto> dtos = mapper.map(projectPage.getContent(), targetListType);
 
-        Page<ProjectListDto> page = new Page<ProjectListDto>() {
+        /*Page<ProjectListDto> page = new Page<ProjectListDto>() {
             @Override
             public int getTotalPages() {
                 return projectPage.getTotalPages();
@@ -148,8 +144,8 @@ public class ProjectAssembler {
                 return dtos.iterator();
             }
         };
-
-        return page;
+*/
+        return Reusable.getPaginated(projectPage, dtos);
     }
 
 

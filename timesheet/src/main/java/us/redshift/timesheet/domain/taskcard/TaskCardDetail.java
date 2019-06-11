@@ -47,4 +47,8 @@ public class TaskCardDetail extends BaseEntity {
     public void setRejectedComment(String rejectedComment) {
         this.rejectedComment = rejectedComment == null ? "" : rejectedComment;
     }
+
+    public void setStatus(TimeSheetStatus status) {
+        this.status = status == null ? TimeSheetStatus.PENDING : status;
+    }
 }

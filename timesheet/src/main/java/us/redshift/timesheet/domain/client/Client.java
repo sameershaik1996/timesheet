@@ -31,6 +31,7 @@ public class Client extends BaseEntity {
     @OneToMany(mappedBy = "client", cascade =CascadeType.ALL)
     private Set<Poc> pocs = new HashSet<>();
 
+
     @Enumerated(EnumType.STRING)
     private ClientStatus status = ClientStatus.ACTIVE;
     private String url;

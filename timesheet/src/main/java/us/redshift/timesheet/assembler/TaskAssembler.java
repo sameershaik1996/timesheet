@@ -1,11 +1,8 @@
 package us.redshift.timesheet.assembler;
 
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.dto.common.SkillDto;
@@ -13,11 +10,10 @@ import us.redshift.timesheet.dto.project.ProjectTaskListDto;
 import us.redshift.timesheet.dto.task.TaskDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
 import us.redshift.timesheet.feignclient.EmployeeFeignClient;
+import us.redshift.timesheet.util.Reusable;
 
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class TaskAssembler {
@@ -71,7 +67,7 @@ public class TaskAssembler {
         }.getType();
         List<ProjectTaskListDto> dtos = mapper.map(taskPage.getContent(), targetListType);
 
-        Page<ProjectTaskListDto> page = new Page<ProjectTaskListDto>() {
+        /*Page<ProjectTaskListDto> page = new Page<ProjectTaskListDto>() {
             @Override
             public int getTotalPages() {
                 return taskPage.getTotalPages();
@@ -152,9 +148,10 @@ public class TaskAssembler {
             public Iterator<ProjectTaskListDto> iterator() {
                 return dtos.iterator();
             }
-        };
+        };*/
 
-        return page;
+        return Reusable.getPaginated(taskPage, dtos);
+
     }
 
     public Page<TaskListDto> convertToPagedDto(Page<Task> taskPage) {
@@ -163,7 +160,7 @@ public class TaskAssembler {
         }.getType();
         List<TaskListDto> dtos = mapper.map(taskPage.getContent(), targetListType);
 
-        Page<TaskListDto> page = new Page<TaskListDto>() {
+        /*Page<TaskListDto> page = new Page<TaskListDto>() {
             @Override
             public int getTotalPages() {
                 return taskPage.getTotalPages();
@@ -245,8 +242,8 @@ public class TaskAssembler {
                 return dtos.iterator();
             }
         };
-
-        return page;
+*/
+        return Reusable.getPaginated(taskPage, dtos);
     }
 
     public List<SkillDto> convertToSkillDto(List<Long> employeeIds) {

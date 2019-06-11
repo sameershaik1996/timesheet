@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.springframework.lang.NonNull;
 import us.redshift.timesheet.domain.client.ClientStatus;
 import us.redshift.timesheet.domain.client.Industry;
-import us.redshift.timesheet.domain.common.Address;
 import us.redshift.timesheet.dto.common.AddressDto;
 import us.redshift.timesheet.dto.common.BaseDto;
 

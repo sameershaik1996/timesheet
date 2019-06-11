@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.task.Task;
@@ -25,12 +24,10 @@ import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
 import us.redshift.timesheet.service.taskcard.ITaskCardService;
 import us.redshift.timesheet.util.Reusable;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.DayOfWeek.MONDAY;
@@ -132,6 +129,7 @@ public class TimeSheetService implements ITimeSheetService {
 
 
 //      Joining Date
+//        TODO Remove HardCode
         LocalDate dateOfJoining = LocalDate.parse("2019-03-14");
         int joiningWeekNumber = dateOfJoining.get(weekFields.weekOfWeekBasedYear());
         int joiningYear = dateOfJoining.getYear();
@@ -246,7 +244,7 @@ public class TimeSheetService implements ITimeSheetService {
 //                projectTimeSheet.size());
 //        return ProjectTimeSheetPage;
 
-        Page<TimeSheet> ProjectTimeSheetPage = new Page<TimeSheet>() {
+        /*Page<TimeSheet> ProjectTimeSheetPage = new Page<TimeSheet>() {
             @Override
             public int getTotalPages() {
                 return timeSheetPage.getTotalPages();
@@ -327,9 +325,9 @@ public class TimeSheetService implements ITimeSheetService {
             public Iterator<TimeSheet> iterator() {
                 return projectTimeSheet.iterator();
             }
-        };
+        };*/
 
-        return ProjectTimeSheetPage;
+        return Reusable.getPaginated(timeSheetPage, projectTimeSheet);
 
     }
 

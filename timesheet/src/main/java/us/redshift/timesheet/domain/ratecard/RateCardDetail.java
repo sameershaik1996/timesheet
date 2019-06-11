@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "pss_rate_card_details", uniqueConstraints =
-@UniqueConstraint(columnNames = {"employee_role_id", "location_id", "designation_id", "rate_card_id"}))
+@UniqueConstraint(columnNames = {"employee_role_id", "location_id", "rate_card_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,9 +24,9 @@ public class RateCardDetail extends BaseEntity {
     private BigDecimal value;
 
     /*@Column(name = "skill_id", nullable = false)
-    private Long skillId;*/
+    private Long skillId;
     @Column(name = "designation_id", nullable = false)
-    private Long designationId;
+    private Long designationId;*/
 
     @ManyToOne()
     @JoinColumn(name = "employee_role_id", nullable = false)

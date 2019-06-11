@@ -141,9 +141,9 @@ public class TaskService implements ITaskService {
 
 //      set employee
         Set<Employee> employees = new HashSet<>(task.getEmployees());
-        System.out.println(employees.size());
+//        System.out.println(employees.size());
         employees.forEach(employee -> {
-            System.out.println(employee.getEmployeeId());
+//            System.out.println(employee.getEmployeeId());
             task.addEmployee(employee);
         });
 

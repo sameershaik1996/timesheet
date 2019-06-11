@@ -3,18 +3,14 @@ package us.redshift.timesheet.assembler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.dto.timesheet.TimeSheetBasicListDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
+import us.redshift.timesheet.util.Reusable;
 
-import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class TimeSheetAssembler {
@@ -42,7 +38,7 @@ public class TimeSheetAssembler {
         Type targetListType = new TypeToken<List<TimeSheetBasicListDto>>() {
         }.getType();
         List<TimeSheetBasicListDto> dtos = mapper.map(timeSheetPage.getContent(), targetListType);
-        Page<TimeSheetBasicListDto> page = new Page<TimeSheetBasicListDto>() {
+        /*Page<TimeSheetBasicListDto> page = new Page<TimeSheetBasicListDto>() {
             @Override
             public int getTotalPages() {
                 return timeSheetPage.getTotalPages();
@@ -124,8 +120,8 @@ public class TimeSheetAssembler {
                 return dtos.iterator();
             }
         };
-
-        return page;
+*/
+        return Reusable.getPaginated(timeSheetPage, dtos);
     }
 
     public Page<TimeSheetDto> convertToPagedDto(Page<TimeSheet> timeSheetPage) {
@@ -133,7 +129,7 @@ public class TimeSheetAssembler {
         }.getType();
         List<TimeSheetDto> dtos = mapper.map(timeSheetPage.getContent(), targetListType);
 
-        Page<TimeSheetDto> page = new Page<TimeSheetDto>() {
+       /* Page<TimeSheetDto> page = new Page<TimeSheetDto>() {
             @Override
             public int getTotalPages() {
                 return timeSheetPage.getTotalPages();
@@ -215,8 +211,8 @@ public class TimeSheetAssembler {
                 return dtos.iterator();
             }
         };
-
-        return page;
+*/
+        return Reusable.getPaginated(timeSheetPage, dtos);
     }
 
 }

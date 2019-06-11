@@ -54,15 +54,19 @@ public class TaskCardDetailService implements ITaskCardDetailService {
 //            if (taskCardDetailRepository.existsByIdAndStatus(taskCardDetail.getId(), taskCardDetail.getStatus()))
 //                throw new ValidationException("It's Already in Approved Status " + taskCardDetail.getId());
             LOGGER.info("UpdateTaskCardDetails  status Update {}", taskCardDetail.getId());
-            TimeSheetStatus sheetStatus=taskCardDetailRepository.findById(taskCardDetail.getId()).get().getStatus();
+
+            TimeSheetStatus sheetStatus = taskCardDetailRepository.findById(taskCardDetail.getId()).get().getStatus();
+
             TaskCardDetail taskCardDetail1 = taskCardDetailRepository.findById(taskCardDetail.getId()).get();
             taskCardDetail.set_index(taskCardDetail1.get_index());
 //            System.out.println(taskCardDetail1.get_index() + "index");
-            System.out.println(taskCardDetail.getStatus()+" taskcardDetails Status " + taskCardDetail.getId());
+
+            System.out.println(taskCardDetail.getStatus() + " taskcardDetails Status " + taskCardDetail.getId());
             if ((sheetStatus.equals(TimeSheetStatus.APPROVED) || sheetStatus.equals(TimeSheetStatus.INVOICE_RAISED)) && status.equals(TimeSheetStatus.APPROVED))
                 throw new ValidationException("It's Already in Approved Status " + " ( " + taskCardDetail.getId() + " )");
             if (sheetStatus.equals(TimeSheetStatus.APPROVED) && status.equals(TimeSheetStatus.REJECTED))
                 throw new ValidationException("InProper status update " + " ( " + taskCardDetail.getId() + " )");
+
             taskCardDetail.setStatus(status);
 //            taskCardDetailRepository.save(taskCardDetail);
             taskCardDetailList.add(taskCardDetail);

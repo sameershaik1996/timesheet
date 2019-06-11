@@ -226,6 +226,7 @@ public class ModelMapperConfig {
 
         /*------------------------------------------------Mapping for Projects-------------------------------------------------*/
 
+
 //      adding property (Project, ProjectDto)
         mapper.addMappings(new PropertyMap<Project, ProjectDto>() {
             protected void configure() {
