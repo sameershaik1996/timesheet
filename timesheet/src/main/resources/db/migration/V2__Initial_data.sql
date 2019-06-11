@@ -4378,7 +4378,7 @@ INSERT INTO `timesheet`.`pss_employee_roles`
 `updated_by`,
 `role`)
 VALUES
-("System","System","TESTER");
+("System","System","QA");
 
 INSERT INTO `timesheet`.`pss_employee_roles`
 (
