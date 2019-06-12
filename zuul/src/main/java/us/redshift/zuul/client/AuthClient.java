@@ -2,6 +2,8 @@ package us.redshift.zuul.client;
 
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,15 +16,15 @@ import javax.validation.Valid;
 public interface AuthClient {
 
     @GetMapping("/auth/v1/api/user/validatetoken")
-    UserDetails validateToken();
+    ResponseEntity<Object> validateToken();
 }
     @Component
     class AuthFallBack implements AuthClient {
 
 
         @Override
-        public UserDetails validateToken() {
-            return new UserDetails();
+        public ResponseEntity<Object> validateToken() {
+            return new ResponseEntity<>(new UserDetails(), HttpStatus.BAD_REQUEST);
         }
     }
 

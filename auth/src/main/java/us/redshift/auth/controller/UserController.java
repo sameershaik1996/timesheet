@@ -144,15 +144,10 @@ public class UserController {
     @GetMapping("validatetoken")
     public ResponseEntity<?> validateToken(@CurrentUser UserPrincipal userPrincipal)
     {
-        try {
             Long employeeId = userPrincipal.getEmployyeId();
             System.out.println("validate:"+employeeId);
             UserDto userDto = modelMapper.map(userService.loadUserByEmployeeId(employeeId), UserDto.class);
             return ResponseEntity.ok(userDto);
-        }catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.ok(e.getMessage());
-        }
 
         // return jwt;
     }
