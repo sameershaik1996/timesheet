@@ -32,10 +32,10 @@ public class ClientService implements IClientService {
 
 //        Set<Poc> pocs = new HashSet<>(client.getPocs());
 //
-//        System.out.println(pocs.size());
+//        ////////System.out.println(pocs.size());
 //
 //        pocs.forEach(poc -> {
-//            System.out.println(poc.getName());
+//            ////////System.out.println(poc.getName());
 //            client.addPoc(poc);
 //        });
 

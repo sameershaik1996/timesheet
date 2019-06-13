@@ -9,7 +9,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class EmployeeListDto {
+public class EmployeeListDto extends BaseDto {
 
     private Long id;
     private String employeeCode;

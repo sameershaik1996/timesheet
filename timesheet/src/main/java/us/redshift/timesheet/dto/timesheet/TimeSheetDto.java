@@ -10,6 +10,7 @@ import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
 import us.redshift.timesheet.dto.taskcard.TaskCardDto;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
@@ -21,8 +22,8 @@ public class TimeSheetDto extends BaseDto {
     private Long id;
     private String name;
     private String comment;
-    private TimeSheetStatus status;
-    private EmployeeListDto approvedBy;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
+    @NotNull(message = "employee cannot be empty")
     private EmployeeListDto employee;
     private Date fromDate;
     private Date toDate;

@@ -2,7 +2,6 @@ package us.redshift.timesheet.controller.project;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import us.redshift.timesheet.assembler.ProjectAssembler;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
-import us.redshift.timesheet.dto.common.SkillDto;
 import us.redshift.timesheet.dto.project.ProjectDto;
 import us.redshift.timesheet.feignclient.EmployeeFeignClient;
+import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.service.project.IProjectService;
 import us.redshift.timesheet.util.Reusable;
 
@@ -24,12 +23,16 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 
 @RestController
 @RequestMapping("timesheet/v1/api/")
 public class ProjectController {
+
+
+    private final ProjectRepository projectRepository;
 
     private final IProjectService projectService;
 
@@ -40,7 +43,8 @@ public class ProjectController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
-    public ProjectController(IProjectService projectService, ProjectAssembler projectAssembler, ObjectMapper objectMapper, EmployeeFeignClient employeeFeignClient) {
+    public ProjectController(ProjectRepository projectRepository, IProjectService projectService, ProjectAssembler projectAssembler, ObjectMapper objectMapper, EmployeeFeignClient employeeFeignClient) {
+        this.projectRepository = projectRepository;
         this.projectService = projectService;
         this.projectAssembler = projectAssembler;
         this.objectMapper = objectMapper;
@@ -105,7 +109,7 @@ public class ProjectController {
             Page<Project> projectPage = projectService.getClientProjectsByPagination(clientId, page, limits, orderBy, fields);
             return new ResponseEntity<>(projectAssembler.convertToPagedDto(projectPage), HttpStatus.OK);
         } else if (employeeId != null && !("ALL".equalsIgnoreCase(status))) {
-            System.out.println("testing...");
+            //System.out.println("testing...");
             List<Project> projectList = projectService.findAllByEmployeeId(employeeId, ProjectStatus.get(status.toUpperCase()));
             return new ResponseEntity<>(projectAssembler.convertToDto(projectList), HttpStatus.OK);
         } else {
@@ -122,39 +126,35 @@ public class ProjectController {
     @GetMapping("project/get/enddate")
     public ResponseEntity<?> getEndDate(@RequestParam("startDate") String startDate, @RequestParam("estimatedDays") Long estimatedDays) {
         //return new ResponseEntity<>(Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays).toString(), HttpStatus.OK);
-        Long epo=Long.parseLong(startDate);
+        Long epo = Long.parseLong(startDate);
 
-        System.out.println(epo);
+        //System.out.println(epo);
 
         LocalDate date =
                 Instant.ofEpochMilli(epo)
                         .atZone(ZoneId.systemDefault())
                         .toLocalDate();
 
-        System.out.println(date.toString());
+        //System.out.println(date.toString());
 
-        LocalDate localDate=Reusable.calcEndDate(LocalDate.parse(date.toString()), estimatedDays);
-        System.out.println(localDate);
+        LocalDate localDate = Reusable.calcEndDate(LocalDate.parse(date.toString()), estimatedDays);
+        //System.out.println(localDate);
 
-        LocalDateTime localDateTime=localDate.atStartOfDay();
+        LocalDateTime localDateTime = localDate.atStartOfDay();
 
-        Long l1=localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+        Long l1 = localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
 
-        return new ResponseEntity<>(l1*1000, HttpStatus.OK);
+        return new ResponseEntity<>(l1 * 1000, HttpStatus.OK);
 
 
     }
 
-    @GetMapping("project/get/employee")
+    @GetMapping("project/get/test")
     public ResponseEntity<?> getEmployee() {
-        SkillDto employeeDto = new SkillDto();
-        try {
-            employeeDto = employeeFeignClient.getSkillById(Long.valueOf(2)).getBody();
 
-        } catch (FeignException e) {
-            System.out.println(e.getStackTrace());
-        }
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+        //System.out.println( new Date(System.currentTimeMillis()));
+
+        return new ResponseEntity<>(projectRepository.findAllByEmployeeIdAndStartDateLessThanEqualAndStatusOrderByIdAsc(Long.valueOf(7), new Date(System.currentTimeMillis()), ProjectStatus.ACTIVE), HttpStatus.OK);
     }
 
 }

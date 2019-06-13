@@ -25,7 +25,7 @@ public class TimeSheet extends BaseEntity {
 
     private String name;
 
-    private String comment = "";
+    private String comment;
 
     @Enumerated(EnumType.STRING)
     private TimeSheetStatus status = TimeSheetStatus.PENDING;

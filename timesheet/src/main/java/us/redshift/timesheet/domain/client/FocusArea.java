@@ -19,7 +19,7 @@ import java.util.List;
 @ToString
 public class FocusArea extends BaseEntity {
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String code;
     @Column(nullable = false, unique = true)
     private String name;

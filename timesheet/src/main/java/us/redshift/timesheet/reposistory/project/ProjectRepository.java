@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findAllByStatusOrderByIdAsc(ProjectStatus status);
 
 
+    List<Project> findAllByEmployeeIdAndStartDateLessThanEqualAndStatusOrderByIdAsc(Long employeeId, Date date, ProjectStatus status);
 }

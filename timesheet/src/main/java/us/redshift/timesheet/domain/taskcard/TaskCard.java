@@ -29,6 +29,7 @@ public class TaskCard extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskType type;
 
@@ -44,6 +45,7 @@ public class TaskCard extends BaseEntity {
     private Long skillId;
     private Long designationId;
 
+
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
@@ -58,11 +60,11 @@ public class TaskCard extends BaseEntity {
 
 
     @ManyToOne()
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @ManyToOne()
-    @JoinColumn(name = "task_id")
+    @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
     @OneToMany(mappedBy = "taskCard",
@@ -80,8 +82,4 @@ public class TaskCard extends BaseEntity {
         taskCardDetail.setTaskCard(this);
     }
 
-
-    public void setComment(String comment) {
-        this.comment = comment == null ? "" : comment;
-    }
 }

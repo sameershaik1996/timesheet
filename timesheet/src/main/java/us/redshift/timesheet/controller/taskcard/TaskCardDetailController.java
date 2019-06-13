@@ -62,9 +62,9 @@ public class TaskCardDetailController {
                                                                     @RequestParam(value = "projectIds", required = false) List<Long> projectIds,
                                                                     @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         Page<TaskCardDetail> taskCardDetails;
-        System.out.println((fromDate) + " " + toDate + " " + projectId);
+        //System.out.println((fromDate) + " " + toDate + " " + projectId);
         if (fromDate != null && toDate != null && projectIds != null) {
-            System.out.println((fromDate) + " " + toDate + " " + projectId);
+            //System.out.println((fromDate) + " " + toDate + " " + projectId);
             return new ResponseEntity<>(taskCardDetailAssembler.convertToDto(taskCardDetailService.getTaskCardDetailBetweenDateAndByProject(projectIds, fromDate, toDate)), HttpStatus.OK);
         } else if (taskCardId != null) {
             taskCardDetails = taskCardDetailService.getTaskCardTaskCardDetailsByPagination(taskCardId, page, limits, orderBy, fields);

@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService implements ITaskService {
@@ -42,6 +43,7 @@ public class TaskService implements ITaskService {
     public Task saveTask(Task task) throws ParseException {
         Project project = projectService.getProjectById(task.getProject().getId());
         taskValidate(project, task);
+        task = addEmployee(task);
         return taskRepository.save(task);
     }
 
@@ -51,6 +53,8 @@ public class TaskService implements ITaskService {
         tasks.forEach(task -> {
             if (status != null) {
                 Task getTask = taskRepository.findById(task.getId()).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", task.getId()));
+                if (TaskStatus.COMPLETE.equals(status))
+                    getTask = updateActualDate(getTask);
                 getTask.setStatus(status);
                 taskList.add(getTask);
             }
@@ -64,13 +68,14 @@ public class TaskService implements ITaskService {
             throw new ResourceNotFoundException("Task", "Id", task.getId());
         Project project = projectService.getProjectById(task.getProject().getId());
         taskValidate(project, task);
-
+        if (TaskStatus.COMPLETE.equals(task.getStatus()))
+            task = updateActualDate(task);
+        task = addEmployee(task);
         return taskRepository.save(task);
     }
 
     @Override
-    public void
-    updateTaskHours(Long taskId, BigDecimal usedHour) {
+    public void updateTaskHours(Long taskId, BigDecimal usedHour) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "Id", taskId));
 
         BigDecimal oldUsedHour = new BigDecimal(0);
@@ -123,7 +128,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status) {
-        return taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndStatusOrderByIdAsc(projectId, employeeId, status);
+
+        Set<Task> tasks = new LinkedHashSet<>(taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndStartDateLessThanEqualAndStatusOrderByIdAsc(projectId, employeeId, new Date(System.currentTimeMillis()), status));
+        return tasks.stream().collect(Collectors.toList());
     }
 
     @Override
@@ -132,20 +139,8 @@ public class TaskService implements ITaskService {
         return task.getSkillId();
     }
 
-    @Override
-    public List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(Long projectId, Long employeeId, Date today) {
-        return taskRepository.findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(projectId, employeeId, today);
-    }
 
     private void taskValidate(Project project, Task task) throws ParseException {
-
-//      set employee
-        Set<Employee> employees = new HashSet<>(task.getEmployees());
-//        System.out.println(employees.size());
-        employees.forEach(employee -> {
-//            System.out.println(employee.getEmployeeId());
-            task.addEmployee(employee);
-        });
 
         String pattern = "yyyy-MM-dd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -160,18 +155,37 @@ public class TaskService implements ITaskService {
 
             if (ProjectStartDate.compareTo(taskStartDate) > 0) {
                 LOGGER.error("The Task Start Date ( " + taskStartDate + " ) should  be greater then or equal the Project Start Date ( " + project.getStartDate() + " )");
-                throw new ValidationException("The Task Start Date ( " + simpleDateFormat.format(task.getStartDate()) + " ) should  be greater then or equal the Project Start Date ( " + project.getStartDate() + " )");
+                throw new ValidationException("The Task Start Date ( " + simpleDateFormat.format(task.getStartDate()) + " ) should be same or after the Project Start Date ( " + project.getStartDate() + " )");
             }
-            if (projectEndDate.compareTo(taskStartDate) < 0 || project.getEndDate().compareTo(taskEndDate) < 0) {
-                LOGGER.error("The Task Start Date  ( " + task.getStartDate() + " ) / End Date ( " + task.getEndDate() + " ) should not be greater then the Project End Date ( " + project.getEndDate() + " )");
-                throw new ValidationException("The Task Start Date  ( " + simpleDateFormat.format(task.getStartDate()) + " ) / End Date ( " + simpleDateFormat.format(task.getEndDate()) + " ) should not be greater then the Project End Date ( " + project.getEndDate() + " )");
+            if (projectEndDate.compareTo(taskStartDate) < 0) {
+                LOGGER.error("The Task Start Date  ( " + task.getStartDate() + " ) should not be greater then the Project End Date ( " + project.getEndDate() + " )");
+                throw new ValidationException("The Task Start Date  ( " + simpleDateFormat.format(task.getStartDate()) + " ) should be before the Project End Date ( " + project.getEndDate() + " )");
+            }
+            if (project.getEndDate().compareTo(taskEndDate) < 0) {
+                LOGGER.error("The Task End Date ( " + task.getEndDate() + " ) should not be greater then the Project End Date ( " + project.getEndDate() + " )");
+                throw new ValidationException("The Task End Date ( " + simpleDateFormat.format(task.getEndDate()) + " ) should be same or before the Project End Date ( " + project.getEndDate() + " )");
             }
             if (taskStartDate.compareTo(taskEndDate) > 0) {
                 LOGGER.error("The Task Start Date ( " + task.getStartDate() + " ) should not be greater then the Task End Date ( " + task.getEndDate() + " )");
-                throw new ValidationException("The Task Start Date ( " + simpleDateFormat.format(task.getStartDate()) + " ) should not be greater then the Task End Date ( " + simpleDateFormat.format(task.getEndDate()) + " )");
+                throw new ValidationException("The Task End Date ( " + simpleDateFormat.format(task.getEndDate()) + " ) should be after the Task Start Date ( " + simpleDateFormat.format(task.getStartDate()) + " )");
             }
 
         }
     }
+
+    private Task addEmployee(Task task) {
+//      set employee
+        Set<Employee> employees = new HashSet<>(task.getEmployees());
+        employees.forEach(employee -> task.addEmployee(employee));
+        return task;
+    }
+
+
+    private Task updateActualDate(Task task) {
+        if (task.getStartDate() != null && task.getEndDate() != null && task.getStartedOn() != null)
+            task.setEndedOn(new Date(System.currentTimeMillis()));
+        return task;
+    }
+
 
 }

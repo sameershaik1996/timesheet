@@ -28,8 +28,8 @@ public class Client extends BaseEntity {
     private String name;
 
     @JsonIgnoreProperties(value = "client")
-    @OneToMany(mappedBy = "client", cascade =CascadeType.ALL)
-    private Set<Poc> pocs = new HashSet<>();
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private Set<Poc> pocs;
 
 
     @Enumerated(EnumType.STRING)
@@ -62,6 +62,8 @@ public class Client extends BaseEntity {
     private String notes;
 
     public void addPoc(Poc poc) {
+        if (pocs == null)
+            pocs = new HashSet<>();
         poc.setClient(this);
         pocs.add(poc);
     }
