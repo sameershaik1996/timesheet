@@ -52,7 +52,7 @@ public class JwtGrantFilter extends OncePerRequestFilter {
         ex.printStackTrace();
         //httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(),"Error");
         entryPoint.commence(httpServletRequest,httpServletResponse,  new AuthException(ex.getMessage()));
-        throw new CustomException("you don't have enough permissions to access this resource");
+        return;
     }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -72,7 +72,7 @@ public class JwtGrantFilter extends OncePerRequestFilter {
             } else {
                 permission.append(split[0] + "_" + "common");
             }
-        }catch (Exception e){
+        }catch (NullPointerException e){
 
         }
         return permission.toString();

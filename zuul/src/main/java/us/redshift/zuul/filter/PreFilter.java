@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import us.redshift.zuul.client.AuthClient;
 import us.redshift.zuul.model.UserDetails;
@@ -42,16 +43,17 @@ public class PreFilter extends ZuulFilter {
         try{
 
             if(request.getRequestURI().contains("v1/api")&&!request.getRequestURI().contains("/auth")) {
-                UserDetails ud = authClient.validateToken();
-                request.setAttribute("userDetails",ud);
+                ResponseEntity<Object> response= authClient.validateToken();
+                if(response.getStatusCode().is2xxSuccessful()) {
+                    UserDetails ud= (UserDetails) response.getBody();
+                    request.setAttribute("userDetails", ud);
+                }
                 //requestContext.req("userDetails",ud);
             }
         }
         catch (Exception e){
             e.printStackTrace();
-            ZuulException zuulException = new ZuulException("unauthorized", HttpStatus.UNAUTHORIZED.value(), "unauthorized access");
-            throw new ZuulRuntimeException(zuulException);
-        }
+           }
 
         return null;
     }
