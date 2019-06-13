@@ -40,7 +40,7 @@ public class EmployeeApplication {
 
 	@PostConstruct
 	void init() {
-		System.out.println(timeZone);
+		//System.out.println(timeZone);
 		TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
 	}
 

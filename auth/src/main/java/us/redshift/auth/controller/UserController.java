@@ -85,7 +85,7 @@ public class UserController {
         User currentUser=userService.loadUserByEmployeeId(employeeId);
         currentUser.setRole(role);
         currentUser.setStatus(status);
-        System.out.println(employeeId+" "+status+" "+currentUser.getPassword());
+        //System.out.println(employeeId+" "+status+" "+currentUser.getPassword());
         return new ResponseEntity<>(userService.updateUserStatusAndRole(currentUser), HttpStatus.CREATED);
     }
 
@@ -93,7 +93,7 @@ public class UserController {
     public ResponseEntity<?> getUserByEmpId( @PathVariable Long employeeId)
     {
         UserDto userDto=modelMapper.map(userService.loadUserByEmployeeId(employeeId),UserDto.class);
-        System.out.println(employeeId+" "+" "+userService.loadUserByEmployeeId(employeeId).getPassword());
+        //System.out.println(employeeId+" "+" "+userService.loadUserByEmployeeId(employeeId).getPassword());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -145,7 +145,7 @@ public class UserController {
     public ResponseEntity<?> validateToken(@CurrentUser UserPrincipal userPrincipal)
     {
             Long employeeId = userPrincipal.getEmployyeId();
-            System.out.println("validate:"+employeeId);
+            //System.out.println("validate:"+employeeId);
             UserDto userDto = modelMapper.map(userService.loadUserByEmployeeId(employeeId), UserDto.class);
             return ResponseEntity.ok(userDto);
 

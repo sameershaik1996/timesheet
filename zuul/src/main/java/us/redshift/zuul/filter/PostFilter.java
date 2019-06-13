@@ -25,7 +25,7 @@ public class PostFilter extends ZuulFilter {
 
     @Override
     public Object run() {
-        System.out.println("Inside post Filter");
+        //System.out.println.println("Inside post Filter");
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request=requestContext.getRequest();
         HttpServletResponse res=requestContext.getResponse();

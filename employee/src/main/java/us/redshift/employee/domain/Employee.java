@@ -60,7 +60,7 @@ public class Employee extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "marital_status", nullable = false)
+    @Column(name = "marital_status")
     @Enumerated(EnumType.STRING)
     private MaritalStatus maritalStatus;
 

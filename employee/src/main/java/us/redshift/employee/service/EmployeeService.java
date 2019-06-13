@@ -45,7 +45,7 @@ public class EmployeeService implements IEmployeeService {
     public Employee updateEmployee(Employee employee) {
         if (employee.getReportingManager() != null) {
             if (employee.getId() == employee.getReportingManager().getId()) {
-                throw new CustomException("Same Employee couldn't assigned as Reporting Manager");
+                throw new CustomException("Same Employee can't be assigned as Reporting Manager ");
             }
         }
 
@@ -56,13 +56,13 @@ public class EmployeeService implements IEmployeeService {
     public Employee getEmployeeById(Long id) throws NoSuchElementException, EntityNotFoundException {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
-        System.out.println(request.getHeader("Authorization"));
+        //System.out.println(request.getHeader("Authorization"));
         try {
             Employee employee = employeeRespository.findById(id).get();
             return employee;
         } catch (NoSuchElementException ex) {
 
-            throw new NoSuchElementException("Employee not found");
+            throw new NoSuchElementException("Employee "+id+"not found");
         }
     }
 

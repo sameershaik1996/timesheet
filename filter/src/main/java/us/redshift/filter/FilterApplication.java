@@ -22,7 +22,7 @@ public class FilterApplication {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
 		HttpServletRequest request = requestAttributes.getRequest();
-		System.out.println(request.getAttribute("test").toString());
+		//System.out.println(request.getAttribute("test").toString());
 	}
 
 	@Bean

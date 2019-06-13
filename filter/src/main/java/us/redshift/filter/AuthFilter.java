@@ -53,7 +53,7 @@ public class AuthFilter extends OncePerRequestFilter {
                     HttpHeaders headers = new HttpHeaders();
                     headers.set("Authorization", request.getHeader("Authorization"));
                     HttpEntity entity = new HttpEntity(headers);
-                    System.out.println(restTemplate+" "+authUrl);
+                    //System.out.println(restTemplate+" "+authUrl);
                     ResponseEntity<UserDetails> res = restTemplate
                             .exchange(authUrl+"/v1/api/user/validatetoken", HttpMethod.GET, entity, UserDetails.class);
                     ud=res.getBody();

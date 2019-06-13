@@ -24,37 +24,37 @@ public class JwtGrantFilter extends OncePerRequestFilter {
     JwtAuthenticationEntryPoint entryPoint;
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException,ResponseStatusException {
+    if(!httpServletRequest.getRequestURI().contains("login")) {
+        try {
+            //System.out.println("grant filter");
 
-    try {
-        System.out.println("grant filter");
+            User ud = (User) httpServletRequest.getAttribute("userDetails");
+            String requestUri = httpServletRequest.getHeader("RequestTo");
+            if (requestUri == null)
+                requestUri = httpServletRequest.getRequestURI();
+            if (ud != null && requestUri != null) {
 
-        User ud = (User) httpServletRequest.getAttribute("userDetails");
-        String requestUri = httpServletRequest.getHeader("RequestTo");
-        if(requestUri==null)
-            requestUri = httpServletRequest.getRequestURI();
-        if (ud != null && requestUri != null) {
+                String permissionFromUri = getPermission((requestUri.substring(requestUri.lastIndexOf("api") + 4)), ud.getRole().getName().toString());
+                Set<Permission> permissions = ud.getRole().getPermissions();
 
-            String permissionFromUri = getPermission((requestUri.substring(requestUri.lastIndexOf("api") + 4)),ud.getRole().getName().toString());
-            Set<Permission> permissions = ud.getRole().getPermissions();
+                List<String> authorities = permissions.stream().map(permission ->
+                        (permission.getName())
+                ).collect(Collectors.toList());
+                //System.out.println(permissionFromUri);
+                //System.out.println(authorities);
+                if (!authorities.contains(permissionFromUri)) {
 
-            List<String> authorities = permissions.stream().map(permission ->
-                    (permission.getName())
-            ).collect(Collectors.toList());
-            System.out.println(permissionFromUri);
-            System.out.println(authorities);
-            if (!authorities.contains(permissionFromUri)) {
+                    throw new CustomException("you don't have enough permissions to access this resource");
+                }
 
-                throw new CustomException("you don't have enough permissions to access this resource");
             }
-
+        } catch (CustomException ex) {
+            ex.printStackTrace();
+            //httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(),"Error");
+            entryPoint.commence(httpServletRequest, httpServletResponse, new AuthException(ex.getMessage()));
+            return;
         }
-    }catch (CustomException ex){
-        ex.printStackTrace();
-        //httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(),"Error");
-        entryPoint.commence(httpServletRequest,httpServletResponse,  new AuthException(ex.getMessage()));
-        return;
     }
-
         filterChain.doFilter(httpServletRequest, httpServletResponse);
 
     }

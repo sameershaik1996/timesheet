@@ -82,7 +82,7 @@ public class EmployeeController {
         Boolean empStatus = true;
         if (empIds != null && status != null) {
             empStatus = status.equals(EmployeeStatus.ACTIVE) ? true : false;
-            System.out.println(status);
+            //System.out.println(status);
             employeeService.setStatusForEmployee(status, empIds);
             userClient.updateUser(empIds, empStatus);
             return new ResponseEntity<>(employeeService.getEmployeeByIds(empIds), HttpStatus.OK);
@@ -121,7 +121,7 @@ public class EmployeeController {
                                             @RequestParam(value = "limits", defaultValue = "0") int limits,
                                             @RequestParam(value = "orderBy", required = false) String orderBy,
                                             @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-        System.out.println(id);
+        //System.out.println(id);
         if (id != null) {
             return new ResponseEntity<>(employeeService.getEmployeeByIds(id), HttpStatus.OK);
         } else if (roleName != null) {
@@ -134,7 +134,7 @@ public class EmployeeController {
             return new ResponseEntity<>(employeeService.getEmployeeByIds(empIds), HttpStatus.OK);
 
         } else {
-            System.out.println("gdshvdbnbv");
+            //System.out.println("gdshvdbnbv");
             return new ResponseEntity<>(employeeService.getAllEmployee(page, limits, orderBy, fields), HttpStatus.OK);
         }
 

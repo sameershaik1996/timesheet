@@ -2,20 +2,24 @@ package us.redshift.zuul.filter;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.exception.ZuulException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.client.RestTemplate;
 import us.redshift.zuul.client.AuthClient;
 import us.redshift.zuul.model.UserDetails;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.Response;
 
 public class PreFilter extends ZuulFilter {
+
+    @Autowired
+    RestTemplate restTemplate;
+
+
 
     @Autowired
     AuthClient authClient;
@@ -37,23 +41,37 @@ public class PreFilter extends ZuulFilter {
 
     @Override
     public Object run() {
-        System.out.println("Inside pre Filter");
+        //System.out.println.println("Inside pre Filter");
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request=requestContext.getRequest();
         try{
 
             if(request.getRequestURI().contains("v1/api")&&!request.getRequestURI().contains("/auth")) {
-                ResponseEntity<Object> response= authClient.validateToken();
-                if(response.getStatusCode().is2xxSuccessful()) {
-                    UserDetails ud= (UserDetails) response.getBody();
+                UserDetails ud= authClient.validateToken().getBody();
+
+                if(ud!=null) {
+//                    //System.out.println.println("error:"+ud);
+
                     request.setAttribute("userDetails", ud);
+
                 }
-                //requestContext.req("userDetails",ud);
+               /* final HttpHeaders headers = new HttpHeaders();
+                headers.add("Authorization", "Bearer "+request.getHeader("Authorization"));
+                headers.add("RequestTo", request.getRequestURI());
+                HttpEntity<String> entity = new HttpEntity<String>(headers);
+                ResponseEntity<Object> response=restTemplate.exchange("http://auth-service/auth/auth/v1/api/user/validatetoken", HttpMethod.GET,entity, Object.class);
+                if(response.getStatusCode().is2xxSuccessful()){
+                    request.setAttribute("userDetails",response.getBody());
+                }
+*/
+
+
+
             }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-           }
+
+    } catch (Exception he) {
+        he.printStackTrace();
+    }
 
         return null;
     }

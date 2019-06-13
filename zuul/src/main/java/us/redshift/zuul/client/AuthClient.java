@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.HttpClientErrorException;
+import us.redshift.zuul.exception.CustomException;
 import us.redshift.zuul.model.UserDetails;
 
 import javax.validation.Valid;
@@ -16,15 +18,25 @@ import javax.validation.Valid;
 public interface AuthClient {
 
     @GetMapping("/auth/v1/api/user/validatetoken")
-    ResponseEntity<Object> validateToken();
+    ResponseEntity<UserDetails> validateToken();
 }
-    @Component
-    class AuthFallBack implements AuthClient {
+@Component
+class AuthFallBack implements AuthClient {
 
 
-        @Override
-        public ResponseEntity<Object> validateToken() {
-            return new ResponseEntity<>(new UserDetails(), HttpStatus.BAD_REQUEST);
+    @Override
+    public ResponseEntity<UserDetails> validateToken() throws CustomException, HttpClientErrorException {
+
+        //System.out.println.println("inside");
+        try {
+
+
+        }catch (CustomException e){
+
+            e.printStackTrace();
+            throw e;
         }
+      return new ResponseEntity<>(new UserDetails(),HttpStatus.UNAUTHORIZED);
     }
+}
 

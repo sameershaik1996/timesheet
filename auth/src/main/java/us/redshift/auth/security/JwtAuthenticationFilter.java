@@ -56,23 +56,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.info(request.getHeader("RequestTo"));
             logger.info(request.getRequestURI());
             logger.info(jwt);
-
+            if(!request.getRequestURI().contains("login")){
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                System.out.println("inside");
-                Long empId= tokenProvider.getUserDetails(jwt);
-                User user=userService.loadUserByEmployeeId(empId);
-                if(user.getStatus()!=true){
+                //System.out.println("inside");
+                Long empId = tokenProvider.getUserDetails(jwt);
+                User user = userService.loadUserByEmployeeId(empId);
+                if (user.getStatus() != true) {
                     throw new CustomException("you have been de-activated");
                 }
                 UserDetails userDetails = UserPrincipal.create(user);
 
-                request.setAttribute("userDetails",user);
+                request.setAttribute("userDetails", user);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
+            }
             }
 
         } catch (CustomException ex) {
@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        System.out.println(bearerToken);
+        //System.out.println(bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7, bearerToken.length());
         }

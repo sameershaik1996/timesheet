@@ -1,10 +1,9 @@
-package us.redshift.employee.exception;
+package us.redshift.zuul.exception;
 
-import org.hibernate.JDBCException;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
+import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.NoSuchElementException;
 
@@ -81,28 +80,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles javax.validation.ConstraintViolationException. Thrown when @Validated fails.
      */
-    @ExceptionHandler(javax.validation.ConstraintViolationException.class)
+    @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolation(
-            javax.validation.ConstraintViolationException ex) {
+            ConstraintViolationException ex) {
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getConstraintViolations());
         return buildResponseEntity(apiError);
     }
 
-    /**
-     * Handles EntityNotFoundException. Created to encapsulate errors with more detail than javax.persistence.EntityNotFoundException.
-     *
-     * @param ex the EntityNotFoundException
-     * @return the ApiError object
-     */
-    @ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<Object> handleEntityNotFound(
-            EntityNotFoundException ex) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
-        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
-    }
+
 
     /**
      * Handle HttpMessageNotReadableException. Happens when request JSON is malformed.
@@ -135,22 +122,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    @ExceptionHandler(value
-            = {DataIntegrityViolationException.class, SQLIntegrityConstraintViolationException.class})
-    protected ResponseEntity<?> handleConflict(RuntimeException ex, WebRequest request) {
-
-        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getCause().getCause().getLocalizedMessage(), ex);
-        if (ex.getCause().getCause() != null) {
-            if (ex.getCause().getCause().getLocalizedMessage().contains("Duplicate")) {
-                String[] message = ex.getCause().getCause().getLocalizedMessage().split(" ");
-                apiError.setMessage(message[2] + " Already Exist");
-                apiError.setDebugMessage(ex.getLocalizedMessage());
-            }
-        }
-
-
-        return buildResponseEntity(apiError);
-    }
 
     /**
      * Handle DataIntegrityViolationException, inspects the cause for different DB causes.
@@ -166,20 +137,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(HttpClientErrorException.class)
     protected ResponseEntity<Object> handleHttpClientErrorException(HttpClientErrorException ex,
-                                                         WebRequest request) {
+                                                         WebRequest request)throws IOException {
+        //System.out.println.println("client exception");
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setMessage("Invalid token or you don't have permission to access this resource");
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
-
-    @ExceptionHandler(JDBCException.class)
-    protected ResponseEntity<Object> handleJDBCException(JDBCException ex,
-                                                                  WebRequest request) {
-        if (ex.getCause() instanceof ConstraintViolationException) {
-            return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
-        }
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,ex.getCause().getCause().getLocalizedMessage(), ex));
+    @ExceptionHandler(value = CustomException.class)
+    public ResponseEntity <?> handleCustomException(CustomException exception, HttpServletRequest res) {
+        //System.out.println.println("hi");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
     }
 
     /**
@@ -207,14 +175,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-    @ExceptionHandler(EmptyResultDataAccessException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public  ResponseEntity<Object> handleEmptyDataException(HttpServletRequest request, Exception exception) {
 
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
-        apiError.setMessage("Resource Not found");
-        return buildResponseEntity(apiError);
-    }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
