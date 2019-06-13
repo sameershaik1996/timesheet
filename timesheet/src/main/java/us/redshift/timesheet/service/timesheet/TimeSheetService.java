@@ -74,18 +74,58 @@ public class TimeSheetService implements ITimeSheetService {
         }
 
         Set<TaskCard> taskCards = new HashSet<>(timeSheet.getTaskCards());
+
+        if (taskCards.size() == 0)
+            throw new ValidationException("Unable to Submit TimeSheet without Entries");
+
         taskCards.forEach(taskCard -> {
+
+            if (taskCard.getTask() == null)
+                throw new ValidationException("Task cannot be empty");
+            if (taskCard.getProject() == null)
+                throw new ValidationException("Project cannot be empty");
+            if (taskCard.getLocation() == null)
+                throw new ValidationException("Location cannot be empty");
+            if (taskCard.getType() == null)
+                throw new ValidationException("TaskType cannot be empty");
+
+
+//          UpdateActual Dates
+            taskCardService.UpdateActualDates(taskCard.getProject().getId(), taskCard.getTask().getId());
+
+
+            EmployeeDto employeeDto = employeeFeignClient.getEmployeeById(taskCard.getEmployeeId()).getBody();
+
+
+//      Set Designation Id
+            if (taskCard.getDesignationId() == null)
+                taskCard.setDesignationId(employeeDto.getDesignation().getId());
+
+
             Task task = taskService.getTaskById(taskCard
                     .getTask().getId());
+
+//       Set ApproverId
+            if (taskCard.getApproverId() == null && employeeDto.getReportingManager() != null)
+                taskCard.setApproverId(task.getProject().getManagerId());
+
             Employee employee = task.getEmployees().stream().filter(employee1 -> employee1.getEmployeeId() == taskCard.getEmployeeId()).findFirst().orElse(null);
 //          setRole
             taskCard.setRole(employee.getRole());
 
+            if (taskCard.getTaskCardDetails().size() == 0)
+                throw new ValidationException("Unable to Submit TimeSheet without Entries");
 
-            TaskCard card = taskCardService.calculateAmount(taskCard);
-//            if (!status.equals(TimeSheetStatus.PENDING)) {
-//                card = taskCardService.calculateAmount(taskCard);
-//            }
+
+            taskCard.getTaskCardDetails().stream().forEach(taskCardDetail -> {
+                taskCardService.checkDates(taskCardDetail, employeeDto.getJoiningDate());
+                taskCard.add(taskCardDetail);
+            });
+
+            TaskCard card = taskCard;
+            if (status.equals(TimeSheetStatus.SUBMITTED) || status.equals(TimeSheetStatus.APPROVED)) {
+                card = taskCardService.calculateAmount(taskCard);
+            }
             card.setStatus(status);
             timeSheet.addTaskCard(card);
             if (status.equals(TimeSheetStatus.APPROVED)) {
@@ -140,7 +180,7 @@ public class TimeSheetService implements ITimeSheetService {
             joiningYear = dateOfJoining.getYear();
         }
 
-//        System.out.println(dateOfJoining +"  " + joiningWeekNumber);
+//        ////////System.out.println(dateOfJoining +"  " + joiningWeekNumber);
 
 //      Current Date
         LocalDate today = LocalDate.now();
@@ -160,12 +200,12 @@ public class TimeSheetService implements ITimeSheetService {
             } else if (timeSheet == null && ((weekNumber <= currentWeekNumber && year <= currentYear) && (weekNumber >= joiningWeekNumber && year >= joiningYear))) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
                 timeSheet = timeSheetRepository.save(newTimeSheet);
-                System.out.println("testing1234");
+                ////////System.out.println("testing1234");
             } /*else if (timeSheet == null && weekNumber >= joiningWeekNumber && year >= joiningYear) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
                 timeSheet = timeSheetRepository.save(newTimeSheet);
             }*/ else {
-                System.out.println("No Entry Found");
+                ////////System.out.println("No Entry Found");
                 if (weekNumber > currentWeekNumber)
                     throw new ValidationException("No Permission to fill future TimeSheets");
                 if (weekNumber < joiningWeekNumber)
@@ -192,6 +232,7 @@ public class TimeSheetService implements ITimeSheetService {
     @Override
     public TimeSheet cloneTimeSheet(TimeSheet timeSheet) {
         List<TaskCard> taskCards = timeSheet.getTaskCards();
+
 
         taskCards.forEach(taskCard ->
         {
@@ -229,8 +270,8 @@ public class TimeSheetService implements ITimeSheetService {
         List<TimeSheet> projectTimeSheet = new ArrayList<>();
 
 
-        List<TaskCard> taskCards = new ArrayList<>();
         timeSheetSet.forEach(timeSheet -> {
+            List<TaskCard> taskCards = new ArrayList<>();
             timeSheet.getTaskCards().forEach(taskCard -> {
                 if (taskCard.getProject().getId() == projectId) {
                     taskCards.add(taskCard);
@@ -239,94 +280,6 @@ public class TimeSheetService implements ITimeSheetService {
             timeSheet.setTaskCards(taskCards);
             projectTimeSheet.add(timeSheet);
         });
-
-//        Page<TimeSheet> ProjectTimeSheetPage = new PageImpl<>(projectTimeSheet, new PageRequest(timeSheetPage.getPageable().getPageNumber(), timeSheetPage.getPageable().getPageSize(), timeSheetPage.getPageable().getSort()),
-//                projectTimeSheet.size());
-//        return ProjectTimeSheetPage;
-
-        /*Page<TimeSheet> ProjectTimeSheetPage = new Page<TimeSheet>() {
-            @Override
-            public int getTotalPages() {
-                return timeSheetPage.getTotalPages();
-            }
-
-            @Override
-            public long getTotalElements() {
-                return timeSheetPage.getTotalElements();
-            }
-
-            @Override
-            public <U> Page<U> map(Function<? super TimeSheet, ? extends U> converter) {
-                return null;
-            }
-
-            @Override
-            public int getNumber() {
-                return timeSheetPage.getNumber();
-            }
-
-            @Override
-            public int getSize() {
-                return timeSheetPage.getSize();
-            }
-
-            @Override
-            public int getNumberOfElements() {
-                return timeSheetPage.getNumberOfElements();
-            }
-
-            @Override
-            public List<TimeSheet> getContent() {
-                return projectTimeSheet;
-            }
-
-            @Override
-            public boolean hasContent() {
-                return timeSheetPage.hasContent();
-            }
-
-            @Override
-            public Sort getSort() {
-                return timeSheetPage.getSort();
-            }
-
-            @Override
-            public boolean isFirst() {
-                return timeSheetPage.isFirst();
-            }
-
-            @Override
-            public boolean isLast() {
-                return timeSheetPage.isLast();
-            }
-
-            @Override
-            public boolean hasNext() {
-                return timeSheetPage.hasNext();
-            }
-
-            @Override
-            public boolean hasPrevious() {
-                return timeSheetPage.hasPrevious();
-            }
-
-            @Override
-            public Pageable nextPageable() {
-                return timeSheetPage.nextPageable();
-            }
-
-            @Override
-            public Pageable previousPageable() {
-                return timeSheetPage.previousPageable();
-            }
-
-            @NotNull
-            @Override
-            public Iterator<TimeSheet> iterator() {
-                return projectTimeSheet.iterator();
-            }
-        };*/
-
         return Reusable.getPaginated(timeSheetPage, projectTimeSheet);
 
     }
@@ -337,17 +290,22 @@ public class TimeSheetService implements ITimeSheetService {
         ZoneId defaultZoneId = ZoneId.of("UTC");
         if (date == null) {
             Calendar calendar = Calendar.getInstance();
-            calendar.setWeekDate(year, weekNumber, 2);
+            calendar.setFirstDayOfWeek(Calendar.MONDAY);
+            calendar.setWeekDate(year, weekNumber, Calendar.MONDAY);
             date = calendar.getTime().toInstant().atZone(defaultZoneId).toLocalDate();
-            System.out.println(date);
         }
 
 
-        LocalDate monday = date.with(previousOrSame(MONDAY));
-        System.out.println(monday);
+        LocalDate monday = date.with((previousOrSame(MONDAY)));
+        ////////System.out.println(monday);
         LocalDate sunday = date.with(nextOrSame(SUNDAY));
+        ////////System.out.println(sunday);
         TimeSheet newTimeSheet = new TimeSheet();
+
+//        newTimeSheet.setFromDate(Date.from(monday.atZone(defaultZoneId).toInstant()));
         newTimeSheet.setFromDate(Date.from(monday.atStartOfDay(defaultZoneId).toInstant()));
+
+        ////////System.out.println(newTimeSheet.getFromDate());
         newTimeSheet.setToDate(Date.from(sunday.atStartOfDay(defaultZoneId).toInstant()));
         newTimeSheet.setWeekNumber(weekNumber);
         newTimeSheet.setEmployeeId(employeeId);

@@ -22,7 +22,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndStatusOrderByIdAsc(Long projectId, Long employeeId, TaskStatus status);
 
 
-    List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(Long projectId, Long employeeId, Date today);
+    List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndStartDateLessThanEqualAndStatusOrderByIdAsc(Long projectId, Long employeeId, Date today, TaskStatus status);
 
 
 }

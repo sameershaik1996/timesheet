@@ -13,10 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDate;
+import javax.annotation.PostConstruct;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableJpaAuditing
@@ -28,10 +30,18 @@ import java.util.Calendar;
         TimesheetApplication.class,
         Jsr310JpaConverters.class
 })
+@EnableScheduling
 public class TimesheetApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(TimesheetApplication.class, args);
+    }
+
+
+    @PostConstruct
+    public void init() {
+        // Setting Spring Boot SetTimeZone
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
     @Bean
@@ -45,9 +55,9 @@ public class TimesheetApplication {
         return new ObjectMapper();
     }
 
-    @Scheduled(fixedRate = 6000)
-    public void evictAllcachesAtIntervals() {
-        System.out.println(LocalDate.now());
+    @Scheduled(fixedRate = 60000 * 5)
+    public void evictAllCachesAtIntervals() {
+//        //System.out.println(LocalDateTime.now());
         evictAllCacheValues();
     }
 

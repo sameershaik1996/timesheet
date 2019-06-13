@@ -1,7 +1,10 @@
 package us.redshift.timesheet.dto.taskcard;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import us.redshift.timesheet.domain.EmployeeRole;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
@@ -10,6 +13,7 @@ import us.redshift.timesheet.dto.project.ProjectListDto;
 import us.redshift.timesheet.dto.task.TaskListDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetListDto;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -20,27 +24,27 @@ import java.util.List;
 public class TaskCardDto extends BaseDto {
 
     private Long id;
-    private TimeSheetStatus status;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
     private EmployeeListDto approvedBy;
-    @NonNull
+    @NotNull(message = "taskType cannot be empty")
     private TaskType type;
-    @NonNull
+    @NotNull(message = "employee cannot be empty")
     private EmployeeListDto employee;
-    @NonNull
+    @NotNull(message = "skill cannot be empty")
     private SkillDto skill;
     private EmployeeRole role;
     private DesignationDto designation;
-    @NonNull
+    @NotNull(message = "location cannot be empty")
     private LocationDto location;
-    private BigDecimal ratePerHour;
-    private BigDecimal amount;
-    private BigDecimal hours;
-    private String comment;
-    @NonNull
+    private BigDecimal ratePerHour = BigDecimal.valueOf(0);
+    private BigDecimal amount = BigDecimal.valueOf(0);
+    private BigDecimal hours = BigDecimal.valueOf(0);
+    private String comment = "";
+    @NotNull(message = "task cannot be empty")
     private TaskListDto task;
-    @NonNull
+    @NotNull(message = "project cannot be empty")
     private ProjectListDto project;
-    @NonNull
+    @NotNull(message = "taskCardDetails cannot be empty")
     @JsonIgnoreProperties("taskCard")
     private List<TaskCardDetailDto> taskCardDetails;
     private TimeSheetListDto timeSheet;

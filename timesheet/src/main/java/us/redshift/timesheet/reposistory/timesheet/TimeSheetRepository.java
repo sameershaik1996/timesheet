@@ -33,7 +33,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
     int setStatusForTimeSheet(String status, Long id);
 
 
-    Set<TimeSheet> findAllByStatusAndFromDateBefore(TimeSheetStatus status, Date localDate);
+    Set<TimeSheet> findAllByStatusAndFromDateBefore(TimeSheetStatus status, Date date);
 
 
 }

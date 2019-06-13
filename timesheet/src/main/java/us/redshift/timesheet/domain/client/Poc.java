@@ -12,7 +12,7 @@ import javax.validation.constraints.Email;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "pss_pocs", uniqueConstraints = @UniqueConstraint(columnNames = {"client_id", "phoneNumber"}))
+@Table(name = "pss_pocs", uniqueConstraints = @UniqueConstraint(columnNames = {"client_id", "phoneNumber", "email"}))
 @Getter
 @Setter
 @NoArgsConstructor

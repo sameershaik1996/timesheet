@@ -6,14 +6,12 @@ import lombok.*;
 import us.redshift.timesheet.domain.common.BaseEntity;
 import us.redshift.timesheet.domain.task.Task;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 @Entity
-@Table(name = "pss_employees")
+@Table(name = "pss_employees",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "role_id", "task_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +19,7 @@ import javax.persistence.Table;
 @ToString
 public class Employee extends BaseEntity {
 
+    @Column(name = "employee_id", nullable = false)
     private Long employeeId;
 
     private String firstName;

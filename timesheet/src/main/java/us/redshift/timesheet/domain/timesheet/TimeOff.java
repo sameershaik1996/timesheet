@@ -31,7 +31,4 @@ public class TimeOff extends BaseEntity {
     @JsonIgnoreProperties(value = {"timeOffs", "taskCards"})
     private TimeSheet timeSheet;
 
-    public void setStatus(TimeSheetStatus status) {
-        this.status = status == null ? TimeSheetStatus.PENDING : status;
-    }
 }

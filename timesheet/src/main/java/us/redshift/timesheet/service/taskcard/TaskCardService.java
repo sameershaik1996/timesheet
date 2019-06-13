@@ -14,10 +14,8 @@ import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
-import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.exception.ValidationException;
-import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 import us.redshift.timesheet.reposistory.taskcard.TaskCardRepository;
 import us.redshift.timesheet.service.project.IProjectService;
 import us.redshift.timesheet.service.ratecard.IRateCardDetailService;
@@ -26,8 +24,7 @@ import us.redshift.timesheet.service.timesheet.ITimeSheetService;
 import us.redshift.timesheet.util.Reusable;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,23 +39,19 @@ public class TaskCardService implements ITaskCardService {
     private final ITaskCardDetailService taskCardDetailService;
     private final ITaskService taskService;
     private final ITimeSheetService timeSheetService;
-    private final EmployeeFeignClient employeeFeignClient;
-
 
     public TaskCardService(TaskCardRepository taskCardRepository,
                            @Lazy IRateCardDetailService rateCardDetailService,
                            @Lazy IProjectService projectService,
                            @Lazy ITaskCardDetailService taskCardDetailService,
                            @Lazy ITaskService taskService,
-                           @Lazy ITimeSheetService timeSheetService,
-                           @Lazy EmployeeFeignClient employeeFeignClient) {
+                           @Lazy ITimeSheetService timeSheetService) {
         this.taskCardRepository = taskCardRepository;
         this.rateCardDetailService = rateCardDetailService;
         this.projectService = projectService;
         this.taskCardDetailService = taskCardDetailService;
         this.taskService = taskService;
         this.timeSheetService = timeSheetService;
-        this.employeeFeignClient = employeeFeignClient;
     }
 
 
@@ -72,8 +65,10 @@ public class TaskCardService implements ITaskCardService {
             taskCard.setStatus(status);
             TimeSheet timeSheet = timeSheetService.getTimeSheet(taskCard.getTimeSheet().getId());
 //          calculateAmount()
-            if (status.equals(TimeSheetStatus.APPROVED))
+            if (status.equals(TimeSheetStatus.APPROVED)) {
+                taskCard = addTaskCardDetails(taskCard);
                 taskCard = calculateAmount(taskCard);
+            }
             TaskCard savedTaskCard = taskCardRepository.save(taskCard);
             taskCardList.add(savedTaskCard);
             if (status.equals(TimeSheetStatus.APPROVED)) {
@@ -149,23 +144,10 @@ public class TaskCardService implements ITaskCardService {
     @Override
     public TaskCard calculateAmount(TaskCard card) {
 
-
 //      Get rateCardId
         Task task = taskService.getTaskById(card
                 .getTask().getId());
-
-        EmployeeDto employeeDto = employeeFeignClient.getEmployeeById(card.getEmployeeId()).getBody();
-
-
-/*//      Set Designation Id
-        if (card.getDesignationId() == null)
-            card.setDesignationId(employeeDto.getDesignation().getId());
-//       Set ApproverId
-        if(card.getApproverId() == null)
-            card.setApproverId(employeeDto.getReportingManager().getId());*/
-
-
-        Long rateCardId = new Long(0);
+        Long rateCardId = null;
         BigDecimal ratePerHour = new BigDecimal(0);
 
         if (TaskType.BILLABLE.equals(task.getType())) {
@@ -174,18 +156,9 @@ public class TaskCardService implements ITaskCardService {
 
 
 //      Assign ratePerHour
-            if (card.getLocation().getId() != null && card.getRole() != null && rateCardId != null) {
-/*
-//      Get Employee Designation
-                Long designationId = Long.valueOf(1);
-                EmployeeDto employeeDto = employeeFeign.getEmployeeById(card.getEmployeeId()).getBody();
-                if (employeeDto.getDesignation() != null)
-                    designationId = employeeDto.getDesignation().getId();
-*/
+            if (card.getLocation() != null && card.getRole() != null && rateCardId != null) {
 //       TODo Add RateCard Id
                 RateCardDetail rateCardDetail = rateCardDetailService.findByRateCard_IdAndLocation_IdAndEmployeeRole_Id(rateCardId, card.getLocation().getId(), card.getRole().getId());
-//                rateCardDetailService.findByLocationIdAndSkillIdAndDesignationId
-//                        (card.getLocation().getId(), card.getSkillId(), card.getDesignationId());
                 if (rateCardDetail != null)
                     ratePerHour = rateCardDetail.getValue();
                 LOGGER.info(" UpdateTaskCard Calculate Amount RatePerHour {}", ratePerHour);
@@ -201,14 +174,6 @@ public class TaskCardService implements ITaskCardService {
             hours = hours.add(cardDetail.getHours());
         }
 
-//      add task_card_id
-        cardDetails.forEach(taskCardDetail -> {
-            System.out.println(taskCardDetail.getDate() + "taskCardDetail dates");
-
-            checkDates(taskCardDetail, employeeDto.getJoiningDate());
-            card.add(taskCardDetail);
-        });
-
 //      SetAmount and Hour
         LOGGER.info(" UpdateTaskCard Calculate Amount Total Hours{}", hours);
         card.setHours(hours);
@@ -217,24 +182,41 @@ public class TaskCardService implements ITaskCardService {
         return card;
     }
 
-    private void checkDates(TaskCardDetail taskCardDetail, Date joiningDate) {
-//        System.out.println(taskCardDetail.getDate().before(joiningDate));
+    @Override
+    public void UpdateActualDates(Long projectId, Long taskId) {
 
-//        System.out.println("Current Date "+ LocalDate.now());
-//
-//        System.out.println("TaskCardDetailsDate "+taskCardDetail.getDate().toInstant()
-//                .atZone(ZoneId.systemDefault())
-//                .toLocalDate());
-//
-//        System.out.println("Check Today Date " + LocalDate.now().isBefore(taskCardDetail.getDate().toInstant()
-//                .atZone(ZoneId.systemDefault())
-//                .toLocalDate()));
-        if (taskCardDetail.getDate().before(joiningDate))
+        Project project = projectService.getProjectById(projectId);
+        Task task = taskService.getTaskById(taskId);
+        if (project.getStartedOn() == null && project.getStartDate() != null) {
+
+            ////////System.out.println("Project and Task Actual Dates");
+
+            project.setStartedOn(new Date(System.currentTimeMillis()));
+            projectService.saveProject(project);
+            if (task.getStartedOn() == null && task.getStartDate() != null) {
+                task.setStartedOn(new Date(System.currentTimeMillis()));
+                try {
+                    taskService.saveTask(task);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void checkDates(TaskCardDetail taskCardDetail, Date date) {
+
+        java.sql.Date taskCardDetailDate = new java.sql.Date(taskCardDetail.getDate().getTime());
+        java.sql.Date joiningDate = new java.sql.Date(date.getTime());
+        java.sql.Date currentDate = new java.sql.Date(System.currentTimeMillis());
+        if (taskCardDetailDate.compareTo(joiningDate) > 1)
             throw new ValidationException("Please fill from your joining Date");
-        if (LocalDate.now().isBefore(taskCardDetail.getDate().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()))
-            throw new ValidationException("Don't Fill for Future Dates");
+        if (currentDate.compareTo(taskCardDetailDate) < 1)
+            if (!currentDate.equals(taskCardDetailDate))
+                throw new ValidationException("Don't Fill for Future Dates");
+
     }
 
     @Override
@@ -257,6 +239,14 @@ public class TaskCardService implements ITaskCardService {
             timeSheetService.setStatusForTimeSheet(TimeSheetStatus.REJECTED.name(), timeSheet.getId());
         }
 
+    }
+
+
+    public TaskCard addTaskCardDetails(TaskCard taskCard) {
+
+        taskCard.getTaskCardDetails().stream().forEach(taskCardDetail -> taskCard.add(taskCardDetail));
+
+        return taskCard;
     }
 
 

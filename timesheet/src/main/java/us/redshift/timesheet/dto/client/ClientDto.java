@@ -1,7 +1,6 @@
 package us.redshift.timesheet.dto.client;
 
 import lombok.*;
-import org.springframework.lang.NonNull;
 import us.redshift.timesheet.domain.client.ClientStatus;
 import us.redshift.timesheet.dto.common.AddressDto;
 import us.redshift.timesheet.dto.common.BaseDto;
@@ -18,13 +17,13 @@ import java.util.Set;
 public class ClientDto extends BaseDto {
 
     private Long id;
-    @NotNull(message = "clientCode can't be NULL")
+    @NotNull(message = "clientCode cannot be empty")
     private String clientCode;
-    @NonNull
+    @NotNull(message = "name cannot be empty")
     private String name;
     private Set<PocDto> pocs = new HashSet<>();
     private String url;
-    private ClientStatus status;
+    private ClientStatus status = ClientStatus.ACTIVE;
     private IndustryDto industry;
     private Set<FocusAreaDto> focusAreas = new HashSet<>();
     private String futureFocus;
@@ -32,6 +31,5 @@ public class ClientDto extends BaseDto {
     private AddressDto address;
     private AddressDto billingAddress;
     private String notes;
-
 
 }

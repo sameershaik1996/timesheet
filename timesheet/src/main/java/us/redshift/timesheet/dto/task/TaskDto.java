@@ -1,6 +1,9 @@
 package us.redshift.timesheet.dto.task;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.domain.taskcard.TaskType;
@@ -8,6 +11,7 @@ import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.CommonDto;
 import us.redshift.timesheet.dto.common.SkillDto;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -19,28 +23,26 @@ import java.util.List;
 public class TaskDto extends BaseDto {
 
     private Long id;
-    @NonNull
+    @NotNull(message = "taskCode cannot be empty")
     private String taskCode;
-    @NonNull
+    @NotNull(message = "name cannot be empty")
     private String name;
-    @NonNull
     private String description;
-    @NonNull
+    @NotNull(message = "taskType cannot be empty")
     private TaskType type;
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.ACTIVE;
     private Date startDate;
     private Date endDate;
     private Date startedOn;
     private Date endedOn;
-    private BigDecimal usedHour;
-    private BigDecimal billableHour;
-
-    private BigDecimal nonBillableHour;
-    @NonNull
+    private BigDecimal usedHour = BigDecimal.valueOf(0);
+    private BigDecimal billableHour = BigDecimal.valueOf(0);
+    private BigDecimal nonBillableHour = BigDecimal.valueOf(0);
+    @NotNull(message = "skills cannot be empty")
     private List<SkillDto> skills;
-    @NonNull
+    @NotNull(message = "employees cannot be empty")
     private List<Employee> employees;
-    @NonNull
+    @NotNull(message = "project cannot be empty")
     private CommonDto project;
 
 

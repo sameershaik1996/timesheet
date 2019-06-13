@@ -29,6 +29,7 @@ import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 import us.redshift.timesheet.feignclient.EmployeeFeignClientFallback;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public class ModelMapperConfig {
                     //LOGGER.info("EmployeeDto {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(employee));
 
                 } catch (FeignException e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
                 EmployeeListDto dest = mapper.map(employee, EmployeeListDto.class);
                 return dest;
@@ -97,7 +98,7 @@ public class ModelMapperConfig {
                     //LOGGER.info(" List<EmployeeDto> {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(employees));
 
                 } catch (FeignException e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
                 Type targetType = new TypeToken<List<EmployeeListDto>>() {
                 }.getType();
@@ -134,7 +135,7 @@ public class ModelMapperConfig {
                     //LOGGER.info(" SkillDto {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dest));
 
                 } catch (FeignException e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
                 return dest;
             }
@@ -161,7 +162,7 @@ public class ModelMapperConfig {
                     //LOGGER.info("List<SkillDto> {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dest));
 
                 } catch (FeignException e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
                 return dest;
             }
@@ -192,7 +193,7 @@ public class ModelMapperConfig {
                     //LOGGER.info("Designation get {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dest));
 
                 } catch (FeignException e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
 
                 return dest;
@@ -212,7 +213,7 @@ public class ModelMapperConfig {
                     //LOGGER.info("EmployeeDto get {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(employee));
 
                 } catch (FeignException e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
                 if (employee.getDesignation() != null)
                     return employee.getDesignation().getId();
@@ -320,7 +321,7 @@ public class ModelMapperConfig {
             protected void configure() {
                 using(LongToEmployeeListDto).map(source.getEmployeeId()).setEmployee(null);
                 using(LongToSkillDto).map(source.getSkillId()).setSkill(null);
-                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
+//                using(LongToDesignationDto).map(source.getDesignationId()).setDesignation(null);
 
             }
         });
@@ -335,13 +336,14 @@ public class ModelMapperConfig {
                 source = mappingContext.getSource();
                 source.forEach(taskCardDetailDto -> {
                     if (taskCardDetailDto != null) {
-                        if (taskCardDetailDto.getHours() != null) {
+                        if (taskCardDetailDto.getHours() != null || BigDecimal.valueOf(0).equals(taskCardDetailDto.getHours())) {
                             TaskCardDetail taskCardDetail = new TaskCardDetail();
                             taskCardDetail.setId(taskCardDetailDto.getId());
                             taskCardDetail.set_index(taskCardDetailDto.get_index());
                             taskCardDetail.setHours(taskCardDetailDto.getHours());
                             taskCardDetail.setDate(taskCardDetailDto.getDate());
                             taskCardDetail.setComment(taskCardDetailDto.getComment());
+                            taskCardDetail.setRejectedComment(taskCardDetail.getRejectedComment());
                             dest.add(taskCardDetail);
                         }
                     }
@@ -357,7 +359,7 @@ public class ModelMapperConfig {
                 using(EmployeeListDtoToLong).map(source.getEmployee()).setEmployeeId(null);
                 using(SkillDtoToLong).map(source.getSkill()).setSkillId(null);
                 using(taskCardDetailConverter).map(source.getTaskCardDetails()).setTaskCardDetails(null);
-                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
+//                using(designationDtoFromEmployeeToLong).map(source.getEmployee()).setDesignationId(null);
             }
         });
 

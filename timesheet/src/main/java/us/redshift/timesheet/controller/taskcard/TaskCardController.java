@@ -58,7 +58,7 @@ public class TaskCardController {
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCardList), HttpStatus.OK);
         } else if (projectId != null) {
             List<TaskCard> taskCards = taskCardService.getAllTaskCardByProject(projectId);
-            System.out.println(taskCards.size());
+            //System.out.println(taskCards.size());
             return new ResponseEntity<>(taskCardAssembler.convertToDto(taskCards), HttpStatus.OK);
         } else {
             Page<TaskCard> taskCardPage = taskCardService.getAllTaskCardByPagination(page, limits, orderBy, fields);

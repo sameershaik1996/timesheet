@@ -21,7 +21,7 @@ public class TimesheetCloneDto {
     private Long id;
     private String name;
     private String comment;
-    private TimeSheetStatus status;
+    private TimeSheetStatus status = TimeSheetStatus.PENDING;
 
     private EmployeeListDto employee;
     private Date fromDate;

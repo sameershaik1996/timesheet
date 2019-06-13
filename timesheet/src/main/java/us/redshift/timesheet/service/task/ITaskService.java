@@ -6,7 +6,6 @@ import us.redshift.timesheet.domain.task.TaskStatus;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 public interface ITaskService {
@@ -33,8 +32,5 @@ public interface ITaskService {
     List<Task> findAllByProjectIdAndEmployeeId(Long projectId, Long employeeId, TaskStatus status);
 
     List<Long> findAllSkillsByProjectId(Long taskId);
-
-
-    List<Task> findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(Long projectId, Long employeeId, Date today);
 
 }

@@ -7,27 +7,32 @@ import org.springframework.stereotype.Service;
 import us.redshift.timesheet.domain.project.Project;
 import us.redshift.timesheet.domain.project.ProjectStatus;
 import us.redshift.timesheet.domain.ratecard.RateCardDetail;
+import us.redshift.timesheet.domain.task.Task;
+import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
+import us.redshift.timesheet.exception.ValidationException;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.service.client.IClientService;
+import us.redshift.timesheet.service.task.ITaskService;
 import us.redshift.timesheet.util.Reusable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService implements IProjectService {
 
     private final ProjectRepository projectRepository;
     private final IClientService clientService;
+    private final ITaskService taskService;
 
 
     public ProjectService(ProjectRepository projectRepository,
-                          @Lazy IClientService clientService) {
+                          @Lazy IClientService clientService,
+                          @Lazy ITaskService taskService) {
         this.projectRepository = projectRepository;
         this.clientService = clientService;
+        this.taskService = taskService;
     }
 
     @Override
@@ -44,6 +49,9 @@ public class ProjectService implements IProjectService {
         projects.forEach(project -> {
             if (status != null) {
                 Project getProject = projectRepository.findById(project.getId()).orElseThrow(() -> new ResourceNotFoundException("Project", "Id", ""));
+                if (ProjectStatus.COMPLETE.equals(status))
+                    getProject = updateActualDate(project);
+
                 getProject.setStatus(status);
                 projectList.add(getProject);
             }
@@ -58,6 +66,8 @@ public class ProjectService implements IProjectService {
     public Project updateProject(Project project) {
         if (!projectRepository.existsById(project.getId()))
             throw new ResourceNotFoundException("Project", "Id", project.getId());
+        if (ProjectStatus.COMPLETE.equals(project.getStatus()))
+            project = updateActualDate(project);
         project = setRateCardDetail(project);
         return projectRepository.save(project);
     }
@@ -88,7 +98,8 @@ public class ProjectService implements IProjectService {
 
     @Override
     public List<Project> findAllByEmployeeId(Long employeeId, ProjectStatus status) {
-        return projectRepository.findAllByEmployeeIdAndStatusOrderByIdAsc(employeeId, status);
+        Set<Project> projects = new LinkedHashSet<>(projectRepository.findAllByEmployeeIdAndStartDateLessThanEqualAndStatusOrderByIdAsc(employeeId, new Date(System.currentTimeMillis()), status));
+        return projects.stream().collect(Collectors.toList());
     }
 
 
@@ -126,6 +137,23 @@ public class ProjectService implements IProjectService {
         if (project.getRateCard() != null)
             rateCardDetails = new HashSet<>(project.getRateCard().getRateCardDetails());
         rateCardDetails.forEach(rateCardDetail -> project.getRateCard().addRateCardDetail(rateCardDetail));
+        return project;
+    }
+
+    private Project updateActualDate(Project project) {
+        if (project.getStartDate() != null && project.getEndDate() != null && project.getStartedOn() != null) {
+
+            List<Task> tasks = taskService.getProjectTasksByPagination(project.getId(), 0, 0, null, null).getContent();
+
+            Long count = tasks.stream().filter(task -> TaskStatus.COMPLETE.equals(task.getStatus())).count();
+
+            //////System.out.println(count);
+
+            if (tasks.size() == count)
+                project.setEndedOn(new Date(System.currentTimeMillis()));
+            else
+                throw new ValidationException("Some Task under this project still not completed");
+        }
         return project;
     }
 

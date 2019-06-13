@@ -22,7 +22,7 @@ public class RateCardService implements IRateCardService {
     @Override
     public RateCard saveRateCard(RateCard rateCard) {
         List<RateCardDetail> rateCardDetails = new ArrayList<>(rateCard.getRateCardDetails());
-//        System.out.println(rateCardDetails.size());
+//        ////////System.out.println(rateCardDetails.size());
         rateCardDetails.forEach(cardDetail -> {
             rateCard.addRateCardDetail(cardDetail);
         });

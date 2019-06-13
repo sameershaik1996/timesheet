@@ -88,7 +88,6 @@ public class TaskController {
             return new ResponseEntity<>(taskAssembler.convertToPagedDto(taskPage), HttpStatus.OK);
         } else if (projectId != null && employeeId != null && !("ALL".equalsIgnoreCase(status))) {
             List<Task> tasks = taskService.findAllByProjectIdAndEmployeeId(projectId, employeeId, TaskStatus.get(status.toUpperCase()));
-//            List<Task> tasks = taskService.findAllByProject_IdAndEmployees_EmployeeIdAndEndDateBeforeOrderByIdAsc(projectId, employeeId, new Date(LocalDate.now().toString()));
             return new ResponseEntity<>(taskAssembler.convertToDto(tasks), HttpStatus.OK);
         } else {
             Page<Task> taskPage = taskService.getAllTaskByPagination(page, limits, orderBy, fields);

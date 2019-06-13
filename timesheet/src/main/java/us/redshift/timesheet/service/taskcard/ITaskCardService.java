@@ -2,10 +2,12 @@ package us.redshift.timesheet.service.taskcard;
 
 import org.springframework.data.domain.Page;
 import us.redshift.timesheet.domain.taskcard.TaskCard;
+import us.redshift.timesheet.domain.taskcard.TaskCardDetail;
 import us.redshift.timesheet.domain.taskcard.TaskType;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ITaskCardService {
@@ -30,7 +32,11 @@ public interface ITaskCardService {
 
     Boolean existsById(Long taskCardId);
 
+    void checkDates(TaskCardDetail taskCardDetail, Date date);
+
     TaskCard calculateAmount(TaskCard taskCard);
+
+    void UpdateActualDates(Long projectId, Long taskId);
 
     void TimeSheetStatus(TimeSheet timeSheet);
 }

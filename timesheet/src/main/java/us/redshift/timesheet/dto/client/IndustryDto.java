@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import us.redshift.timesheet.dto.common.BaseDto;
 
+import javax.validation.constraints.NotNull;
+
 
 @Getter
 @Setter
@@ -13,6 +15,7 @@ import us.redshift.timesheet.dto.common.BaseDto;
 @AllArgsConstructor
 public class IndustryDto extends BaseDto {
 
-    private int id;
+    private Long id;
+    @NotNull(message = "name cannot be empty")
     private String name;
 }
