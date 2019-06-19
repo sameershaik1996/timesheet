@@ -9,7 +9,8 @@ rm -Rf target
 echo "> building jar..."
 call mvn package -Dmaven.test.skip=true
 
-echo "> Building $APPLICATION_NAME:latest"
+echo "> Building %APPLICATION_NAME%:latest"
+docker login -u ssameer03 -pSameer@123
 docker build -t %IMAGE_NAME%:latest .
 
 docker tag pss_employee %REPO_IMAGE%
