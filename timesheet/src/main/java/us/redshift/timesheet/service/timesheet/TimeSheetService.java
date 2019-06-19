@@ -66,8 +66,8 @@ public class TimeSheetService implements ITimeSheetService {
         if (!timeSheetRepository.existsById(timeSheet.getId()))
             throw new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId());
         if (TimeSheetStatus.SUBMITTED.equals(status)) {
-            int count = timeSheetRepository.findAllByStatusAndFromDateBefore(TimeSheetStatus.PENDING, timeSheet.getFromDate()).size();
-            if (count > 1) {
+            int count = timeSheetRepository.findAllByStatusAndFromDateLessThanAndEmployeeId(TimeSheetStatus.PENDING, timeSheet.getFromDate(), timeSheet.getEmployeeId()).size();
+            if (count > 0) {
                 LOGGER.info(" previous unSubmitted TimeSheets {}", count);
                 throw new ValidationException("Please submit previous TimeSheet (" + count + ")");
             }
@@ -140,7 +140,7 @@ public class TimeSheetService implements ITimeSheetService {
         timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
         timeSheet.setStatus(status);
         TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
-        timeSheet.getTaskCards().forEach(taskCard -> {
+        SaveTimeSheet.getTaskCards().forEach(taskCard -> {
             LOGGER.info("UpdateTimeSheet TaskCardDetails Status Updated {}", taskCardDetailService.setStatusForTaskCardDetailByTaskCardId(status.name(), taskCard.getId()));
         });
 

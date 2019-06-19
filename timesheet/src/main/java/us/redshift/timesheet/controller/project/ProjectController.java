@@ -126,18 +126,16 @@ public class ProjectController {
     @GetMapping("project/get/enddate")
     public ResponseEntity<?> getEndDate(@RequestParam("startDate") String startDate, @RequestParam("estimatedDays") Long estimatedDays) {
         //return new ResponseEntity<>(Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays).toString(), HttpStatus.OK);
-        Long epo = Long.parseLong(startDate);
+      /*  Long epo = Long.parseLong(startDate);
 
         //System.out.println(epo);
 
         LocalDate date =
                 Instant.ofEpochMilli(epo)
                         .atZone(ZoneId.systemDefault())
-                        .toLocalDate();
+                        .toLocalDate();*/
 
-        //System.out.println(date.toString());
-
-        LocalDate localDate = Reusable.calcEndDate(LocalDate.parse(date.toString()), estimatedDays);
+        LocalDate localDate = Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays);
         //System.out.println(localDate);
 
         LocalDateTime localDateTime = localDate.atStartOfDay();

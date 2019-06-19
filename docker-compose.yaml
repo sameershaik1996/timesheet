@@ -26,7 +26,7 @@ services:
     command: mvn package -Dmaven.test.skip=true
     build:
       context: employee/
-      dockerfile: employee/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - '9090:9090'
     links:

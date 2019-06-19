@@ -74,7 +74,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateEmployee(@Valid @RequestBody EmployeeDto employee,
+    public ResponseEntity<?> updateEmployee( @RequestBody EmployeeDto employee,
                                             @RequestParam(value = "empId", required = false) List<Long> empIds,
                                             @RequestParam(value = "status", required = false) EmployeeStatus status
     ) {

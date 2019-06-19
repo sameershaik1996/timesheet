@@ -12,9 +12,9 @@ IF "%build%"=="timesheet" goto timesheet
 
 
 :zuul
-set arg1="employee"
-set arg2="pss_employee"
-set arg3="employeeService"
+set arg1="timesheet"
+set arg2="pss_timesheet"
+set arg3="timesheetService"
 goto exec
 
 

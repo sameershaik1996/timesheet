@@ -1,11 +1,12 @@
 package us.redshift.timesheet.util;
 
-import org.jetbrains.annotations.NotNull;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;

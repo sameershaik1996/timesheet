@@ -26,4 +26,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
 
     List<Project> findAllByEmployeeIdAndStartDateLessThanEqualAndStatusOrderByIdAsc(Long employeeId, Date date, ProjectStatus status);
+
+    List<Project> findAllByEmployeeIdAndStartDateLessThanEqualAndStartDateLessThanEqualAndStatusOrderByIdAsc(Long employeeId, Date currentDate, Date timeSheetFromDate, ProjectStatus status);
 }

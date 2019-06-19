@@ -65,6 +65,8 @@ public class TaskCardDetailService implements ITaskCardDetailService {
             if ((sheetStatus.equals(TimeSheetStatus.APPROVED) || sheetStatus.equals(TimeSheetStatus.INVOICE_RAISED)) && status.equals(TimeSheetStatus.REJECTED))
                 throw new ValidationException("Could not Reject the Approved TimeSheet " + " ( " + taskCardDetail.getId() + " )");
 
+            if (status == null) throw new ValidationException("status should not be null ");
+
             taskCardDetail.setStatus(status);
 //            taskCardDetailRepository.save(taskCardDetail);
             taskCardDetailList.add(taskCardDetail);
