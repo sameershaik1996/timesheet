@@ -14,7 +14,7 @@ echo "> Building %APPLICATION_NAME%:latest"
 docker login -u ssameer03 -pSameer@123
 docker build -t %IMAGE_NAME%:beta .
 
-docker tag pss_employee %REPO_IMAGE%
+docker tag %IMAGE_NAME% %REPO_IMAGE%
 
 docker push %REPO_IMAGE%
 echo "> Done."
