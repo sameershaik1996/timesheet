@@ -16,8 +16,7 @@ services:
     ports:
       - '3306:3306'
     
-    volumes:
-      - my-db:/var/lib/mysql
+    
   
   employeeService:
     image: ssameer03/pss_employee:beta
@@ -110,5 +109,4 @@ services:
 
 
 # Names our volume
-volumes:
-  my-db:
+
