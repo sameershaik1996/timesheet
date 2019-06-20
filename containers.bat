@@ -1,0 +1,1 @@
+docker-compose -f .\docker-compose-beta.yaml up -d
