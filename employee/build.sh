@@ -1,6 +1,9 @@
 #!/bin/bash
 
 APPLICATION_NAME=employee
+set IMAGE_NAME=pss_%APPLICATION_NAME%
+set REGISTERGY_NAME=ssameer03
+set REPO_IMAGE=%REGISTERGY_NAME%/%IMAGE_NAME%:latest
 
 echo "> Cleaning target..."
 rm -Rf target

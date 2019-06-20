@@ -20,7 +20,7 @@ services:
       - my-db:/var/lib/mysql
   
   employeeService:
-    image: ssameer03/pss_employee:latest
+    image: ssameer03/pss_employee:beta
     container_name: employeeService
     restart: always
     command: mvn package -Dmaven.test.skip=true
@@ -46,7 +46,7 @@ services:
     
 
   serviceDiscovery:
-    image: ssameer03/pss_eureka:latest
+    image: ssameer03/pss_eureka:beta
     container_name: serviceDiscovery
     restart: always
     ports: 
@@ -56,7 +56,7 @@ services:
    
 
   apiGateway:
-    image: ssameer03/pss_zuul:latest
+    image: ssameer03/pss_zuul:beta
     container_name: apiGateway
     restart: always
     ports:
@@ -71,7 +71,7 @@ services:
     
     
   authService:
-    image: ssameer03/pss_auth:latest
+    image: ssameer03/pss_auth:beta
     container_name: authService
     restart: always
     ports:
@@ -88,7 +88,7 @@ services:
       - database:database
 
   timesheetService:
-    image: ssameer03/pss_timesheet:latest
+    image: ssameer03/pss_timesheet:beta
     container_name: timesheetService
     restart: always
     ports:
