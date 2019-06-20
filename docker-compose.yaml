@@ -24,9 +24,7 @@ services:
     container_name: employeeService
     restart: always
     command: mvn package -Dmaven.test.skip=true
-    build:
-      context: employee/
-      dockerfile: Dockerfile
+    
     ports:
       - '9090:9090'
     links:
