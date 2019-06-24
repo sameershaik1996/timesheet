@@ -3,7 +3,7 @@ pipeline {
     stages {
 stage('testing pipeline'){
           steps{
-      echo 'test1'
+      bat label: ", script: '" newman run "C:\\Users\\redshift\\Desktop\\TimeSheet.postman_collection" -e "C:\\Users\\redshift\\Desktop\\test.postman_environment.json""'
                 
                 }
         }
