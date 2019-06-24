@@ -1,0 +1,9 @@
+- MAO_AUTHURL=https://pvtes-auth.omni.manh.com  
+      - MAO_AUTHENDPOINT=/oauth/token
+      - MAO_APPURL=https://pvtes.omni.manh.com
+      - MAO_AUTHORIZATION=
+      - MAO_GRANTTYPE=password
+      - MAO_CLIENTUSERNAME=8YvnVKQC7+0YmYHrJ75K6T68E1U9Ey96M/GzosJS4eg=
+      - MAO_CLIENTPASSWORD=/5D13gDHH/lN7Ldq3TGswwCj/iXUF/iwxbv0TxlCj4I=
+      - MAO_USERNAME=YakHWMQq7uf4jOHJmSnSwg==
+      - MAO_PASSWORD=rA5gNfoM7w8id5S9BOUp4Q==
