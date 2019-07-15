@@ -1,10 +1,12 @@
 package us.redshift.employee.service;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -13,6 +15,7 @@ import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.exception.CustomException;
+import us.redshift.employee.feignclient.IUserClient;
 import us.redshift.employee.repository.EmployeeRespository;
 import us.redshift.employee.util.DTO;
 
@@ -21,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,6 +35,9 @@ public class EmployeeService implements IEmployeeService {
 
     @Autowired
     EmployeeRespository employeeRespository;
+
+    @Autowired
+    IUserClient userClient;
 
     @Override
     public Employee createEmployee(Employee employee) throws ConstraintViolationException, DataIntegrityViolationException {
@@ -91,6 +99,18 @@ public class EmployeeService implements IEmployeeService {
     @Override
     public int setStatusForEmployee(EmployeeStatus status, List<Long> empIds) {
         return employeeRespository.setStatusForEmployee(status.toString(), empIds);
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 12 * * ?")
+    public void markEmployeeAsInActive() {
+        List<Employee> employees=employeeRespository.findByLastWorkingDateLessThanAndStatus(DateUtils.truncate(new Date(), java.util.Calendar.DAY_OF_MONTH),EmployeeStatus.ACTIVE);
+        List<Long> ids=new ArrayList<>();
+        for (Employee emp:employees) {
+            ids.add(emp.getId());
+        }
+        setStatusForEmployee(EmployeeStatus.INACTIVE, ids);
+        userClient.updateUser(ids, false);
     }
 
     private String generateEmployeeId(Employee emp) {

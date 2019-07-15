@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.domain.common.EmployeeStatus;
 
+import java.util.Date;
 import java.util.List;
 
 public interface EmployeeRespository extends JpaRepository<Employee, Long> {
@@ -29,5 +30,6 @@ public interface EmployeeRespository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByIdNotLike(Long id);
 
+    List<Employee> findByLastWorkingDateLessThanAndStatus(Date date,EmployeeStatus status);
 
 }

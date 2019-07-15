@@ -8,6 +8,8 @@ import us.redshift.auth.domain.Role;
 import us.redshift.auth.repository.RoleRepository;
 import us.redshift.auth.service.IRoleService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/auth/v1/api/role")
 public class RoleController {
@@ -18,9 +20,9 @@ public class RoleController {
     @Autowired
     IRoleService roleService;
     @PostMapping("assignpermission")
-    public ResponseEntity<?> assignPermissionForRole(@RequestBody Role role){
+    public ResponseEntity<?> assignPermissionForRole(@RequestBody List<Role> role){
 
-        return new ResponseEntity<>(roleRepository.save(role), HttpStatus.CREATED);
+        return new ResponseEntity<>(roleRepository.saveAll(role), HttpStatus.CREATED);
 
     }
 

@@ -26,4 +26,6 @@ public interface IEmployeeService {
     List<Employee> findByIdNotLike(Long id);
 
     int setStatusForEmployee(EmployeeStatus status, List<Long> empIds);
+
+    void markEmployeeAsInActive();
 }

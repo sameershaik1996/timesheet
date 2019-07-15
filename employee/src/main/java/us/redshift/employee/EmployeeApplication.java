@@ -15,6 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import us.redshift.employee.domain.Employee;
 import us.redshift.employee.dto.EmployeeDto;
 
@@ -31,6 +32,7 @@ import java.util.TimeZone;
 		Jsr310JpaConverters.class
 })
 @EnableJpaAuditing
+@EnableScheduling
 public class EmployeeApplication {
 
 	@Value( "${spring.jackson.time-zone}" )

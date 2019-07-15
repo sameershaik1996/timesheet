@@ -14,9 +14,13 @@ import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.dto.task.TaskDto;
 import us.redshift.timesheet.service.task.ITaskService;
+import us.redshift.timesheet.util.Reusable;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController
@@ -100,5 +104,22 @@ public class TaskController {
     public ResponseEntity<?> getAllTaskStatuses() {
         return new ResponseEntity<>(taskService.getAllTaskStatus(), HttpStatus.OK);
     }
+
+    @GetMapping("task/get/enddate")
+    public ResponseEntity<?> getEndDate(@RequestParam("startDate") String startDate, @RequestParam("estimatedHours") Long estimatedHours) {
+
+        Long estimatedDays=(estimatedHours/8)+1;
+        LocalDate localDate = Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays);
+        //System.out.println(localDate);
+
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+
+        Long l1 = localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+
+        return new ResponseEntity<>(l1 * 1000, HttpStatus.OK);
+
+
+    }
+
 
 }

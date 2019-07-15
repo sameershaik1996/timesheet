@@ -148,5 +148,12 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.checkIfEmployeeExists(id), HttpStatus.OK);
     }
 
+    @GetMapping("get/test/{id}")
+    public void test(@PathVariable Long id) {
+
+
+        employeeService.markEmployeeAsInActive();
+    }
+
 }
 
