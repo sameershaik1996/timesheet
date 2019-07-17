@@ -75,5 +75,14 @@ public class EmployeeFeignClientFallback implements EmployeeFeignClient {
         throw new ValidationException("Unable to load Skills");
     }
 
+    @Override
+    public ResponseEntity<List<Long>> getEmployeeBySearch(String search) {
+
+            LOGGER.info("error-getEmployeeBySearch");
+//        List<SkillDto> dtos = employeeIds.stream().map(id -> new SkillDto(id, "NAN")).collect(Collectors.toList());
+//        return new ResponseEntity<>(dtos, HttpStatus.OK);
+            throw new ValidationException("Unable to load employees");
+    }
+
 
 }

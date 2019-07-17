@@ -139,6 +139,16 @@ public class TaskService implements ITaskService {
         return task.getSkillId();
     }
 
+    @Override
+    public Page<Task> getTaskBySearch(String search, Integer page, Integer limits, String orderBy, String[] fields) {
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+        List<Long> projectIds=projectService.searchProjects(search);
+        if(projectIds.size()==0)
+            projectIds=null;
+        Page<Task> tasks=taskRepository.searchTasks(search,search,projectIds,pageable);
+        return  tasks;
+    }
+
 
     private void taskValidate(Project project, Task task) throws ParseException {
 

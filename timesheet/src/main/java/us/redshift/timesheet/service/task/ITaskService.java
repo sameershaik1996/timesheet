@@ -33,4 +33,5 @@ public interface ITaskService {
 
     List<Long> findAllSkillsByProjectId(Long taskId);
 
+    Page<Task> getTaskBySearch(String search, Integer page, Integer limits, String orderBy, String[] fields);
 }

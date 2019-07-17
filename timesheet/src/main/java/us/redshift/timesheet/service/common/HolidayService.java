@@ -18,4 +18,9 @@ public class HolidayService implements IHolidayService {
     public List<HolidayList> createHolidayEntry(ArrayList<HolidayList> holidayList) {
         return holidayRepository.saveAll(holidayList);
     }
+
+    @Override
+    public List<HolidayList> getHolidayList() {
+        return holidayRepository.findAll();
+    }
 }

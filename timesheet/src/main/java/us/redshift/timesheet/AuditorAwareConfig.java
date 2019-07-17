@@ -16,9 +16,9 @@ public class AuditorAwareConfig implements AuditorAware<String> {
 
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
-       UserDetails ud = (UserDetails) request.getAttribute("userDetails");
+        UserDetails ud = (UserDetails) request.getAttribute("userDetails");
 //        //System.out.println(request.getAttribute("test"));
-       return Optional.of(ud.getUserName());
+        return Optional.of(ud.getUserName());
 
     }
 }

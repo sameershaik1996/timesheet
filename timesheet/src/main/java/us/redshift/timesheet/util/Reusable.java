@@ -1,15 +1,23 @@
 package us.redshift.timesheet.util;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+import us.redshift.timesheet.domain.common.HolidayList;
+import us.redshift.timesheet.service.common.IHolidayService;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
@@ -17,7 +25,12 @@ import java.util.function.Function;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 
+@Component
 public class Reusable {
+
+    @Autowired
+    private IHolidayService holidayService;
+
 
     public static Pageable paginationSort(int page, int limit, String orderBy, String... fields) {
         Pageable pageable;
@@ -39,22 +52,35 @@ public class Reusable {
         return hours.multiply(ratePerHours);
     }
 
-    public static LocalDate calcEndDate(final LocalDate startDate, final Long estimatedDays) {
+    public LocalDate calcEndDate(String startDate, final Long estimatedDays) {
 
+        System.out.println(holidayService);
+        List<HolidayList> holidays = holidayService.getHolidayList();
+        List<LocalDate> dates = new ArrayList<>();
+        for (HolidayList hl : holidays) {
+            dates.add(LocalDate.parse(hl.getDate().toString()));
+        }
 
         if (estimatedDays < 1) {
-            return startDate;
+            return LocalDate.parse(startDate);
         }
-        LocalDate endDate = startDate;
+        LocalDate endDate = LocalDate.parse(startDate);
         int addedDays = 1;
-        while (addedDays < estimatedDays) {
+        while (addedDays <= estimatedDays) {
             endDate = endDate.plusDays(1);
 
-            if (!isWeekEnd(endDate)) {
+            if (!isHoliday(endDate, dates) && !isWeekEnd(endDate)) {
                 addedDays++;
             }
         }
         return endDate;
+    }
+
+    private static boolean isHoliday(LocalDate date, List<LocalDate> dates) {
+        if (dates.contains(date))
+            return true;
+        return false;
+
     }
 
     private static boolean isWeekEnd(LocalDate date) {
@@ -150,4 +176,9 @@ public class Reusable {
         return ts;
     }
 
+    public LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
 }

@@ -11,6 +11,7 @@ import us.redshift.timesheet.domain.task.Task;
 import us.redshift.timesheet.domain.task.TaskStatus;
 import us.redshift.timesheet.exception.ResourceNotFoundException;
 import us.redshift.timesheet.exception.ValidationException;
+import us.redshift.timesheet.feignclient.EmployeeFeignClient;
 import us.redshift.timesheet.reposistory.project.ProjectRepository;
 import us.redshift.timesheet.service.client.IClientService;
 import us.redshift.timesheet.service.task.ITaskService;
@@ -25,14 +26,16 @@ public class ProjectService implements IProjectService {
     private final ProjectRepository projectRepository;
     private final IClientService clientService;
     private final ITaskService taskService;
-
+    private final EmployeeFeignClient employeeFeignClient;
 
     public ProjectService(ProjectRepository projectRepository,
                           @Lazy IClientService clientService,
-                          @Lazy ITaskService taskService) {
+                          @Lazy ITaskService taskService,
+                          EmployeeFeignClient employeeFeignClient) {
         this.projectRepository = projectRepository;
         this.clientService = clientService;
         this.taskService = taskService;
+        this.employeeFeignClient=employeeFeignClient;
     }
 
     @Override
@@ -132,6 +135,8 @@ public class ProjectService implements IProjectService {
         return projectRepository.findAllByManagerId(managerId);
     }
 
+
+
     private Project setRateCardDetail(Project project) {
         Set<RateCardDetail> rateCardDetails = new HashSet<>();
         if (project.getRateCard() != null)
@@ -155,6 +160,33 @@ public class ProjectService implements IProjectService {
                 throw new ValidationException("Some Task under this project still not completed");
         }
         return project;
+    }
+
+
+    @Override
+    public Page<Project> searchProjects(String search, Integer page, Integer limits, String orderBy, String[] fields) {
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+        List<Long> managerIds=employeeFeignClient.getEmployeeBySearch(search).getBody();
+        System.out.println(managerIds);
+        List<Long> clientIds=clientService.getClientByName(search);
+        if(managerIds.size()==0)
+            managerIds=null;
+        if(clientIds.size()==0)
+            clientIds=null;
+
+        Page<Project> projects= projectRepository.searchProjects(search,search,clientIds,managerIds,pageable);
+        return projects;
+    }
+
+    @Override
+    public List<Long> searchProjects(String search) {
+        List<Long> managerIds=null;
+        List<Long> clientIds=clientService.getClientByName(search);
+        if(clientIds.size()==0)
+            clientIds=null;
+
+        List<Long> projects= projectRepository.searchProjectsList(search,search,clientIds,managerIds);
+        return projects;
     }
 
 }

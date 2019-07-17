@@ -35,4 +35,7 @@ public interface IProjectService {
     List<Project> getAllProjectByManagerId(Long managerId);
 
 
+    Page<Project> searchProjects(String search, Integer page, Integer limits, String orderBy, String[] fields);
+
+    List<Long> searchProjects(String search);
 }

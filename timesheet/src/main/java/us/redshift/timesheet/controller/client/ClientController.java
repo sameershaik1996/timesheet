@@ -72,9 +72,13 @@ public class ClientController {
                                                       @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                       @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                       @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                      @RequestParam(value = "search",required = false)String search,
                                                       @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-
-        if ("ALL".equalsIgnoreCase(status)) {
+        if(search!=null){
+            Page<Client> clients=clientService.getAllClientsBySearchFilter(search,page, limits, orderBy,fields);
+            return new ResponseEntity<>(clientAssembler.convertToPagedDto(clients), HttpStatus.OK);
+        }
+        else if ("ALL".equalsIgnoreCase(status)) {
             Page<Client> clients = clientService.getAllClientByPagination(page, limits, orderBy, fields);
             return new ResponseEntity<>(clientAssembler.convertToPagedDto(clients), HttpStatus.OK);
         } else {

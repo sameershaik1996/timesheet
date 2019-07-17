@@ -33,12 +33,14 @@ public class TaskController {
 
     private final ObjectMapper objectMapper;
 
+    private final Reusable reusable;
 
     private final Logger LOGGER = LoggerFactory.getLogger(TaskController.class);
 
-    public TaskController(ITaskService taskService, TaskAssembler taskAssembler, ObjectMapper objectMapper) {
+    public TaskController(ITaskService taskService, TaskAssembler taskAssembler, ObjectMapper objectMapper, Reusable reusable) {
         this.taskService = taskService;
         this.taskAssembler = taskAssembler;
+        this.reusable = reusable;
         this.objectMapper = objectMapper;
     }
 
@@ -82,9 +84,14 @@ public class TaskController {
                                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                     @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                     @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                    @RequestParam(value = "search",required = false)String search,
                                                     @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
 
-        if (taskId != null && skills) {
+        if(search!=null){
+            Page<Task> tasks = taskService.getTaskBySearch(search,page, limits, orderBy, fields);
+            return new ResponseEntity<>(taskAssembler.convertToProjectTaskPagedDto(tasks), HttpStatus.OK);
+        }
+        else if (taskId != null && skills) {
             List<Long> ids = taskService.findAllSkillsByProjectId(taskId);
             return new ResponseEntity<>(taskAssembler.convertToSkillDto(ids), HttpStatus.OK);
         } else if (projectId != null && employeeId == null) {
@@ -108,8 +115,8 @@ public class TaskController {
     @GetMapping("task/get/enddate")
     public ResponseEntity<?> getEndDate(@RequestParam("startDate") String startDate, @RequestParam("estimatedHours") Long estimatedHours) {
 
-        Long estimatedDays=(estimatedHours/8)+1;
-        LocalDate localDate = Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays);
+        Long estimatedDays = (estimatedHours / 8) + 1;
+        LocalDate localDate = reusable.calcEndDate(startDate, estimatedDays);
         //System.out.println(localDate);
 
         LocalDateTime localDateTime = localDate.atStartOfDay();

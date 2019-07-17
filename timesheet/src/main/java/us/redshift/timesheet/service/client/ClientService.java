@@ -102,4 +102,17 @@ public class ClientService implements IClientService {
     public Boolean existsById(Long ClientId) {
         return clientRepository.existsById(ClientId);
     }
+
+    @Override
+    public Page<Client> getAllClientsBySearchFilter(String search,Integer page, Integer limits, String orderBy, String[] fields ) {
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+       // Page<Client> clients=clientRepository.searchClients(search,search,pageable);
+        Page<Client> clients=clientRepository.searchClients(search,search,pageable);
+        return clients;
+    }
+
+    @Override
+    public List<Long> getClientByName(String name) {
+        return clientRepository.findIdByNameLike(name);
+    }
 }

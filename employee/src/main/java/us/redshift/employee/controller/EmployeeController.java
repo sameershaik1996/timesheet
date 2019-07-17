@@ -115,14 +115,22 @@ public class EmployeeController {
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getAllEmployee(@RequestParam(value = "id", required = false) List<Long> id,
+    public ResponseEntity<?> getAllEmployee(@RequestParam(value = "fullSearch", required = false)String fullSearch,
+                                            @RequestParam(value = "search", required = false)String search,
+                                            @RequestParam(value = "id", required = false) List<Long> id,
                                             @RequestParam(value = "roleName", required = false) String roleName,
                                             @RequestParam(value = "page", defaultValue = "0") int page,
                                             @RequestParam(value = "limits", defaultValue = "0") int limits,
                                             @RequestParam(value = "orderBy", required = false) String orderBy,
                                             @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
         //System.out.println(id);
-        if (id != null) {
+        if(search!=null){
+            return new ResponseEntity<>(employeeService.searchEmployeesForIds(search), HttpStatus.OK);
+        }
+        else if(fullSearch!=null){
+            return new ResponseEntity<>(employeeService.searchEmployee(fullSearch,page, limits, orderBy, fields), HttpStatus.OK);
+        }
+        else if (id != null) {
             return new ResponseEntity<>(employeeService.getEmployeeByIds(id), HttpStatus.OK);
         } else if (roleName != null) {
             List<UserDetails> ud = (List<UserDetails>) userClient.getUser(roleName);

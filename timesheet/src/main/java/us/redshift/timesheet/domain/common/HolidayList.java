@@ -22,7 +22,11 @@ public class HolidayList {
     private Long id;
 
     @Temporal(TemporalType.DATE)
+    @Column(unique = true)
     private Date date;
+
+
+    private String description;
 
 
 }

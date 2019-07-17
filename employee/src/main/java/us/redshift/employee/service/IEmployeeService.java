@@ -28,4 +28,8 @@ public interface IEmployeeService {
     int setStatusForEmployee(EmployeeStatus status, List<Long> empIds);
 
     void markEmployeeAsInActive();
+
+    List<Long> searchEmployeesForIds(String search);
+
+    Page<Employee> searchEmployee(String fullSearch, int page, int limits, String orderBy, String[] fields);
 }

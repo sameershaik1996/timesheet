@@ -19,7 +19,6 @@ import us.redshift.timesheet.util.Reusable;
 
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -41,11 +40,18 @@ public class ProjectController {
 
     private final EmployeeFeignClient employeeFeignClient;
 
+    private final Reusable reusable;
     private final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
-    public ProjectController(ProjectRepository projectRepository, IProjectService projectService, ProjectAssembler projectAssembler, ObjectMapper objectMapper, EmployeeFeignClient employeeFeignClient) {
+    public ProjectController(ProjectRepository projectRepository,
+                             IProjectService projectService,
+                             ProjectAssembler projectAssembler,
+                             ObjectMapper objectMapper,
+                             EmployeeFeignClient employeeFeignClient,
+                             Reusable reusable) {
         this.projectRepository = projectRepository;
         this.projectService = projectService;
+        this.reusable = reusable;
         this.projectAssembler = projectAssembler;
         this.objectMapper = objectMapper;
         this.employeeFeignClient = employeeFeignClient;
@@ -93,9 +99,13 @@ public class ProjectController {
                                                        @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                        @RequestParam(value = "limits", defaultValue = "0") Integer limits,
                                                        @RequestParam(value = "orderBy", defaultValue = "ASC", required = false) String orderBy,
+                                                       @RequestParam(value = "search",required = false)String search,
                                                        @RequestParam(value = "fields", defaultValue = "id", required = false) String... fields) throws ParseException {
-
-        if (projectId != null) {
+        if(search!=null){
+            Page<Project> projects=projectService.searchProjects(search, page, limits, orderBy, fields);
+            return new ResponseEntity<>(projectAssembler.convertToPagedDto(projects), HttpStatus.OK);
+        }
+        else if (projectId != null) {
             if (skills) {
                 List<Long> ids = projectService.findAllEmployeesByProjectId(projectId);
                 return new ResponseEntity<>(projectAssembler.convertToSkillDto(ids), HttpStatus.OK);
@@ -135,7 +145,7 @@ public class ProjectController {
                         .atZone(ZoneId.systemDefault())
                         .toLocalDate();*/
 
-        LocalDate localDate = Reusable.calcEndDate(LocalDate.parse(startDate), estimatedDays);
+        LocalDate localDate = reusable.calcEndDate(startDate, estimatedDays);
         //System.out.println(localDate);
 
         LocalDateTime localDateTime = localDate.atStartOfDay();

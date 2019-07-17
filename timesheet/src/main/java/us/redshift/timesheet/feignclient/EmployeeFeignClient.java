@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import us.redshift.timesheet.domain.Employee;
 import us.redshift.timesheet.dto.common.DesignationDto;
 import us.redshift.timesheet.dto.common.EmployeeDto;
 import us.redshift.timesheet.dto.common.SkillDto;
@@ -38,6 +39,9 @@ public interface EmployeeFeignClient {
     @Cacheable(cacheNames = "skills", key = "#employeeIds")
     @GetMapping("/employee/v1/api/skill/get")
     ResponseEntity<List<SkillDto>> getAllSkillsByEmployeeIds(@RequestParam("empId") List<Long> employeeIds);
+
+    @GetMapping("/employee/v1/api/employee/get")
+    ResponseEntity<List<Long>> getEmployeeBySearch(@RequestParam("search") String search);
 
 }
 

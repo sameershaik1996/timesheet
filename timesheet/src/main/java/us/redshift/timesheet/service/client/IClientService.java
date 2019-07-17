@@ -25,4 +25,7 @@ public interface IClientService {
 
     Boolean existsById(Long ClientId);
 
+    Page<Client> getAllClientsBySearchFilter(String search,Integer page, Integer limits, String orderBy, String[] fields);
+
+    List<Long> getClientByName(String name);
 }

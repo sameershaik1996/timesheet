@@ -2,6 +2,9 @@ package us.redshift.timesheet.domain.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.hibernate.search.annotations.Field;
+
+import org.hibernate.search.annotations.Indexed;
 import us.redshift.timesheet.domain.common.Address;
 import us.redshift.timesheet.domain.common.BaseEntity;
 

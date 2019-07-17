@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IHolidayService {
     List<HolidayList> createHolidayEntry(ArrayList<HolidayList> holidayList);
+
+    List<HolidayList> getHolidayList();
 }

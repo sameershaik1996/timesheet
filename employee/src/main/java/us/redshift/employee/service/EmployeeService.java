@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -16,7 +17,9 @@ import us.redshift.employee.domain.common.EmployeeStatus;
 import us.redshift.employee.dto.EmployeeDto;
 import us.redshift.employee.exception.CustomException;
 import us.redshift.employee.feignclient.IUserClient;
+import us.redshift.employee.repository.DesignationRepository;
 import us.redshift.employee.repository.EmployeeRespository;
+import us.redshift.employee.repository.SkillRepository;
 import us.redshift.employee.util.DTO;
 
 import javax.persistence.EntityNotFoundException;
@@ -24,10 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @Transactional
@@ -35,6 +35,12 @@ public class EmployeeService implements IEmployeeService {
 
     @Autowired
     EmployeeRespository employeeRespository;
+
+    @Autowired
+    DesignationRepository designationRepository;
+
+    @Autowired
+    SkillRepository skillRepository;
 
     @Autowired
     IUserClient userClient;
@@ -111,6 +117,32 @@ public class EmployeeService implements IEmployeeService {
         }
         setStatusForEmployee(EmployeeStatus.INACTIVE, ids);
         userClient.updateUser(ids, false);
+    }
+
+    @Override
+    public List<Long> searchEmployeesForIds(String search) {
+
+        List<Long> designationIds=designationRepository.findIdByDesignation(search);
+        List<Long> empIds=skillRepository.findEmployeesBySkill(search);
+        if(empIds.size()==0)
+            empIds=null;
+        if(designationIds.size()==0)
+            designationIds=null;
+        List<Long> employeeIds = employeeRespository.searchEmployee(search,search,search,designationIds,empIds);
+        return employeeIds;
+    }
+
+    @Override
+    public Page<Employee> searchEmployee(String fullSearch, int page, int limits, String orderBy, String[] fields) {
+        Pageable pageable = Reusable.paginationSort(page, limits, orderBy, fields);
+        List<Long> designationIds=designationRepository.findIdByDesignation(fullSearch);
+        List<Long> empIds=skillRepository.findEmployeesBySkill(fullSearch);
+        if(empIds.size()==0)
+            empIds=null;
+        if(designationIds.size()==0)
+            designationIds=null;
+        Page<Employee> employees=employeeRespository.searchEmployeePaged(fullSearch,fullSearch,fullSearch,designationIds,empIds,pageable);
+        return employees;
     }
 
     private String generateEmployeeId(Employee emp) {
