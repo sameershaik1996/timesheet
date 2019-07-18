@@ -65,10 +65,10 @@ public class TimeSheetService implements ITimeSheetService {
 
     @Override
     public TimeSheet updateTimeSheet(TimeSheet timeSheet, TimeSheetStatus status) {
-        if (!timeSheetRepository.existsById(timeSheet.getId()))
-            throw new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId());
-        if (TimeSheetStatus.SUBMITTED.equals(status)) {
-            int count = timeSheetRepository.findAllByStatusAndFromDateLessThanAndEmployeeId(TimeSheetStatus.PENDING, timeSheet.getFromDate(), timeSheet.getEmployeeId()).size();
+        /*if (!timeSheetRepository.existsById(timeSheet.getId()))
+            throw new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId());*/
+        if (TimeSheetStatus.SUBMITTED.equals(status)||TimeSheetStatus.PENDING.equals(status)) {
+            int count = timeSheetRepository.findAllByStatusAndFromDateLessThanEqualAndEmployeeId(TimeSheetStatus.PENDING, timeSheet.getFromDate(), timeSheet.getEmployeeId()).size();
             if (count > 0) {
                 LOGGER.info(" previous unSubmitted TimeSheets {}", count);
                 throw new ValidationException("Please submit previous TimeSheet (" + count + ")");
@@ -140,11 +140,9 @@ public class TimeSheetService implements ITimeSheetService {
         });
         Set<TimeOff> timeOffs = new HashSet<>(timeSheet.getTimeOffs());
         timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
+
         timeSheet.setStatus(status);
-        if(status.equals(TimeSheetStatus.SUBMITTED)){
-            Date today = new Date(System.currentTimeMillis());
-            timeSheet.setToDate(today);
-        }
+
         TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
         SaveTimeSheet.getTaskCards().forEach(taskCard -> {
             LOGGER.info("UpdateTimeSheet TaskCardDetails Status Updated {}", taskCardDetailService.setStatusForTaskCardDetailByTaskCardId(status.name(), taskCard.getId()));
@@ -203,14 +201,7 @@ public class TimeSheetService implements ITimeSheetService {
             timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, year, weekNumber);
             if (timeSheet.size()>0) {
                 return timeSheet;
-            } else if (timeSheet.size() == 0 && ((weekNumber <= currentWeekNumber && year <= currentYear) && (weekNumber >= joiningWeekNumber && year >= joiningYear))) {
-                TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
-                timeSheet .add( timeSheetRepository.save(newTimeSheet));
-                ////////System.out.println("testing1234");
-            } /*else if (timeSheet == null && weekNumber >= joiningWeekNumber && year >= joiningYear) {
-                TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
-                timeSheet = timeSheetRepository.save(newTimeSheet);
-            }*/ else {
+            } else {
                 ////////System.out.println("No Entry Found");
                 if (weekNumber > currentWeekNumber)
                     throw new ValidationException("No Permission to fill future TimeSheets");
@@ -218,17 +209,15 @@ public class TimeSheetService implements ITimeSheetService {
                     throw new ValidationException("No Permission to fill TimeSheets before Joining Date");
             }
         } else if (weekNumber == 0) {
-            TimeSheet ts = timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateAsc(employeeId, TimeSheetStatus.PENDING);
-            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId,currentYear,currentWeekNumber);
-            if (ts == null) {
-                //timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberAndStatusOrderByTaskCardsAsc(employeeId, currentYear, currentWeekNumber,TimeSheetStatus.PENDING);
-
-
-                    TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, null);
-                    timeSheet.add(timeSheetRepository.save(newTimeSheet));
-
-
+            TimeSheet ts=timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateAsc(employeeId,TimeSheetStatus.PENDING);
+            if(ts!=null){
+                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId,ts.getYear(),ts.getWeekNumber());
+            }else
+            {
+                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId,currentYear,currentWeekNumber);
             }
+
+
 
         }
         return timeSheet;

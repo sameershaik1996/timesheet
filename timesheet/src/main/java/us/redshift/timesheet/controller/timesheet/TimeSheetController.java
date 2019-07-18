@@ -17,6 +17,7 @@ import us.redshift.timesheet.service.timesheet.ITimeSheetService;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -42,10 +43,16 @@ public class TimeSheetController {
 
 
     @PutMapping("timesheet/update")
-    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody TimeSheetDto timeSheetDto,
+    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody List<TimeSheetDto> timeSheetListDto,
                                              @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
-        TimeSheet timeSheet = timeSheetAssembler.convertToEntity(timeSheetDto);
-        TimeSheet savedTimeSheet = timeSheetService.updateTimeSheet(timeSheet, TimeSheetStatus.get(status.toUpperCase()));
+
+        List<TimeSheet> savedTimeSheet=new ArrayList<>();
+        for ( TimeSheetDto timeSheetDto:timeSheetListDto ) {
+            TimeSheet timeSheet=timeSheetAssembler.convertToEntity(timeSheetDto);
+            savedTimeSheet.add(timeSheetService.updateTimeSheet(timeSheet, TimeSheetStatus.get(status.toUpperCase())));
+        }
+
+
         return new ResponseEntity<>(timeSheetAssembler.convertToDto(savedTimeSheet), HttpStatus.OK);
     }
 

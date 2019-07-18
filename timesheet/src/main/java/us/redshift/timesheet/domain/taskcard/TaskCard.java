@@ -58,6 +58,7 @@ public class TaskCard extends BaseEntity {
 
     private String comment;
 
+    private String defectId;
 
     @ManyToOne()
     @JoinColumn(name = "project_id", nullable = false)

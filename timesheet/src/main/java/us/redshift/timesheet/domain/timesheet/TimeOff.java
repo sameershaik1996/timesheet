@@ -24,7 +24,7 @@ public class TimeOff extends BaseEntity {
     private String reason;
     private Date date;
     private BigDecimal hours;
-    private TimeSheetStatus status;
+
 
     @ManyToOne()
     @JoinColumn(name = "time_sheet_id")

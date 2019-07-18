@@ -42,7 +42,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
 
     Set<TimeSheet> findAllByStatusAndFromDateBefore(TimeSheetStatus status, Date date);
 
-    Set<TimeSheet> findAllByStatusAndFromDateLessThanAndEmployeeId(TimeSheetStatus status, Date date, Long employeeId);
+    Set<TimeSheet> findAllByStatusAndFromDateLessThanEqualAndEmployeeId(TimeSheetStatus status, Date date, Long employeeId);
 
 
 }
