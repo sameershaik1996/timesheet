@@ -1,0 +1,1 @@
+INSERT INTO auth_roles_permission VALUES(2,39),(3,39),(4,39);

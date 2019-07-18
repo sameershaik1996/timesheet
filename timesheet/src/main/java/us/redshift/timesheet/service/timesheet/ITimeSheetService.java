@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
+import java.util.List;
+
 public interface ITimeSheetService {
 
     TimeSheet updateTimeSheet(TimeSheet timeSheet, TimeSheetStatus status);
@@ -14,12 +16,12 @@ public interface ITimeSheetService {
 
     TimeSheet getTimeSheet(Long id);
 
-    TimeSheet getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber);
+    List<TimeSheet> getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber);
 
     Page<TimeSheet> getAllTimeSheetByProjectId(Long projectId, int page, int limits, String orderBy, String... fields);
 
 
-    TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year);
+    List<TimeSheet> getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year);
 
 
     TimeSheet cloneTimeSheet(TimeSheet timeSheet);

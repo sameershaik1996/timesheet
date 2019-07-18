@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "pss_timesheets",
         uniqueConstraints =
-        @UniqueConstraint(columnNames = {"employee_id", "from_date", "to_date", "week_number", "year"}))
+        @UniqueConstraint(columnNames = {"employee_id", "from_date", "to_date", "year","week_number"}))
 @Getter
 @Setter
 @NoArgsConstructor

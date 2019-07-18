@@ -12,6 +12,7 @@ import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -20,9 +21,15 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
 
     TimeSheet findFirstByStatus(TimeSheetStatus status);
 
-    TimeSheet findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber);
+    List<TimeSheet> findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber);
+
+    List<TimeSheet> findTimeSheetByEmployeeIdAndYearAndWeekNumberAndStatusOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber,TimeSheetStatus status);
+
+    //List<TimeSheet> findTimeSheetByEmployeeIdAndYearAndWeekNumberAndStatusOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber,TimeSheetStatus status);
 
     TimeSheet findFirstByEmployeeIdAndStatusOrderByFromDateAsc(Long employeeId, TimeSheetStatus status);
+
+    //List<TimeSheet> findByEmployeeIdAndStatusOrderByFromDateAsc(Long employeeId, TimeSheetStatus status);
 
     Page<TimeSheet> findAllByTaskCardsInAndStatusNotLikeOrderByFromDateAsc(Set<TaskCard> taskCardSet, TimeSheetStatus status, Pageable pageable);
 

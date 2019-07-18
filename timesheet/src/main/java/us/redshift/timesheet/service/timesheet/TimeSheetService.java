@@ -1,5 +1,6 @@
 package us.redshift.timesheet.service.timesheet;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -24,6 +25,7 @@ import us.redshift.timesheet.service.taskcard.ITaskCardDetailService;
 import us.redshift.timesheet.service.taskcard.ITaskCardService;
 import us.redshift.timesheet.util.Reusable;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
@@ -139,6 +141,10 @@ public class TimeSheetService implements ITimeSheetService {
         Set<TimeOff> timeOffs = new HashSet<>(timeSheet.getTimeOffs());
         timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
         timeSheet.setStatus(status);
+        if(status.equals(TimeSheetStatus.SUBMITTED)){
+            Date today = new Date(System.currentTimeMillis());
+            timeSheet.setToDate(today);
+        }
         TimeSheet SaveTimeSheet = timeSheetRepository.save(timeSheet);
         SaveTimeSheet.getTaskCards().forEach(taskCard -> {
             LOGGER.info("UpdateTimeSheet TaskCardDetails Status Updated {}", taskCardDetailService.setStatusForTaskCardDetailByTaskCardId(status.name(), taskCard.getId()));
@@ -161,7 +167,7 @@ public class TimeSheetService implements ITimeSheetService {
     }
 
     @Override
-    public TimeSheet getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber) {
+    public List<TimeSheet> getTimeSheetByWeekNumber(Long employeeId, int year, int weekNumber) {
 
         EmployeeDto employeeDto = employeeFeignClient.getEmployeeById(employeeId).getBody();
         ZoneId defaultZoneId = ZoneId.of("UTC");
@@ -192,14 +198,14 @@ public class TimeSheetService implements ITimeSheetService {
 //        year = year == 0 ? currentYear : year;
 
 
-        TimeSheet timeSheet = new TimeSheet();
+        List<TimeSheet> timeSheet = new ArrayList<TimeSheet>();
         if (weekNumber != 0 && year != 0) {
             timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, year, weekNumber);
-            if (timeSheet != null) {
+            if (timeSheet.size()>0) {
                 return timeSheet;
-            } else if (timeSheet == null && ((weekNumber <= currentWeekNumber && year <= currentYear) && (weekNumber >= joiningWeekNumber && year >= joiningYear))) {
+            } else if (timeSheet.size() == 0 && ((weekNumber <= currentWeekNumber && year <= currentYear) && (weekNumber >= joiningWeekNumber && year >= joiningYear))) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
-                timeSheet = timeSheetRepository.save(newTimeSheet);
+                timeSheet .add( timeSheetRepository.save(newTimeSheet));
                 ////////System.out.println("testing1234");
             } /*else if (timeSheet == null && weekNumber >= joiningWeekNumber && year >= joiningYear) {
                 TimeSheet newTimeSheet = newTimeSheet(employeeId, weekNumber, year, null);
@@ -212,20 +218,24 @@ public class TimeSheetService implements ITimeSheetService {
                     throw new ValidationException("No Permission to fill TimeSheets before Joining Date");
             }
         } else if (weekNumber == 0) {
-            timeSheet = timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateAsc(employeeId, TimeSheetStatus.PENDING);
-            if (timeSheet == null) {
-                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, currentYear, currentWeekNumber);
-                if (timeSheet == null) {
+            TimeSheet ts = timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateAsc(employeeId, TimeSheetStatus.PENDING);
+            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId,currentYear,currentWeekNumber);
+            if (ts == null) {
+                //timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberAndStatusOrderByTaskCardsAsc(employeeId, currentYear, currentWeekNumber,TimeSheetStatus.PENDING);
+
+
                     TimeSheet newTimeSheet = newTimeSheet(employeeId, currentWeekNumber, currentYear, null);
-                    timeSheet = timeSheetRepository.save(newTimeSheet);
-                }
+                    timeSheet.add(timeSheetRepository.save(newTimeSheet));
+
+
             }
+
         }
         return timeSheet;
     }
 
     @Override
-    public TimeSheet getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year) {
+    public List<TimeSheet> getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year) {
         return timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(id, year, weekNumber);
     }
 
@@ -294,16 +304,21 @@ public class TimeSheetService implements ITimeSheetService {
             calendar.setWeekDate(year, weekNumber, Calendar.MONDAY);
             date = calendar.getTime().toInstant().atZone(defaultZoneId).toLocalDate();
         }
-
-
-        LocalDate monday = date.with((previousOrSame(MONDAY)));
+        LocalDate startDate;
+        LocalDate endDate;
+        List<TimeSheet> timeSheet= timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberAndStatusOrderByTaskCardsAsc(employeeId, year, weekNumber,TimeSheetStatus.SUBMITTED);
+        if(timeSheet.size()>0){
+            startDate= LocalDate.now();
+        }
+        else
+            startDate = date.with((previousOrSame(MONDAY)));
         ////////System.out.println(monday);
         LocalDate sunday = date.with(nextOrSame(SUNDAY));
         ////////System.out.println(sunday);
         TimeSheet newTimeSheet = new TimeSheet();
 
 //        newTimeSheet.setFromDate(Date.from(monday.atZone(defaultZoneId).toInstant()));
-        newTimeSheet.setFromDate(Date.from(monday.atStartOfDay(defaultZoneId).toInstant()));
+        newTimeSheet.setFromDate(Date.from(startDate.atStartOfDay(defaultZoneId).toInstant()));
 
         ////////System.out.println(newTimeSheet.getFromDate());
         newTimeSheet.setToDate(Date.from(sunday.atStartOfDay(defaultZoneId).toInstant()));

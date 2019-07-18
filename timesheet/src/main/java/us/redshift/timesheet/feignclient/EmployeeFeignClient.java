@@ -41,7 +41,7 @@ public interface EmployeeFeignClient {
     ResponseEntity<List<SkillDto>> getAllSkillsByEmployeeIds(@RequestParam("empId") List<Long> employeeIds);
 
     @GetMapping("/employee/v1/api/employee/get")
-    ResponseEntity<List<Long>> getEmployeeBySearch(@RequestParam("search") String search);
+    ResponseEntity<List<Long>> getEmployeeBySearch(@RequestParam("fullSearch") String search);
 
 }
 

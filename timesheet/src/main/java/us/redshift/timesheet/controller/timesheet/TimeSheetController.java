@@ -17,6 +17,7 @@ import us.redshift.timesheet.service.timesheet.ITimeSheetService;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("timesheet/v1/api/")
@@ -70,7 +71,7 @@ public class TimeSheetController {
             Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByProjectId(projectId, page, limits, orderBy, fields);
             return new ResponseEntity<>(timeSheetAssembler.convertToPagedDto(timeSheetPage), HttpStatus.OK);
         } else if (employeeId != null) {
-            TimeSheet timeSheet = timeSheetService.getTimeSheetByWeekNumber(employeeId, year, weekNumber);
+            List<TimeSheet> timeSheet = timeSheetService.getTimeSheetByWeekNumber(employeeId, year, weekNumber);
             return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheet), HttpStatus.OK);
         } else {
             Page<TimeSheet> timeSheetPage = timeSheetService.getAllTimeSheetByPagination(page, limits, orderBy, fields);
@@ -78,7 +79,7 @@ public class TimeSheetController {
         }
     }
 
-    @PutMapping("timesheet/clone")
+    /*@PutMapping("timesheet/clone")
     public ResponseEntity<?> cloneTimeSheet(@Valid @RequestBody TimeSheetDto timeSheetDto) throws ParseException {
 
 
@@ -97,5 +98,5 @@ public class TimeSheetController {
 
         return new ResponseEntity<>(timeSheetAssembler.convertToDto(timeSheetService.cloneTimeSheet(timeSheet)), HttpStatus.OK);
     }
-
+*/
 }

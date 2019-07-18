@@ -115,8 +115,8 @@ public class EmployeeController {
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getAllEmployee(@RequestParam(value = "fullSearch", required = false)String fullSearch,
-                                            @RequestParam(value = "search", required = false)String search,
+    public ResponseEntity<?> getAllEmployee(@RequestParam(value = "fullSearch", required = false)String search,
+                                            @RequestParam(value = "search", required = false)String fullSearch,
                                             @RequestParam(value = "id", required = false) List<Long> id,
                                             @RequestParam(value = "roleName", required = false) String roleName,
                                             @RequestParam(value = "page", defaultValue = "0") int page,
