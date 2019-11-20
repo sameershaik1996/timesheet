@@ -14,6 +14,7 @@ import us.redshift.timesheet.dto.task.TaskListDto;
 import us.redshift.timesheet.dto.timesheet.TimeSheetListDto;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class TaskCardDto extends BaseDto {
     private BigDecimal amount = BigDecimal.valueOf(0);
     private BigDecimal hours = BigDecimal.valueOf(0);
     private String comment = "";
+    @Pattern(regexp = "BELK_",message = "Defect Id should be of pattern BELK_[0-9]")
+    private String defectId;
     @NotNull(message = "task cannot be empty")
     private TaskListDto task;
     @NotNull(message = "project cannot be empty")

@@ -23,7 +23,7 @@ public interface TaskCardRepository extends JpaRepository<TaskCard, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE pss_task_cards SET status=?1 WHERE time_sheet_id = ?2", nativeQuery = true)
+    @Query(value = "UPDATE pss_task_cards SET status=?1 WHERE id = ?2", nativeQuery = true)
     int setStatusForTaskCard(String status, Long id);
 
 

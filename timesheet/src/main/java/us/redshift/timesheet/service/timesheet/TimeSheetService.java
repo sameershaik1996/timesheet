@@ -67,8 +67,8 @@ public class TimeSheetService implements ITimeSheetService {
     public TimeSheet updateTimeSheet(TimeSheet timeSheet, TimeSheetStatus status) {
         /*if (!timeSheetRepository.existsById(timeSheet.getId()))
             throw new ResourceNotFoundException("TimeSheet", "Id", timeSheet.getId());*/
-        if (TimeSheetStatus.SUBMITTED.equals(status)||TimeSheetStatus.PENDING.equals(status)) {
-            int count = timeSheetRepository.findAllByStatusAndFromDateLessThanEqualAndEmployeeId(TimeSheetStatus.PENDING, timeSheet.getFromDate(), timeSheet.getEmployeeId()).size();
+        if (TimeSheetStatus.SUBMITTED.equals(status)) {
+            int count = timeSheetRepository.findAllByStatusAndFromDateLessThanAndEmployeeId(TimeSheetStatus.PENDING, timeSheet.getFromDate(), timeSheet.getEmployeeId()).size();
             if (count > 0) {
                 LOGGER.info(" previous unSubmitted TimeSheets {}", count);
                 throw new ValidationException("Please submit previous TimeSheet (" + count + ")");
@@ -139,7 +139,16 @@ public class TimeSheetService implements ITimeSheetService {
             }
         });
         Set<TimeOff> timeOffs = new HashSet<>(timeSheet.getTimeOffs());
-        timeOffs.forEach(timeOff -> timeSheet.addTimeOff(timeOff));
+
+        timeOffs.forEach( timeOff ->{
+                if(status.equals(TimeSheetStatus.SUBMITTED)){
+                    timeOff.setStatus(status);
+                }
+                timeOff.getDates().stream().forEach(timeOffDate -> {
+                    timeOff.add(timeOffDate);
+                });
+                timeSheet.addTimeOff(timeOff);
+        });
 
         timeSheet.setStatus(status);
 
@@ -174,10 +183,10 @@ public class TimeSheetService implements ITimeSheetService {
 
 //      Joining Date
 //        TODO Remove HardCode
-        LocalDate dateOfJoining = LocalDate.parse("2019-03-14");
-        int joiningWeekNumber = dateOfJoining.get(weekFields.weekOfWeekBasedYear());
-        int joiningYear = dateOfJoining.getYear();
 
+        LocalDate dateOfJoining;
+        int joiningWeekNumber=0 ;
+        int joiningYear =0;
         if (employeeDto.getJoiningDate() != null) {
             dateOfJoining = employeeDto.getJoiningDate().toInstant().atZone(defaultZoneId).toLocalDate();
             joiningWeekNumber = dateOfJoining.get(weekFields.weekOfWeekBasedYear());
@@ -198,7 +207,7 @@ public class TimeSheetService implements ITimeSheetService {
 
         List<TimeSheet> timeSheet = new ArrayList<TimeSheet>();
         if (weekNumber != 0 && year != 0) {
-            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId, year, weekNumber);
+            timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(employeeId, year, weekNumber);
             if (timeSheet.size()>0) {
                 return timeSheet;
             } else {
@@ -211,10 +220,10 @@ public class TimeSheetService implements ITimeSheetService {
         } else if (weekNumber == 0) {
             TimeSheet ts=timeSheetRepository.findFirstByEmployeeIdAndStatusOrderByFromDateAsc(employeeId,TimeSheetStatus.PENDING);
             if(ts!=null){
-                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId,ts.getYear(),ts.getWeekNumber());
+                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(employeeId,ts.getYear(),ts.getWeekNumber());
             }else
             {
-                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(employeeId,currentYear,currentWeekNumber);
+                timeSheet = timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(employeeId,currentYear,currentWeekNumber);
             }
 
 
@@ -225,7 +234,7 @@ public class TimeSheetService implements ITimeSheetService {
 
     @Override
     public List<TimeSheet> getTimeSheetByWeekNumberAndEmpId(Long id, Integer weekNumber, Integer year) {
-        return timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(id, year, weekNumber);
+        return timeSheetRepository.findTimeSheetByEmployeeIdAndYearAndWeekNumber(id, year, weekNumber);
     }
 
     @Override
@@ -272,7 +281,7 @@ public class TimeSheetService implements ITimeSheetService {
         timeSheetSet.forEach(timeSheet -> {
             List<TaskCard> taskCards = new ArrayList<>();
             timeSheet.getTaskCards().forEach(taskCard -> {
-                if (taskCard.getProject().getId() == projectId) {
+                if (taskCard.getProject().getId() == projectId&&!taskCard.getStatus().equals(TimeSheetStatus.PENDING)) {
                     taskCards.add(taskCard);
                 }
             });

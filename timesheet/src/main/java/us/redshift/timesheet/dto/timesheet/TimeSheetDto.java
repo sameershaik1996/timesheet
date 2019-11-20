@@ -10,6 +10,7 @@ import us.redshift.timesheet.dto.common.BaseDto;
 import us.redshift.timesheet.dto.common.EmployeeListDto;
 import us.redshift.timesheet.dto.taskcard.TaskCardDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
@@ -29,6 +30,7 @@ public class TimeSheetDto extends BaseDto {
     private Date toDate;
     private Integer weekNumber;
     private Integer year;
+    @Valid
     @JsonIgnoreProperties("timeSheet")
     private Set<TaskCardDto> taskCards;
     @JsonIgnoreProperties("timeSheet")

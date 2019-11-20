@@ -18,6 +18,7 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@JsonIgnoreProperties(value = {"createdTimeStamp","updatedTimeStamp"})
 public class BaseEntity implements Serializable {
 
     @Id

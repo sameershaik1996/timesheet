@@ -21,7 +21,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
 
     TimeSheet findFirstByStatus(TimeSheetStatus status);
 
-    List<TimeSheet> findTimeSheetByEmployeeIdAndYearAndWeekNumberOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber);
+    List<TimeSheet> findTimeSheetByEmployeeIdAndYearAndWeekNumber(Long employeeId, int year, int weekNumber);
 
     List<TimeSheet> findTimeSheetByEmployeeIdAndYearAndWeekNumberAndStatusOrderByTaskCardsAsc(Long employeeId, int year, int weekNumber,TimeSheetStatus status);
 
@@ -42,7 +42,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheet, Long> {
 
     Set<TimeSheet> findAllByStatusAndFromDateBefore(TimeSheetStatus status, Date date);
 
-    Set<TimeSheet> findAllByStatusAndFromDateLessThanEqualAndEmployeeId(TimeSheetStatus status, Date date, Long employeeId);
+    Set<TimeSheet> findAllByStatusAndFromDateLessThanAndEmployeeId(TimeSheetStatus status, Date date, Long employeeId);
 
 
 }

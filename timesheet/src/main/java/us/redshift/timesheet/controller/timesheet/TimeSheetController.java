@@ -9,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import us.redshift.timesheet.assembler.TimeSheetAssembler;
 import us.redshift.timesheet.assembler.TimeSheetCloneAssembler;
+import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.timesheet.TimeSheet;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.timesheet.TimeSheetDto;
 import us.redshift.timesheet.dto.timesheet.TimesheetCloneDto;
 import us.redshift.timesheet.service.timesheet.ITimeSheetService;
+import us.redshift.timesheet.util.ListWrapper;
 
 import javax.validation.Valid;
 import java.text.ParseException;
@@ -43,13 +45,21 @@ public class TimeSheetController {
 
 
     @PutMapping("timesheet/update")
-    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody List<TimeSheetDto> timeSheetListDto,
+    public ResponseEntity<?> updateTimeSheet(@Valid @RequestBody ListWrapper<TimeSheetDto> timeSheetListWrapperDto,
                                              @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
-
+        List<TimeSheetDto> timeSheetListDto=timeSheetListWrapperDto.getList();
         List<TimeSheet> savedTimeSheet=new ArrayList<>();
         for ( TimeSheetDto timeSheetDto:timeSheetListDto ) {
             TimeSheet timeSheet=timeSheetAssembler.convertToEntity(timeSheetDto);
-            savedTimeSheet.add(timeSheetService.updateTimeSheet(timeSheet, TimeSheetStatus.get(status.toUpperCase())));
+            if(timeSheetDto.getStatus().equals(TimeSheetStatus.PENDING)||timeSheetDto.getStatus().equals(TimeSheetStatus.REJECTED)){
+                savedTimeSheet.add(timeSheetService.updateTimeSheet(timeSheet, TimeSheetStatus.get(status.toUpperCase())));
+            }
+            else
+            {
+                savedTimeSheet.add(timeSheet);
+            }
+
+
         }
 
 

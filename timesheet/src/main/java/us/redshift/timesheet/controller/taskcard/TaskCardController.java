@@ -13,6 +13,7 @@ import us.redshift.timesheet.domain.taskcard.TaskCard;
 import us.redshift.timesheet.domain.timesheet.TimeSheetStatus;
 import us.redshift.timesheet.dto.taskcard.TaskCardDto;
 import us.redshift.timesheet.service.taskcard.ITaskCardService;
+import us.redshift.timesheet.util.ListWrapper;
 
 import javax.validation.Valid;
 import java.text.ParseException;
@@ -39,9 +40,10 @@ public class TaskCardController {
 
 
     @PutMapping("taskcard/update")
-    public ResponseEntity<?> updateTaskCard(@Valid @RequestBody List<TaskCardDto> taskCardDtoList,
+    public ResponseEntity<?> updateTaskCard(@Valid @RequestBody ListWrapper<TaskCardDto> taskCardDtoList,
                                             @RequestParam(value = "status", defaultValue = "PENDING") String status) throws ParseException {
-        List<TaskCard> taskCardList = taskCardAssembler.convertToEntity(taskCardDtoList);
+        List<TaskCardDto> tcl=taskCardDtoList.getList();
+        List<TaskCard> taskCardList = taskCardAssembler.convertToEntity(tcl);
         List<TaskCard> saveTaskCardList = taskCardService.updateTaskCard(taskCardList, TimeSheetStatus.get(status.toUpperCase()));
         return new ResponseEntity<>(taskCardAssembler.convertToDto(saveTaskCardList), HttpStatus.OK);
     }
@@ -74,6 +76,7 @@ public class TaskCardController {
 
     @DeleteMapping("taskcard/delete/{id}")
     public ResponseEntity<Void> deleteTaskCard(@PathVariable Long id) {
+
         taskCardService.deleteTaskCardById(id);
         return ResponseEntity.noContent().build();
     }
