@@ -38,13 +38,13 @@ public class JwtTokenProvider {
     public String generateToken(Authentication authentication) {
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        User user=userService.loadUserByEmployeeId(userPrincipal.getEmployyeId());
-        ClaimsDto claimsDto=mapper.map(user,ClaimsDto.class);
+        User user = userService.loadUserByEmployeeId(userPrincipal.getEmployyeId());
+        ClaimsDto claimsDto = mapper.map(user, ClaimsDto.class);
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .claim("employeeId",user.getEmployeeId())
+                .claim("employeeId", user.getEmployeeId())
                 //.claim("details",claimsDto)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
@@ -67,11 +67,11 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 //        User user=mapper.map(claims.get("details"), User.class);
-        return Long.parseLong(claims.get("employeeId").toString() );
+        return Long.parseLong(claims.get("employeeId").toString());
 
     }
 
-    public boolean validateToken(String authToken) throws CustomException{
+    public boolean validateToken(String authToken) throws CustomException {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;

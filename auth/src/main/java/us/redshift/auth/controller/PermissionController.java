@@ -18,14 +18,14 @@ public class PermissionController {
     IPermissionService permissionService;
 
     @PostMapping("save")
-    public ResponseEntity<?> createPermission(@RequestBody Set<Permission> permission){
+    public ResponseEntity<?> createPermission(@RequestBody Set<Permission> permission) {
 
         return new ResponseEntity<>(permissionService.createPermissionByList(permission), HttpStatus.CREATED);
 
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getPermission(){
+    public ResponseEntity<?> getPermission() {
 
         return new ResponseEntity<>(permissionService.getAllPermission(), HttpStatus.OK);
 

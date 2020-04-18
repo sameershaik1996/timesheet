@@ -17,7 +17,7 @@ public class AuditorAwareImpl implements AuditorAware<String> {
     public Optional<String> getCurrentAuditor() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
-        User user=(User)request.getAttribute("userDetails");
+        User user = (User) request.getAttribute("userDetails");
         return Optional.of(user.getUserName());
     }
 

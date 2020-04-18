@@ -16,9 +16,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import us.redshift.auth.security.*;
+import us.redshift.auth.security.CustomUserDetailsService;
+import us.redshift.auth.security.JwtAuthenticationEntryPoint;
+import us.redshift.auth.security.JwtAuthenticationFilter;
+import us.redshift.auth.security.JwtGrantFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -31,16 +32,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     CustomUserDetailsService customUserDetailsService;
-
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
-
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -112,7 +110,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterAfter(jwtGrantFilter(), JwtAuthenticationFilter.class);
         //http.addFilterBefore(new ExceptionHandlerFilter(), LogoutFilter.class);
     }
-
 
 
 }

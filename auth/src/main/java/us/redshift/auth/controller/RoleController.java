@@ -19,29 +19,30 @@ public class RoleController {
 
     @Autowired
     IRoleService roleService;
+
     @PostMapping("assignpermission")
-    public ResponseEntity<?> assignPermissionForRole(@RequestBody List<Role> role){
+    public ResponseEntity<?> assignPermissionForRole(@RequestBody List<Role> role) {
 
         return new ResponseEntity<>(roleRepository.saveAll(role), HttpStatus.CREATED);
 
     }
 
     @PostMapping("save")
-    public ResponseEntity<?> craeteRole(@RequestBody Role role){
+    public ResponseEntity<?> craeteRole(@RequestBody Role role) {
 
         return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
 
     }
 
     @PutMapping("update")
-    public ResponseEntity<?> updateRole(@RequestBody Role role){
+    public ResponseEntity<?> updateRole(@RequestBody Role role) {
 
         return new ResponseEntity<>(roleService.updateRole(role), HttpStatus.CREATED);
 
     }
 
     @GetMapping("get")
-    public ResponseEntity<?> getRole(){
+    public ResponseEntity<?> getRole() {
 
         return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
 

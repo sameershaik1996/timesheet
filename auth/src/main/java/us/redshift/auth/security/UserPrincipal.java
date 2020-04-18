@@ -26,7 +26,6 @@ public class UserPrincipal implements UserDetails {
     private Long id;
 
 
-
     private String username;
 
     private Long employeeId;
@@ -40,9 +39,9 @@ public class UserPrincipal implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(Long id, Long employeeId,String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, Long employeeId, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.employeeId=employeeId;
+        this.employeeId = employeeId;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -70,11 +69,13 @@ public class UserPrincipal implements UserDetails {
                 authorities
         );
     }
+
     private static Collection<? extends GrantedAuthority> getAuthorities(
             Collection<Role> roles) {
 
         return getGrantedAuthorities(getPrivileges(roles));
     }
+
     private static List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (String privilege : privileges) {
@@ -99,7 +100,6 @@ public class UserPrincipal implements UserDetails {
     public Long getId() {
         return id;
     }
-
 
 
     public String getEmail() {
@@ -145,7 +145,6 @@ public class UserPrincipal implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 
     @Override

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name="auth_permissions")
+@Table(name = "auth_permissions")
 public class Permission implements Serializable {
 
     @Id
@@ -21,7 +21,7 @@ public class Permission implements Serializable {
 
 
     @NaturalId
-    @Column(length = 60,unique = true)
+    @Column(length = 60, unique = true)
     private String name;
 
 

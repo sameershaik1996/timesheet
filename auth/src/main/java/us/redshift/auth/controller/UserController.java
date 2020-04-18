@@ -24,7 +24,6 @@ import us.redshift.auth.security.JwtTokenProvider;
 import us.redshift.auth.security.UserPrincipal;
 import us.redshift.auth.service.IUserService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,18 +41,17 @@ public class UserController {
     @Autowired
     RoleRepository roleRepository;
 
-   @Autowired
+    @Autowired
     ModelMapper modelMapper;
 
     @Autowired
     private IUserService userService;
 
     @PostMapping("save")
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user, @RequestParam(value = "roleId",required = false)Long roleId,@RequestParam(required = false)Boolean status)
-    {
-        if(user.getRole()==null){
-            Role role=new Role();
-            Long id=new Long(roleId);
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, @RequestParam(value = "roleId", required = false) Long roleId, @RequestParam(required = false) Boolean status) {
+        if (user.getRole() == null) {
+            Role role = new Role();
+            Long id = new Long(roleId);
             role.setId(id);
             user.setRole(role);
             user.setStatus(status);
@@ -62,27 +60,24 @@ public class UserController {
     }
 
     @PutMapping("update")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody User user)
-    {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
 
         return new ResponseEntity<>(userService.updateUser(user), HttpStatus.CREATED);
     }
 
 
     @PutMapping("update/status")
-    public ResponseEntity<?> updateUserStatus(@RequestParam(value = "empId")List<Long> empIds,
-                                              @RequestParam(value = "status")Boolean status)
-    {
+    public ResponseEntity<?> updateUserStatus(@RequestParam(value = "empId") List<Long> empIds,
+                                              @RequestParam(value = "status") Boolean status) {
 
-            return new ResponseEntity<>(userService.updateUserStatus(empIds,status), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.updateUserStatus(empIds, status), HttpStatus.CREATED);
 
 
     }
 
     @PutMapping("/update/role/{employeeId}")
-    public ResponseEntity<?> updateUsersRole(@PathVariable Long employeeId,@RequestParam(value = "status")Boolean status,@RequestBody Role role)
-    {
-        User currentUser=userService.loadUserByEmployeeId(employeeId);
+    public ResponseEntity<?> updateUsersRole(@PathVariable Long employeeId, @RequestParam(value = "status") Boolean status, @RequestBody Role role) {
+        User currentUser = userService.loadUserByEmployeeId(employeeId);
         currentUser.setRole(role);
         currentUser.setStatus(status);
         //System.out.println(employeeId+" "+status+" "+currentUser.getPassword());
@@ -90,64 +85,56 @@ public class UserController {
     }
 
     @GetMapping("get/{employeeId}")
-    public ResponseEntity<?> getUserByEmpId( @PathVariable Long employeeId)
-    {
-        UserDto userDto=modelMapper.map(userService.loadUserByEmployeeId(employeeId),UserDto.class);
+    public ResponseEntity<?> getUserByEmpId(@PathVariable Long employeeId) {
+        UserDto userDto = modelMapper.map(userService.loadUserByEmployeeId(employeeId), UserDto.class);
         //System.out.println(employeeId+" "+" "+userService.loadUserByEmployeeId(employeeId).getPassword());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
 
-
     @GetMapping("get")
-    public ResponseEntity<?> getUserByRole( @RequestParam(value = "roleName",required = false) String roleName)
-    {
-        List<UserDto> userDto=new ArrayList<>();
-        if(roleName!=null) {
-             Role role= roleRepository.findByName(RoleName.get(roleName.toUpperCase()));
-             if(role!=null)
-                userService.findUserByRole(role).forEach(user -> userDto.add(modelMapper.map(user,UserDto.class)));
-             else
-                 return new ResponseEntity<>(new BadRequestException("Role doesn't exist"), HttpStatus.BAD_REQUEST);
-        }
-        else
-        {
-            userService.findAllUsers().forEach(user -> userDto.add(modelMapper.map(user,UserDto.class)));
+    public ResponseEntity<?> getUserByRole(@RequestParam(value = "roleName", required = false) String roleName) {
+        List<UserDto> userDto = new ArrayList<>();
+        if (roleName != null) {
+            Role role = roleRepository.findByName(RoleName.get(roleName.toUpperCase()));
+            if (role != null)
+                userService.findUserByRole(role).forEach(user -> userDto.add(modelMapper.map(user, UserDto.class)));
+            else
+                return new ResponseEntity<>(new BadRequestException("Role doesn't exist"), HttpStatus.BAD_REQUEST);
+        } else {
+            userService.findAllUsers().forEach(user -> userDto.add(modelMapper.map(user, UserDto.class)));
         }
 
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
     @PostMapping("login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginDto login)throws BadCredentialsException
-    {
-        int status=userService.checkIfUserIsActive(login.getUserNameOrEmail());
-        if(status!=1){
-            return new ResponseEntity<>(new ApiError(HttpStatus.BAD_REQUEST,"You are in-active please contact admin for access"),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginDto login) throws BadCredentialsException {
+        int status = userService.checkIfUserIsActive(login.getUserNameOrEmail());
+        if (status != 1) {
+            return new ResponseEntity<>(new ApiError(HttpStatus.BAD_REQUEST, "You are in-active please contact admin for access"), HttpStatus.BAD_REQUEST);
         }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        login.getUserNameOrEmail(),login.getPassword()
+                        login.getUserNameOrEmail(), login.getPassword()
                 )
         );
 
 
         String jwt = tokenProvider.generateToken(authentication);
-            return new ResponseEntity<>(new JwtAuthenticationResponse(jwt),HttpStatus.OK);
+        return new ResponseEntity<>(new JwtAuthenticationResponse(jwt), HttpStatus.OK);
     }
 
 
-       // return jwt;
-
+    // return jwt;
 
 
     @GetMapping("validatetoken")
-    public ResponseEntity<?> validateToken(@CurrentUser UserPrincipal userPrincipal)
-    {
-            Long employeeId = userPrincipal.getEmployyeId();
-            //System.out.println("validate:"+employeeId);
-            UserDto userDto = modelMapper.map(userService.loadUserByEmployeeId(employeeId), UserDto.class);
-            return ResponseEntity.ok(userDto);
+    public ResponseEntity<?> validateToken(@CurrentUser UserPrincipal userPrincipal) {
+        Long employeeId = userPrincipal.getEmployyeId();
+        //System.out.println("validate:"+employeeId);
+        UserDto userDto = modelMapper.map(userService.loadUserByEmployeeId(employeeId), UserDto.class);
+        return ResponseEntity.ok(userDto);
 
         // return jwt;
     }

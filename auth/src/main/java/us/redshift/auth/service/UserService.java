@@ -49,7 +49,7 @@ public class UserService implements IUserService {
     public Object authenticateUser(LoginDto login) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        login.getUserNameOrEmail(),login.getPassword()
+                        login.getUserNameOrEmail(), login.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -77,8 +77,8 @@ public class UserService implements IUserService {
 
     @Override
     public int checkIfUserIsActive(String userNameOrEmail) {
-        Optional<User> user=userRepository.findByUserNameOrEmail(userNameOrEmail,userNameOrEmail);
-        if(user.get().getStatus()==true){
+        Optional<User> user = userRepository.findByUserNameOrEmail(userNameOrEmail, userNameOrEmail);
+        if (user.get().getStatus() == true) {
             return 1;
         }
         return 0;
@@ -86,7 +86,7 @@ public class UserService implements IUserService {
 
     @Override
     public int updateUserStatus(List<Long> empIds, Boolean status) {
-        return userRepository.setUserStatus(empIds,status);
+        return userRepository.setUserStatus(empIds, status);
     }
 
     @Override

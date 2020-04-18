@@ -27,44 +27,44 @@ import java.io.Serializable;
 })
 public class User extends BaseEntity implements Serializable {
 
-        @NotBlank
-        @Size(max = 15)
-        @Column(unique = true)
-        @JsonProperty("username")
-        private String userName;
+    @NotBlank
+    @Size(max = 15)
+    @Column(unique = true)
+    @JsonProperty("username")
+    private String userName;
 
-        @NaturalId(mutable = false)
-        @NotBlank
-        @Size(max = 40)
-        @Email
-        @Column(unique = true)
-        private String email;
+    @NaturalId(mutable = false)
+    @NotBlank
+    @Size(max = 40)
+    @Email
+    @Column(unique = true)
+    private String email;
 
-        @NotNull
-        @JsonProperty("employee_id")
-        @Column(unique = true)
-        @NaturalId
-        private Long employeeId;
+    @NotNull
+    @JsonProperty("employee_id")
+    @Column(unique = true)
+    @NaturalId
+    private Long employeeId;
 
-        @NotBlank
-        @JsonIgnoreProperties(allowGetters = false,allowSetters = true)
-        @Size(max = 100)
-        private String password;
+    @NotBlank
+    @JsonIgnoreProperties(allowGetters = false, allowSetters = true)
+    @Size(max = 100)
+    private String password;
 
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name="role_id")
-        private Role role;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
-        private Boolean status=Boolean.TRUE;
+    private Boolean status = Boolean.TRUE;
 
-        @Override
-        public String toString() {
-                return "User{" +
-                        "userName='" + userName + '\'' +
-                        ", email='" + email + '\'' +
-                        ", employeeId=" + employeeId +
-                        ", password='" + password + '\'' +
-                        ", roles=" + role +
-                        '}';
-        }
+    @Override
+    public String toString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", employeeId=" + employeeId +
+                ", password='" + password + '\'' +
+                ", roles=" + role +
+                '}';
+    }
 }

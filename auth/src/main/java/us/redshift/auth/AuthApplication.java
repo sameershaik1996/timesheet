@@ -18,24 +18,23 @@ import java.util.TimeZone;
 @EnableJpaAuditing
 public class AuthApplication {
 
-	@Value( "${spring.jackson.time-zone}" )
-	private String timeZone;
-	@PostConstruct
-	void init() {
-		TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
-	}
+    @Value("${spring.jackson.time-zone}")
+    private String timeZone;
 
+    public static void main(String[] args) {
+        SpringApplication.run(AuthApplication.class, args);
+    }
 
+    @PostConstruct
+    void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
+    }
 
-	@Bean
-	public ModelMapper modelMapper() {
-		ModelMapper mapper=new ModelMapper();
-		mapper.typeMap(User.class,User.class).setPropertyCondition(Conditions.isNotNull());
-		return mapper;
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(AuthApplication.class, args);
-	}
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper mapper = new ModelMapper();
+        mapper.typeMap(User.class, User.class).setPropertyCondition(Conditions.isNotNull());
+        return mapper;
+    }
 
 }

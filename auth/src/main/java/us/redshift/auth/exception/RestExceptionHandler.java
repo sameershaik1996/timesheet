@@ -153,7 +153,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value
             = {DataIntegrityViolationException.class, SQLIntegrityConstraintViolationException.class})
     protected ResponseEntity<?> handleConflict(RuntimeException ex, WebRequest request) {
-        ApiError apiError=new ApiError(HttpStatus.CONFLICT,ex.getCause().getCause().getLocalizedMessage(), ex);
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getCause().getCause().getLocalizedMessage(), ex);
 
 
         return buildResponseEntity(apiError);
@@ -161,17 +161,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<?> handleCustomException(CustomException ex, WebRequest request) {
-        ApiError apiError=new ApiError(HttpStatus.UNAUTHORIZED,ex.getMessage(), ex);
+        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, ex.getMessage(), ex);
 
 
         return buildResponseEntity(apiError);
     }
-    @ExceptionHandler({ Exception.class })
+
+    @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiError apiError = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), ex);
         return buildResponseEntity(apiError);
     }
+
     @ExceptionHandler(HttpClientErrorException.class)
     protected ResponseEntity<Object> handleHttpClientErrorException(HttpClientErrorException ex,
                                                                     WebRequest request) {

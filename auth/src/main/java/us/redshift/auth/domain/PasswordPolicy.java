@@ -10,14 +10,14 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name="auth_password_policy")
+@Table(name = "auth_password_policy")
 public class PasswordPolicy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 60,unique = true)
+    @Column(length = 60, unique = true)
     private String pattern;
 
     @Column(length = 60)

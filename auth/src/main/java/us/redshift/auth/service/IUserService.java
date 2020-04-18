@@ -7,7 +7,7 @@ import us.redshift.auth.dto.LoginDto;
 import java.util.List;
 
 public interface IUserService {
-     User createUser(User user);
+    User createUser(User user);
 
     User loadUserByEmployeeId(Long id);
 

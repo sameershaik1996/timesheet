@@ -57,18 +57,21 @@ public class ApiError {
         this.message = message;
         this.debugMessage = ex.getLocalizedMessage();
     }
-   public  ApiError(HttpStatus status, String message) {
+
+    public ApiError(HttpStatus status, String message) {
         this();
         this.status = status;
         this.message = message;
 
     }
+
     private void addSubError(ApiSubError subError) {
         if (subErrors == null) {
             subErrors = new ArrayList<>();
         }
         subErrors.add(subError);
     }
+
     public String convertToJson() throws JsonProcessingException {
         if (this == null) {
             return null;
@@ -79,6 +82,7 @@ public class ApiError {
 
         return mapper.writeValueAsString(this);
     }
+
     private void addValidationError(String object, String field, Object rejectedValue, String message) {
         addSubError(new ApiValidationError(object, field, rejectedValue, message));
     }

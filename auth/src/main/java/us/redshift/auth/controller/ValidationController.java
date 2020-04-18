@@ -25,32 +25,29 @@ public class ValidationController {
     private UserRepository userRepository;
 
     @GetMapping("usernameexists/{username}")
-    public ResponseEntity<?> checkIfUserNameExists(@PathVariable String username )
-    {
+    public ResponseEntity<?> checkIfUserNameExists(@PathVariable String username) {
         return new ResponseEntity<>(userRepository.existsByUserName(username), HttpStatus.OK);
 
     }
 
 
     @GetMapping("passwordpolicy/{password}")
-    public ResponseEntity<?> checkPassword(@PathVariable String password )
-    {
-        PasswordPolicy res=new PasswordPolicy();
+    public ResponseEntity<?> checkPassword(@PathVariable String password) {
+        PasswordPolicy res = new PasswordPolicy();
         Pattern pattern;
         Matcher matcher;
-        int flag=1;
-        List<PasswordPolicy> pp=passwordPolicyRepository.findAll();
-        for (PasswordPolicy p:pp) {
+        int flag = 1;
+        List<PasswordPolicy> pp = passwordPolicyRepository.findAll();
+        for (PasswordPolicy p : pp) {
             pattern = Pattern.compile(p.getPattern());
             matcher = pattern.matcher(password);
-            if( !matcher.matches())
-            {
-                res=p;
-                flag=1;
+            if (!matcher.matches()) {
+                res = p;
+                flag = 1;
                 break;
             }
         }
-        if(flag==1)
+        if (flag == 1)
             return new ResponseEntity<>(res.getMessage(), HttpStatus.OK);
         else
             return new ResponseEntity<>(true, HttpStatus.OK);

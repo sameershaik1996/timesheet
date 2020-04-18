@@ -3,8 +3,8 @@ package us.redshift.auth.domain;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum  RoleName {
-    ADMIN("ADMIN"),EMPLOYEE("EMPLOYEE"), MANAGER("MANAGER"), PM("PM");
+public enum RoleName {
+    ADMIN("ADMIN"), EMPLOYEE("EMPLOYEE"), MANAGER("MANAGER"), PM("PM");
 
 
     private static final Map<String, RoleName> lookup = new HashMap<>();
@@ -39,4 +39,4 @@ public enum  RoleName {
     }
 
 
-    }
+}

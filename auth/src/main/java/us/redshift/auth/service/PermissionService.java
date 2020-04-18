@@ -12,6 +12,7 @@ import java.util.Set;
 public class PermissionService implements IPermissionService {
     @Autowired
     PermissionRepository permissionRepository;
+
     @Override
     public List<Permission> createPermissionByList(Set<Permission> permission) {
         return permissionRepository.saveAll(permission);

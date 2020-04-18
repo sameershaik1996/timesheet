@@ -7,5 +7,6 @@ import java.util.Set;
 
 public interface IPermissionService {
     List<Permission> createPermissionByList(Set<Permission> permission);
+
     List<Permission> getAllPermission();
 }

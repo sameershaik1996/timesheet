@@ -26,15 +26,13 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @NaturalId
-    @Column(length = 60,unique = true)
+    @Column(length = 60, unique = true)
     private RoleName name;
 
 
-
-
     @JsonIgnore
-    @OneToMany(mappedBy="role")
-    private Set<User> users=new HashSet<>();
+    @OneToMany(mappedBy = "role")
+    private Set<User> users = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = "permissions")
@@ -42,7 +40,6 @@ public class Role {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private Set<Permission> permissions = new HashSet<>();
-
 
 
 }

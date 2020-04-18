@@ -1,7 +1,5 @@
 package us.redshift.auth.exception;
 
-import org.omg.SendingContext.RunTime;
-
 public class CustomException extends RuntimeException {
     public CustomException() {
     }
